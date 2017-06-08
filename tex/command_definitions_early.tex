@@ -1,0 +1,300 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Allows to align the headings of the numbered structure levels to the text using 
+% \settoggle{alignheadings}{true} OR \toggletrue{alignheadings}:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\usepackage{etoolbox}
+
+\newtoggle{alignheadings}
+
+\renewcommand*{\chapterformat}{%
+	\iftoggle{alignheadings}{%
+		\IfChapterUsesPrefixLine{%
+			\chapapp~\thechapter\autodot\enskip%
+		}{%
+			\makebox[0pt][r]{\thechapter\autodot\enskip}%
+		}%
+	}{%
+		\mbox{\chapappifchapterprefix{\nobreakspace}\thechapter \autodot\IfUsePrefixLine{}{\enskip}}%
+	}%
+}
+
+\renewcommand*{\sectionformat}{%
+	\iftoggle{alignheadings}{%
+		\makebox[0pt][r]{\thesection\autodot\enskip}%
+	}{%
+		\thesection\autodot\enskip%
+	}%
+}
+	
+\renewcommand*{\subsectionformat}{%
+	\iftoggle{alignheadings}{%
+		\makebox[0pt][r]{\thesubsection\autodot\enskip}%
+	}{%
+		\thesubsection\autodot\enskip%
+	}%
+}
+	
+\renewcommand*{\subsubsectionformat}{%
+	\iftoggle{alignheadings}{%
+		\makebox[0pt][r]{\thesubsubsection\autodot\enskip}%
+	}{%
+		\thesubsubsection\autodot\enskip%
+	}%
+}
+	
+\renewcommand*{\paragraphformat}{%
+	\iftoggle{alignheadings}{%
+		\makebox[0pt][r]{\theparagraph\autodot\enskip}%
+	}{%
+		\theparagraph\autodot\enskip%
+	}%
+}
+	
+\renewcommand*{\subparagraphformat}{%
+	\iftoggle{alignheadings}{%
+		\makebox[0pt][r]{\thesubparagraph\autodot\enskip}%
+	}{%
+		\thesubparagraph\autodot\enskip%
+	}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Defines a toggle to switch between grayscale and colored output:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\usepackage{etoolbox}			% allows the usage of different 
+
+\newtoggle{bwmode}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Writes some text (i.e. "This page intentionally left blank.") on every blank page:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\usepackage{scrlayer}				% allows the creation of individual page styles
+
+\newcommand*{\blankpage}{%
+	\vspace*{\fill}%
+	\begin{center}%
+		\textcolor{gray}{This page intentionally left blank.}%
+	\end{center}%
+	\vspace{\fill}%
+}
+
+\DeclareNewLayer[
+    foreground,
+    textarea,
+    contents = \blankpage
+  ]{blankpage.fg}
+\DeclarePageStyleByLayers{blank}{blankpage.fg}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Redefines \thefootnote to use numbering starting from 0:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\newcounter{indianfoot}
+\newcommand{\useindianfootnotes}{
+	\renewcommand{\thefootnote}{%
+		\setcounter{indianfoot}{0}%
+		\addtocounter{indianfoot}{\value{footnote}}%
+		\arabic{indianfoot}}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Redefines \thempfootnote to use numbering starting from 1 (should be 0 but buggy):
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\newcounter{indianmpfoot}
+\newcommand{\useindianmpfootnotes}{
+	\renewcommand\thempfootnote{\arabic{mpfootnote}}
+%	\renewcommand{\thempfootnote}{%
+%		\setcounter{indianmpfoot}{0}%
+%		\addtocounter{indianmpfoot}{\value{mpfootnote}}%
+%		\arabic{indianmpfoot}}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Allows the highlighting of lines in lstlisting environments using the key: 
+%     linebackgroundcolor = {\btLstHL{line ranges}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\usepackage{listings}
+
+% Define backgroundcolor
+    \usepackage[
+        style=1,
+        skipbelow=\topskip,
+        skipabove=\topskip
+    ]{mdframed}
+
+    \definecolor{bggray}{rgb}{0.85, 0.85, 0.85}
+    \mdfsetup{
+        leftmargin = 20pt,
+        rightmargin = 20pt,
+        backgroundcolor = bggray,
+        middlelinecolor = black,
+        roundcorner = 15
+    }
+    \BeforeBeginEnvironment{lstlisting}{\begin{mdframed}\vskip-.5\baselineskip}
+    \AfterEndEnvironment{lstlisting}{\end{mdframed}}
+
+\makeatletter
+%
+% \btIfInRange{number}{range list}{TRUE}{FALSE}
+%
+% Test if int number <number> is element of a (comma separated) list of ranges
+% (such as: {1,3-5,7,10-12,14}) and processes <TRUE> or <FALSE> respectively
+%
+        \newcount\bt@rangea
+        \newcount\bt@rangeb
+
+        \newcommand\btIfInRange[2]{%
+            \global\let\bt@inrange\@secondoftwo%
+            \edef\bt@rangelist{#2}%
+            \foreach \range in \bt@rangelist {%
+                \afterassignment\bt@getrangeb%
+                \bt@rangea=0\range\relax%
+                \pgfmathtruncatemacro\result{ ( #1 >= \bt@rangea) && (#1 <= \bt@rangeb) }%
+                \ifnum\result=1\relax%
+                    \breakforeach%
+                    \global\let\bt@inrange\@firstoftwo%
+                \fi%
+            }%
+            \bt@inrange%
+        }
+
+        \newcommand\bt@getrangeb{%
+            \@ifnextchar\relax%
+            {\bt@rangeb=\bt@rangea}%
+            {\@getrangeb}%
+        }
+
+        \def\@getrangeb-#1\relax{%
+            \ifx\relax#1\relax%
+                \bt@rangeb=100000%   \maxdimen is too large for pgfmath
+            \else%
+                \bt@rangeb=#1\relax%
+            \fi%
+        }
+
+%
+% \btLstHL{range list}
+%
+    \definecolor{lsthighlight}{RGB}{217, 216, 255}
+        \newcommand{\btLstHL}[1]{%
+            \btIfInRange{\value{lstnumber}}{#1}%
+            {\color{lsthighlight}}%
+            {\def\lst@linebgrd}%
+        }%
+
+%
+% \btInputEmph[listing options]{range list}{file name}
+%
+        \newcommand{\btLstInputEmph}[3][\empty]{%
+            \lstset{%
+                linebackgroundcolor=\btLstHL{#2}%
+                \lstinputlisting{#3}%
+            }% \only
+        }
+
+% Patch line number key to call line background macro
+        \lst@Key{numbers}{none}{%
+            \def\lst@PlaceNumber{\lst@linebgrd}%
+            \lstKV@SwitchCases{#1}{%
+                none&\\%
+                left&\def\lst@PlaceNumber{\llap{\normalfont
+                \lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\lst@linebgrd}\\%
+                right&\def\lst@PlaceNumber{\rlap{\normalfont
+                \kern\linewidth \kern\lst@numbersep
+                \lst@numberstyle{\thelstnumber}}\lst@linebgrd}%
+            }{%
+                \PackageError{Listings}{Numbers #1 unknown}\@ehc%
+            }%
+        }
+
+% New keys
+        \lst@Key{linebackgroundcolor}{}{%
+            \def\lst@linebgrdcolor{#1}%
+        }
+        \lst@Key{linebackgroundsep}{0pt}{%
+            \def\lst@linebgrdsep{#1}%
+        }
+        \lst@Key{linebackgroundwidth}{\linewidth}{%
+            \def\lst@linebgrdwidth{#1}%
+        }
+        \lst@Key{linebackgroundheight}{\ht\strutbox}{%
+            \def\lst@linebgrdheight{#1}%
+        }
+        \lst@Key{linebackgrounddepth}{\dp\strutbox}{%
+            \def\lst@linebgrddepth{#1}%
+        }
+        \lst@Key{linebackgroundcmd}{\color@block}{%
+            \def\lst@linebgrdcmd{#1}%
+        }
+
+% Line Background macro
+        \newcommand{\lst@linebgrd}{%
+            \ifx\lst@linebgrdcolor\empty\else
+                \rlap{%
+                    \lst@basicstyle
+                    \color{-.}% By default use the opposite (`-`) of the current color (`.`) as background
+                    \lst@linebgrdcolor{%
+                        \kern-\dimexpr\lst@linebgrdsep\relax%
+                        \lst@linebgrdcmd{\lst@linebgrdwidth}{\lst@linebgrdheight}{\lst@linebgrddepth}%
+                    }%
+                }%
+            \fi
+        }
+
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Defines a key=value switch for lstlistings with matchrangestart=<true/false> that allows
+% the numbering following the linerange key=value settings:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\usepackage{listings}
+
+\makeatletter
+\lst@Key{matchrangestart}{false}{\lstKV@SetIf{#1}\lst@ifmatchrangestart}
+\def\lst@SkipToFirst{%
+    \lst@ifmatchrangestart\c@lstnumber=\numexpr-1+\lst@firstline\fi
+    \ifnum \lst@lineno<\lst@firstline
+        \def\lst@next{\lst@BeginDropInput\lst@Pmode
+        \lst@Let{13}\lst@MSkipToFirst
+        \lst@Let{10}\lst@MSkipToFirst}%
+        \expandafter\lst@next
+    \else
+        \expandafter\lst@BOLGobble
+    \fi}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Allows the writing of dates specified as \specificdate{YYYY}{MM}{DD}:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\newcommand{\specificdate}[3]{\setdate{#1}{#2}{#3} \datedate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Allows inline comments using \ignore{comment text}:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
+\newcommand{\ignore}[1]{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition

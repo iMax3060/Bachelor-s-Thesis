@@ -1,0 +1,312 @@
+\documentclass[final]{scrreprt}	% setting of the document class; only the KOMA-Script classes are allowed here as this document uses many of those features
+
+\include{./tex/command_definitions_early}
+
+% Settings regarding the general paper format:
+\KOMAoptions{paper = A4}			% the paper size of the printout
+\KOMAoptions{paper = portrait}			% the orientation of the document
+\KOMAoptions{pagesize = auto}		% sets the page size of the compiled document (not for the calculation of the type area)
+\settoggle{bwmode}{false}				% enable/disable grayscale mode for the output (see ./tex/command_definitions.tex)
+
+%\KOMAoptions{draft} 				% for a draft with additional hints about warnings inside the compiled document
+
+% Settings regarding the type area:
+\KOMAoptions{twoside = true}			% enable/disable for two-sided printouts (with specific type area)
+\KOMAoptions{BCOR = 8.25mm}		% binding correction
+\KOMAoptions{DIV = calc}			% setting for the type area (calc uses automatic calculation)
+\KOMAoptions{twocolumn = false}		% enable/disable two-columned documents
+\KOMAoptions{headinclude = false}		% enable/disable that the header is part of the type area (instead of top margin) (if header is empty or nearly empty like only pagination)
+\KOMAoptions{footinclude = false}		% enable/disable that the footer is part of the type area (instead of bottom margin) (if footer is empty or nearly empty like only pagination)
+\KOMAoptions{mpinclude = false}		% enable/disable that marginal notes are part of the type area (instead of the margin) (increases the margin if enabled; shouldn't be enabled)
+% If mpinclude is enabled the following option controls if e.g. 50% of the width of the marginal notes should be part of the margin:
+% \setlength{\marginparwidth}{2\marginparwidth}
+% \setlength{\textwidth}{\textwidth - \marginparwidth}
+
+% Settings regarding the used fonts and typographical details:
+\KOMAoptions{fontsize = 11pt}			% the \normalsize font size
+\usepackage[utf8]{inputenc}			% character encoding of this .tex-file
+\usepackage[T1]{fontenc}				% character encoding within the compiled document
+\usepackage{libertine, libertinust1math}	% used font/fonts
+\usepackage{microtype}				% enables microtypography (can be further configured but the default mode is well)
+
+% Settings regarding the text alignment:
+\usepackage
+		[
+			newcommands,			% the commands \centering, \raggedleft, and \raggedright are redefined to work like \Centering, \RaggedLeft, and \RaggedRight
+			newparameters			% the commands \Centering, \RaggedLeft, and \RaggedRight don't behave like vanilla \centering, \raggedleft, and \raggedright 
+		]{ragged2e}				% offers new environments for ragged ( and justified) text alignment with many parameters that can be changed using \setlength 
+
+% Settings regarding the preliminaries:
+\KOMAoptions{titlepage = firstiscover}	% enable/disable that the title created using \maketitle is on an own page or activate an additional cover page using the value 'firstiscover'
+\KOMAoptions{abstract = true}			% enable/disable the creation of an abstract before the table of contents as specified in \begin{abstract} ... \end{abstract}
+%\raggedbottom					% Prevents the spread of paragraphs inside a page which is used to end a page on the same height
+\newcommand*\origfootnoterule{}
+\let\origfootnoterule\footnoterule
+\renewcommand*{\footnoterule}{\vskip 0pt plus .01fil\origfootnoterule}
+
+% Settings regarding the table of contents:
+\setcounter{tocdepth}{\subsectionnumdepth}	% set the lowest structure level of the entries inside the table of contents
+\KOMAoptions{toc = bib}					% adds the bibliography to the table of contents
+\KOMAoptions{toc = index}				% adds the index to the table of contents
+\KOMAoptions{toc = listof}					% adds the list of {figures, tables} to the table of contents (can be selected seperatly)
+\KOMAoptions{toc = chapterentrywithoutdots}	% the chapter entry isn't connected to its page number with dots (as it is with section entries)
+\PassOptionsToPackage{toc = bib}{biblatex}	% fixes toc = bib when using BibLaTex instead of BibTeX
+\KOMAoptions{toc = graduated}			% makes the table of contents hierarchic
+\KOMAoptions{toc = indenttextentries}		% indents unnumbered entries
+
+% Settings regarding the headers and footers:
+\KOMAoptions{headlines = 1.25}		% the height of the header in number of lines (increase e.g. for multiline headers)
+% \KOMAoptions{headheight = 1cm}		% the height of the header in some measure of length
+\KOMAoptions{footlines = 1.25}			% the height of the footer in number of lines (increase e.g. for multiline footers); might be incompatible with some packages
+% \KOMAoptions{footheight = 1cm}		% the height of the footer in some measure of length; might be incompatible with some packages
+\KOMAoptions{headsepline = false}		% enable/disable a line below the header (headsepline = true -> headinclude = true)
+\KOMAoptions{footsepline = false}		% enable/disable a line above the footer (footsepline = true -> footinclude = true
+\usepackage{scrlayer-scrpage}			% allows the creation of individual page styles
+\KOMAoptions{cleardoublepage = blank}	% select the page style for blank pages
+\automark[section]{chapter}			% select the content of \headmark for left and right pages
+\clearpairofpagestyles				% empties the plain and main page styles
+\ifoot[\pagemark]{\pagemark}			% sets the pagination in the inner (actually outer) field of the footer of the plain and main page styles
+\ihead[]{\headmark}					% sets the chapter/section title in the inner (actually outer) field of the header main page style
+
+% Settings regarding the structuring and headings:
+\KOMAoptions{open = any}					% select the page (any, left, right) to open a new chapter in two-sided documents
+\KOMAoptions{parskip = false}					% toggle between first line indent and paragraph distance (can be further specified)
+\KOMAoptions{headings = big}					% select the font size of the headings of the different structure levels
+\KOMAoptions{headings = optiontohead}			% select the usage of the short title of a disposition
+\setcounter{secnumdepth}{\subsubsectionnumdepth}% set the lowest structure level with a numbering
+\KOMAoptions{numbers = autoendperiod}			% enable/disable the usage of periods after the numbering of a chapter (auto mode enables option when there are numbers that aren't arabic numbers)
+\KOMAoptions{chapterprefix = false}				% enable/disable the usage of ``Chapter n\\ \chaptername'' instead of ``n \chaptername''
+\KOMAoptions{appendixprefix = true}			% enable/disable the usage of ``Appendix n\\ \chaptername'' instead of ``n \chaptername''
+\settoggle{alignheadings}{true}					% enable/disable the alignment of the headings of the numbered structure levels to the text (which results in putting the numbers in the margin)
+
+% Settings regarding the footnotes:
+\KOMAoptions{footnotes = multiple}				% enable/disable a separation of multiple consecutive footnotes
+\renewcommand*{\multfootsep}{,\nobreakspace}	% select the separater between multiple consecutive footnotes
+%\useindianfootnotes						% activates the usage of footnote numbering starting with zero - ATTENTION: Doesn't work at the moment!
+%\useindianmpfootnotes						% activates the usage of footnote numbering starting with zero within minipages - ATTENTION: Doesn't work at the moment!
+\deffootnote[1em]{1.5em}{1em}{%				% select the indentation of the first line of a footnote (footnote mark aligned right in this indentation), the indentation of the further lines and first line indent
+	\textsuperscript{\thefootnotemark}%			% specify the footnote mark inside the footnote
+}
+
+% Settings regarding the floats and captions:
+\KOMAoptions{captions = figuresignature}			% select if the caption of a figure should be printed as signature or heading (to put the caption below or above the content of the figure)
+\KOMAoptions{captions = tableheading}			% select if the caption of a table should be printed as signature or heading (to put the caption below or above the content of the table)
+\KOMAoptions{captions = oneline}				% select if single-line captions should be centered
+\KOMAoptions{captions = bottombeside}			% select where to put a caption created using ``captionsbeside'' vertically
+\KOMAoptions{captions = outerbeside}			% select where to put a caption created using ``captionsbeside'' horizontally (different for one-sided and two-sided documents)
+\setcapmargin{1em}							% select the left and right margin of a caption (different options can be used to set the left, right, inner or outer margin separately)
+\setcapindent{0.5em}						% select the indent of the second and further lines of a caption (alternatives are hanging caption or only have an indentation in the second line)
+\addtokomafont{caption}{\small\justifying}			% select the font of the captions
+\addtokomafont{captionlabel}{\bfseries}			% select the font of the caption label (in addition to the font of the caption)
+\KOMAoptions{listof = chaptergapsmall}			% select the highlighting of floats of different chapters in the lists of floats
+\KOMAoptions{listof = graduated}				% select the layout of the lists of floats
+\KOMAoptions{listof = indenttextentries}			% indents unnumbered floats in the lists of floats
+\usepackage{float}							% allows the definition of new types of floats
+\floatstyle{komaabove}						% every definition of a new type of floats will use this style (defined by KOMA-Script: komaabove, komabelow)
+\newfloat{code}{tbp}{code}[chapter]				% defines a new type of float ``code'' that gets numbered per chapter and that can be used with \begin{code} ... \end{code} and \listof{code}{List of Listings}
+\floatname{code}{Listing}						% the name of the float ``code'' that is printed in the caption is ``Listing''
+\newfloat{algorithm}{tbp}{algorithm}[chapter]		% defines a new type of float ``algorithm'' that gets numbered per chapter and that can be used with \begin{code} ... \end{code} and \listof{code}{List of Listings}
+\floatname{algorithm}{Algorithm}				% the name of the float ``algorithm'' that is printed in the caption is ``Algorithm''
+\usepackage{caption}						% used to split floats using \ContinuedFloat but has many more features
+
+% Settings regarding the used languages:
+\usepackage[main = english, ngerman]{babel}	% define the used languages (has influence on different things like hyphenation, date format and figure labels)
+\babeltags{eng = english, de = ngerman}		% allows to switch between the loaded languages by using the tags like \begin{<tag>} ... \end{<tag>} or \text<tag>{ ... }
+\usepackage[
+			detect-all]					% use the font settings of the surrounding text for numbers and units set with siunitx
+		{siunitx}						% allows the easy typesetting of numbers, units and combinations including lists and ranges
+\sisetup{
+	range-phrase = \text{--},				% select the phrase between upper and lower bounds of ranges (here: -)
+	binary-units = true,					% enable/disable loading of binary prefixes
+	per-mode = fraction,					% select how to display \per (symbol: uses exponents; fraction: uses fractions)
+	fraction-function = \sfrac}				% select the kind of fraction used in siunitx (e.g. frac, cfrac, rfrac, sfrac, ...)
+\DeclareSIUnit{\euro}{\text{\texteuro}}		% define the unit \euro using the €-symbol
+\DeclareSIUnit{\usdollar}{\text{US-\textdollar}}	% define the unit \usdollar using the US-$-symbol
+\DeclareSIUnit{\cy}{\text{Cyc.}}				% define the unit \cy used for Cycles using the abbreviation Cyc.
+\DeclareSIUnit\century{\text{century}}		% define the unit \century
+\DeclareSIUnit\year{\text{year}}				% define the unit \year
+\DeclareSIUnit\queries{\text{queries}}		% define the unit \queries
+\DeclareSIUnit\transactions{\text{transactions}}	% define the unit \transactions
+
+\usepackage{graphicx}				% allows including of graphics and the scaling and rotating of elements
+\usepackage{etoolbox}				% toolbox used by packages and classes
+\usepackage{xpatch}					% extends the patching facility of etoolbox
+\usepackage{csquotes}				% context sensitive quotation environment e.g. used by biblatex
+\usepackage{datenumber}				% allows to create a number from a date and especially it allows to create a specific date
+\usepackage{tabularx}				% a tabular* environment that can control the width of columns
+\usepackage{multirow}				% allows tabular cells spanning multiple rows
+\usepackage
+		[
+			usenames,			% allows the usage of the names of the 16 default colors
+			dvipsnames,			% allows the usage of the names of 64 additional colors
+			svgnames,			% allows the usage of the names of ca. 150 additional colors
+			x11names,			% allows the usage of the names of ca. 300 additional colors
+			table					% allows the coloring of whole tabular by changing the color before the definition of the tabular
+		]{xcolor}					% extended color facility
+\usepackage{blindtext}				% allows to easily add some dummy text (similar to lipsum)
+\usepackage{prelim2e}				% marks every page as being a preliminary version when this document is compiled as a draft
+
+\usepackage
+		[
+			style = alphabetic, 		% select the style of the citation and of the bibliography
+			backend = biber		% select the backend that processes the .bib file (run the selected backend instead of BibTeX)
+		]{biblatex}					% used to create the bibliography, more modern alternative to the standard BibTeX
+
+\addbibresource[datatype = bibtex]{./tex/references.bib}		% loads the specified bibliography file (in BibTeX format) into BibLaTeX
+\usepackage{breakcites}				% multiple citations within one \cite break at the end of the line
+\usepackage[]{hyperref}				% allows hyperlinks within the output document (hyperfootnotes = false to make it compatible with package footmisc)
+\usepackage{nameref}				% allows the usage of the command \nameref which prints the title of the referenced label instead of its number
+
+\usepackage{tikz}					% extremely powerful facility to create diagrams
+\usetikzlibrary{shapes.geometric, shapes.misc, shapes.callouts, shapes.multipart}			% provide several shapes besides the standard ones
+\usetikzlibrary{decorations.pathreplacing}	% allows decorated paths without having the original (undecorated) line
+\usetikzlibrary{patterns}				% allows the usage of several patterns to fill shapes
+\usetikzlibrary{positioning}				% defines additional options for placing nodes conventionally
+\usetikzlibrary{calc}					% allows extended coordinate calculation
+\usetikzlibrary{spy}					% allows the magnification of parts of a tikz diagram
+\usetikzlibrary{chains}				% allows the creation of chains of nodes
+\usepackage{pgfplots}				% allows the creation of plots to visualize data
+\usepackage{pgfplotstable}			% allows the loading of .csv-files for pgfplots
+\usepgflibrary{plotmarks}				% extends the available plot marks used e.g. for pgfplots
+\usepgfplotslibrary{fillbetween}			% allows the filling of areas between curves of pgfplots using colors or patterns
+\usepackage{ifthen}					% allows the usage of the \ifthenelse control structure and some boolean operations with it
+
+\pgfplotsset{compat = 1.14}
+
+\usepackage{xfrac}					% adds the \sfrac fraction mode
+\usepackage{rotating}				% allows different kinds of rotations for many kinds of elements
+\usepackage{stackengine}				% allows the stacking of elements like symbols
+\usepackage{bm}					% adds one way of bold math
+\usepackage{ulem}					% allows many kinds of text decorations like underlines or strikes
+\robustify\uline						% allows the usage of \uline together with typewriter fonts
+\normalem						% \emph uses italic fonts to emphasize text
+
+\usepackage{listings}				% allows the printing of source code
+% for a definition of the parameter 'matchrangestart' see ./tex/command_definitions.tex
+\usepackage{algpseudocode}			% allows the creation of pseudocode listings
+
+\nottoggle{bwmode}{
+	\definecolor{keyword}{RGB}{5,0,111}
+%	\definecolor{keyword2}{RGB}{0, 111, 109}
+%	\definecolor{keyword3}{RGB}{5,0,111}
+%	\definecolor{keyword4}{RGB}{80, 0, 201}
+%	\definecolor{keyword5}{RGB}{80, 0, 201}
+%	\definecolor{keyword6}{RGB}{22, 69, 33}
+	\definecolor{string}{RGB}{0,114,0}
+	\definecolor{comment}{RGB}{109,109,109}
+	\definecolor{listingsbackground}{RGB}{255, 255, 225}
+	\definecolor{listingsrulesep}{RGB}{205, 205, 205}
+	\definecolor{lsthighlight}{RGB}{217, 216, 255}			% used to highlight specific lines of a lstlisting
+	\definecolor{alert}{RGB}{244, 0, 68}
+}{
+	\definecolor{keyword}{RGB}{0,0,0}
+%	\definecolor{keyword2}{RGB}{0,0,0}
+%	\definecolor{keyword3}{RGB}{0,0,0}
+%	\definecolor{keyword4}{RGB}{0,0,0}
+%	\definecolor{keyword5}{RGB}{0,0,0}
+%	\definecolor{keyword6}{RGB}{0,0,0}
+	\definecolor{string}{RGB}{0,0,0}
+	\definecolor{comment}{RGB}{109,109,109}
+	\definecolor{listingsbackground}{RGB}{255, 255, 255}
+	\definecolor{listingsrulesep}{RGB}{205, 205, 205}
+	\definecolor{lsthighlight}{RGB}{205, 205, 205}			% used to highlight specific lines of a lstlisting
+	\definecolor{alert}{RGB}{0, 0, 0}
+}
+
+\lstdefinestyle{basic}{
+	basicstyle = \scriptsize \ttfamily,
+	keywordstyle = \color{keyword}\bfseries,
+%	keywordstyle=[2]\color{keyword2},
+%	keywordstyle=[3]\color{keyword3},
+%	keywordstyle=[4]\color{keyword4}\bfseries,
+%	keywordstyle=[5]\color{keyword5},
+%	keywordstyle=[6]\color{keyword6}\bfseries,
+	stringstyle = \color{string}\bfseries,
+	commentstyle = \color{comment},
+	morecomment = [l][\color{comment}]{\#},
+	breaklines = false,
+	showlines = true,
+	matchrangestart = true,
+	numbers = left,
+	numberstyle = \tiny,
+	stepnumber = 1,
+	numberblanklines = false,
+	numbersep = 10pt,
+	frame = shadowbox,
+	backgroundcolor = \color{listingsbackground},
+	rulesepcolor = \color{listingsrulesep},
+	inputencoding = utf8
+}
+
+\lstdefinestyle{inline}{
+	basicstyle = \scriptsize \ttfamily,
+	inputencoding = utf8
+}
+
+\lstset{
+	language = [ISO]C++,
+	style = inline,
+%	keywords = [2]{w_rc_t, bf_tree_m, generic_page, latch_mode_t, lsn_t, bf_tree_cb_t, sthread_t, btree_page_h, smlevel_0, fixable_page_h, GeneralRecordIds, std},
+%	keywords = [3]{PageID, bf_idx, bf_idx_pair, general_recordid_t},
+%	keywords = [4]{WAIT_IMMEDIATE, WAIT_FOREVER, LATCH_EX, LATCH_NL, INVALID, FOSTER_CHILD, stINUSE},
+%	keywords = [5]{_swizzled, _pid, _buffer, _evictioner, _hashtable, first, second, null, lsn, _pin_cnt, _enable_swizzling},
+%	keywords = [6]{W_DO, RC}
+}
+
+% Select the chapters (included files) for partial compilation of drafts (better than just commenting \include commands because of .aux-files); omit .tex file-ending here and in each of the \include commands:
+\includeonly{./tex/titlepage,./tex/abstract,./tex/acknowledgements,\ignore{}./tex/paper,./tex/performance,\ignore{}./tex/replacement,./tex/appendixCAR,./tex/appendixBufferPoolLog,./tex/tu_logo,./tex/command_definitions_early,./tex/command_definitions_late}
+
+\include{./tex/tu_logo}
+
+\include{./tex/command_definitions_late}
+
+\KOMAoptions{DIV = last}				% recalculation of the type area with regard to all the settings
+
+\begin{document}
+
+	\include{./tex/titlepage}
+			
+	% declaration of authorship
+	
+	\pagenumbering{Roman}
+
+	\include{./tex/abstract}
+	
+	\include{./tex/acknowledgements}
+	
+	\cleardoublepage
+	\tableofcontents 			% generates a table of contents
+	% \listoffigures 				% generates a list of all figures (use of the figure environment (or environment using the figure environment) with a \label)
+	% \listoftables 				% generates a list of all tables (use of the ? environment with a ?)
+	% \listof{code}{List of Listings}	% generates a list of all listings as defined using the float package
+	
+	\cleardoublepage
+	\pagenumbering{arabic}
+	
+	\include{./tex/paper}
+	
+	\include{./tex/performance}
+
+	\include{./tex/replacement}
+		
+	\appendix
+	
+	\include{./tex/appendixCAR}
+	
+	\include{./tex/appendixBufferPoolLog}
+	
+	% glossary
+	
+	\sloppy
+	
+	\printbibliography			% generates the bibliography
+				[	
+					env = bibliography,			% select the environment to control the layout of the bibliography
+					heading = bibliography,		% select the heading of the bibliography, alternatives can be defined using \defbibheading
+%					title = Bibliography,			% select the title of the bibliography
+%					prenote = prenote,			% select a note to be printed directly	after the heading of the bibliography defined by \defbibnote
+%					postnote = postnote,			% select a note to be printed directly	after the list of references of the bibliography defined by \defbibnote
+%					filter = bibfilter				% select a filter as defined in \defbibfilter
+				]
+		
+\end{document}

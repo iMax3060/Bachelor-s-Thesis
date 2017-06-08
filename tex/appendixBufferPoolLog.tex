@@ -1,0 +1,68 @@
+\chapter{\textls[-55]{Implementation of the Buffer Pool Log}} \label{ch:bufferpoollog}
+
+\begin{@empty}
+	\lstset{
+		language = [ISO]C++,
+		style = basic
+	}
+	\begin{code}[h]
+		\setlength{\fboxsep}{0pt}
+		\caption{Usage of the Buffer Pool Log (Added lines are \colorbox{lsthighlight}{highlighted})} \label{lst:logstatsexpl}
+		\lstinputlisting[linerange = {1-26}, linebackgroundcolor = {\btLstHL{6-11, 16-23}}]{./tex/code_snippets/bf_tree_m>>fix_nonroot.cpp}
+	\end{code}
+\end{@empty}
+
+\begin{@empty}
+	\lstset{
+		language = [ISO]C++,
+		style = basic
+	}
+	\begin{code}[h]
+		\caption{Interface Definition of the Class \lstinline{sm_stats_logstats_t}} \label{lst:logstatsdef}
+		\lstinputlisting[linerange = {1-46}]{./tex/code_snippets/sm_stats_logstats_t.h}
+	\end{code}
+\end{@empty}
+
+\begin{@empty}
+	\lstset{
+		language = [ISO]C++,
+		style = basic
+	}
+	\begin{code}[h]
+		\caption{Partial Implementation of the Class \lstinline{sm_stats_logstats_t}} \label{lst:logstatsimpl}
+		\lstinputlisting[linerange = {1-3, 38-59, 139-162, 187-191}]{./tex/code_snippets/sm_stats_logstats_t.cpp}
+	\end{code}
+\end{@empty}
+
+\begin{@empty}
+	\lstset{
+		language = [ISO]C++,
+		style = basic
+	}
+	\begin{code}[h]
+		\caption{Implementation of the Buffer Pool Log in the Class \lstinline{smthread_t} \textcolor{alert}{\textbf{(Only added code is shown!)}}} \label{lst:smthreadinsertion}
+		\lstinputlisting[linerange = {1-1, 4-4, 18-19, 38-43, 54-54, 63-68, 71-75, 159-163, 305-305}]{./tex/code_snippets/sthread_t.h}
+	\end{code}
+\end{@empty}
+	
+\begin{@empty}
+	\lstset{
+		language = [ISO]C++,
+		style = basic
+	}
+	\begin{code}[h]
+		\caption{Partial Macro Definition for the Buffer Pool Log} \label{lst:macrodef}
+		\lstinputlisting[linerange = {181-185, 206-211}]{./tex/code_snippets/sthread_t.h}
+	\end{code}
+\end{@empty}
+
+\begin{@empty}
+	\lstset{
+		language = [ISO]C++,
+		style = basic
+	}
+	\begin{code}[h]
+		\caption{Added Options to Set Up the Buffer Pool Log} \label{lst:logstatsopt}
+		\lstinputlisting[linerange = {1-1, 3-3, 210-218, 220-220}]{./tex/code_snippets/Command>>setupSMOptions.cpp}
+	\end{code}
+\end{@empty}

@@ -1,0 +1,19 @@
+\newenvironment{acknowledgements}
+	{
+		\renewcaptionname{english}{\abstractname}{Acknowledgements}
+		\renewcaptionname{ngerman}{\abstractname}{Danksagungen}
+		\begin{abstract}
+			\thispagestyle{plain}
+	}{
+		\end{abstract}
+	}
+
+\begin{acknowledgements}
+	Most of all, I want to give thanks to \emph{Caetano Sauer} who helped me throughout the whole creation process of this bachelor's thesis. I struggled so much to get Zero running in a reasonable way and he helped me with so many technical details which would have watered my benchmark results down. His patience is the reason why I managed to finish this thesis.
+	
+	I also want to thank \emph{Prof. Theo Härder} for proposing the topic of this thesis and who made all this possible. It's really inspiring to me to work with someone who generated so much new far-reaching knowledge while staying humble.
+	
+	A special thanks goes out to \emph{Goetz Graefe and his team at the HP Labs} who proposed the idea of pointer swizzling in the buffer pool in \cite{Graefe:2014}. This proposal was the starting point of my topic and I'm really glad that they came up with that technique.
+	
+	I want to thank \emph{Weiping Qu} for assigning me the paper ''In-memory performance for big data.`` when I participated in the seminar on ''Big Data`` during winter term 2015/16. He also initiated the contact between me and Prof. Theo Härder when he assigned him as my tutor for that seminar. The server administrator of the research group - \emph{Steffen Reithermann} - was a help when I had issues with the computer system that I used for the performance evaluation. I also want to thank all \emph{the people who worked on EXODUS, Shore, Shore-MT and Zero} most sincerely. The section about the history of this great testbed for new technologies is dedicated to those researchers. Most recently especially \emph{Caetano Sauer} and \emph{Lucas Lersch} maintained the software very well.
+\end{acknowledgements}

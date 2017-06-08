@@ -1,0 +1,126 @@
+\newcommand{\thickrule}{\rule{\linewidth}{1mm}}
+\newcommand{\thinrule}{\rule{\linewidth}{.25mm}}
+
+\newcommand{\university}{University of Kaiserslautern}											% the name of the university
+\newcommand{\universitylogo}{\scalebox{2}{\TULogoWithText}}										% the logo of the university (with name)
+\newcommand{\faculty}{Department of Computer Science}										% the faculty
+\newcommand{\chair}{Database and Information Systems Group}									% the chair
+\newcommand{\student}{Max Fabian Gilbert}													% the student's name
+\newcommand{\email}{m\_gilbert13@cs.uni-kl.de}												% the student's email address
+\newcommand{\doctype}{Bachelor's Thesis}													% the type of the thesis (e.g. Bachelor Thesis)
+\newcommand{\doctitle}{Evaluation of Pointer Swizzling Techniques for DBMS Buffer Management}			% the title of the work
+\newcommand{\issuedate}{\specificdate{2016}{9}{1}}												% the issue date of the thesis
+\newcommand{\releasedate}{\specificdate{2017}{3}{1}}											% the release date of the thesis											
+\newcommand{\advisor}{\begin{de}M. Sc. Caetano Sauer\end{de}}									% the advisor of the thesis	
+\newcommand{\reviewerfirst}{\begin{de}Prof. Dr.-Ing. Dr. h. c. Theo Härder\end{de}}						% the first reviewer of the thesis
+\newcommand{\reviewersecond}{\begin{de}M. Sc. Caetano Sauer\end{de}}							% the second reviewer of the thesis
+
+%\extratitle{
+%	\renewcommand*{\cite}[1]{}				% suppress citations in the extratitle
+%	\begin{center}
+%		\vspace{0.5cm}
+%		\huge \textbf{\university} \\
+%		\LARGE \textbf{\faculty} \\
+%		\Large \textbf{\chair}
+%	
+%		\protect{
+%			\vspace{1.5cm}
+%			\thickrule
+%			\vspace{0.5cm}
+%			\Huge \textbf{\doctype}
+%			
+%			\vspace{0.15cm}
+%			\thickrule
+%			\vspace{1.25cm}
+%		}
+%
+%		\vfill
+%
+%		\huge \textbf{\doctitle} \\
+%		\vspace{1cm}
+%		\large \textbf{by} \\
+%		\vspace{1cm}
+%		\LARGE \textbf{\student}
+%		
+%		\protect{
+%			\vspace{1.5cm}
+%			\thickrule
+%			\vspace{0.5cm}
+%			\huge \textbf{\today} 
+%			
+%			\vspace{0.15cm}
+%			\thickrule
+%			\vspace{0.5cm}
+%		}
+%		
+%		\vspace{0.5cm}
+%	\end{center}
+%}
+
+\titlehead{
+%	\vspace{-1.5cm}%
+	\begin{center}
+		\universitylogo \\
+		\vspace{1cm}%
+		\LARGE \faculty \\
+		\Large \chair%
+	\end{center}
+}
+
+\subject{
+	\textsf{\doctype:}
+	\vspace{-1.5cm}
+}
+
+\title{
+	\thinrule
+	\vspace{.5cm}
+	\begin{ptsans}
+		\vbox{
+		\doctitle
+		}
+	\end{ptsans}
+	\vspace{.5cm}
+	\thinrule
+}
+
+\author{
+	\vspace{-2cm}
+	\hfill \\
+	\protect{
+		by
+		\textbf{\student \thanks{\email}}
+	}
+}
+
+\date{
+	\setlength{\tabcolsep}{0pt}
+	\begin{flushleft}
+		\begin{tabular}{ll}
+			\textbf{Day of issue: } 	& \issuedate 	\\
+			\textbf{Day of release: } 	& \releasedate
+		\end{tabular}
+	\end{flushleft}
+	\setlength{\tabcolsep}{6pt}
+}
+
+\publishers{
+	\setlength{\tabcolsep}{0pt}
+	\begin{flushleft}
+		\begin{tabular}{ll}
+			\textbf{Advisor: } 			& \advisor			\\
+			\textbf{First Reviewer: } 		&  \reviewerfirst		\\
+			\textbf{Second Reviewer: } 	& \reviewersecond
+		\end{tabular}
+	\end{flushleft}
+	\setlength{\tabcolsep}{6pt}
+		
+}
+
+\begin{ptsans}
+	\renewcommand*{\thefootnote}{\fnsymbol{footnote}}		% fixes the usage of arabic numbers instead of symbols for footnotes in the further preliminaries when using extratitle
+	\thispagestyle{empty}
+	\KOMAoptions{DIV = 12}
+	\maketitle
+	\KOMAoptions{DIV = last}
+\end{ptsans}
