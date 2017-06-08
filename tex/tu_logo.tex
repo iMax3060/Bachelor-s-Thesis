@@ -12,14 +12,15 @@
 % The following new commands are tikzpicture-environments containing different logos of the University of Kaiserslautern. They are taken from logos published on their website.
 % It defines the following commands: \TULogo, \TULogoWithText, \CSLogo
 
-% The logo of the University of Kaiserslautern:
+% The logo of the University of Kaiserslautern ():
 % Taken from: http://www.uni-kl.de/fileadmin/prum/tupublic/TU_Logo_ohne_Feld/TUKL_LOGO_4C.svg on the 2016-12-14
 % Manipulated using: Inkscape (https://inkscape.org/)
 % Converted to TikZ using: svg2tikz (https://github.com/kjellmf/svg2tikz) as an Inkscape extension
-\newcommand{\TULogo}{
+\newcommand{\TULogo}[1][1]{
 	\begin{tikzpicture}[
 		y = 5pt,
-		x = 5pt
+		x = 5pt,
+		opacity = #1
 	]
 		% Top part:
 		\path[fill = TUblue] (2.898, 23.855) -- (2.898, 20.561) -- (24.299, 20.561)  -- (24.299, 24.034) -- (13.541, 27.197) -- cycle;
