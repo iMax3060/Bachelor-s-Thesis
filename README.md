@@ -1,0 +1,11 @@
+# Evaluation of Pointer Swizzling Techniques for DBMS Buffer Management
+
+## Abstract
+
+Pointer swizzling is a well-known technique used to improve the performance of dereferencing pointers between persistent objects while they reside in main memory. The pointer between persistent objects usually uses an address used to locate the referenced object on non-volatile storage. This requires a translation of the persistent address to a memory address during each dereferencing of the pointer even when both objects are cached in main memory. With pointer swizzling, the translation needs to be done only once because the pointer in the transient copy of the objects will be replaced with the memory address to safe the cost of future address translations. This replacement is only done inside the transient copies of the objects as those main memory addresses will be invalid when the referenced object gets evicted.
+	
+Pages in the buffer pool of a DBMS are persistent objects that are cached in main memory and typical index structures like B-trees use pointers between those pages to build a tree structure of such pages to allow the fast location of records. Multiple page pointers needs to be dereferenced during each operation on the index structure. Therefore Goetz Graefe et al. proposed in \cite{Graefe:2014} the usage of pointer swizzling for the references between pages in the DBMS buffer pool. This would safe the lookup of the main memory address on each page hit while the swizzling and unswizzling happening during a page miss and during the eviction of a page will add some overhead. A discussion of the proposed concept and its implementation can be found in chapter \ref{ch:paper}.
+	
+The very high performance increase observed by the authors requires a closer look to locate the exact source of the performance growth and to determine potential problems that might happen on different workloads. Therefore I repeated the measurements and I compared the execution time of different operations for a buffer management with and without pointer swizzling in chapter \ref{ch:performance}.
+	
+As the performance growth caused by pointer swizzling only occurs in presence of high hit rates a further improvement of the performance using efficient page replacement algorithms is evaluated in chapter \ref{ch:eviction}.
