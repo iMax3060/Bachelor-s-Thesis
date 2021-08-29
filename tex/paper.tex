@@ -2,49 +2,49 @@
 
 \section[Definition of a Database Management System]{Definition of a Database Management System}
 
-	A \emph{database} is a collection of persistently stored data that should be somehow used by application programs. Mainly to reduce the complexity of application programs (especially of information systems) that access such databases, a specialized kind of software evolved in the mid-1960's that takes care about the database access - the \emph{database management system} (\emph{DBMS}). Early works on database management systems were e.g. done in the \emph{Data Base Task Group} of the \emph{CODASYL} which was founded in 1965 (\cite{wikipedia.En_Data_Base_Task_Group}). To fulfil this task, according to \cite{Database_Systems_-_The_Complete_Book} a DBMS is expected to offer the following features:
-	\begin{itemize}
-		\item	Offer an interface to \emph{create new databases} and to define the \emph{logical structure of the data}.
-		\item	Offer an interface to \emph{query} and \emph{modify} the data.
-		\item	\emph{Persistently} store \emph{very large amounts of data} that can be accessed with a \emph{high performance}.
-		\item	Offer \emph{ACID} (\cite{HaerderReuter83}) properties.
-	\end{itemize}
-	
+    A \emph{database} is a collection of persistently stored data that should be somehow used by application programs. Mainly to reduce the complexity of application programs (especially of information systems) that access such databases, a specialized kind of software evolved in the mid-1960's that takes care about the database access - the \emph{database management system} (\emph{DBMS}). Early works on database management systems were e.g. done in the \emph{Data Base Task Group} of the \emph{CODASYL} which was founded in 1965 (\cite{wikipedia.En_Data_Base_Task_Group}). To fulfil this task, according to \cite{Database_Systems_-_The_Complete_Book} a DBMS is expected to offer the following features:
+    \begin{itemize}
+        \item Offer an interface to \emph{create new databases} and to define the \emph{logical structure of the data}.
+        \item Offer an interface to \emph{query} and \emph{modify} the data.
+        \item \emph{Persistently} store \emph{very large amounts of data} that can be accessed with a \emph{high performance}.
+        \item Offer \emph{ACID} (\cite{HaerderReuter83}) properties.
+    \end{itemize}
+
 \section[Structure of a DBMS]{The Structure of a Database Management System}
 
-	Just like any other complex software system (as well as other complex systems), a database management system can't be designed and implemented monolithic but it needs to be well-structured to reduce its complexity as ``systematic abstraction is the prime task of computer science'' (\emph{H. Wedekind}). A typical structure of a DBMS is based on a layer architecture which defines a number of layers, where each layer only has interfaces to the over- and underlying layer.
-	
+    Just like any other complex software system (as well as other complex systems), a database management system can't be designed and implemented monolithic but it needs to be well-structured to reduce its complexity as ``systematic abstraction is the prime task of computer science'' (\emph{H. Wedekind}). A typical structure of a DBMS is based on a layer architecture which defines a number of layers, where each layer only has interfaces to the over- and underlying layer.
+
 \subsection[ANSI/SPARC DBMS Model]{The ANSI/SPARC DBMS Model}
 
-	The \emph{ANSI/SPARC DBMS Model} (\cite{Jardine:1976}) offers a conceptual, three-layer architecture that divides a data independent DBMS as seen in figure \ref{fig:ansisparcarchitecture}. The model defines finer-grained architectures as well but the understanding of those isn't needed for the classification of the buffer management as component of a DBMS.
-	
+    The \emph{ANSI/SPARC DBMS Model} (\cite{Jardine:1976}) offers a conceptual, three-layer architecture that divides a data independent DBMS as seen in figure \ref{fig:ansisparcarchitecture}. The model defines finer-grained architectures as well but the understanding of those isn't needed for the classification of the buffer management as component of a DBMS.
+
 \begin{@empty}
-	\tikzset{%
-		every node/.style = {font = \sffamily},
-		application/.style = {rectangle, draw, thick},
-		layer/.style = {rectangle, draw, thick},
-		external/.style = {layer},
-		conceptual/.style = {layer},
-		internal/.style = {layer},		
-		disk/.style = {cylinder, cylinder uses custom fill, shape border rotate = 90, draw, minimum height = 1cm, minimum width = 1.5cm, thick},
-		interfacearrow/.style = {<->, thick, draw = black}
-	}
-	
-	\nottoggle{bwmode}{
-		\tikzset{%
-			application/.append style = {color = Black, fill = Black!15},
-			external/.append style = {color = OliveGreen, fill = OliveGreen!15},
-			conceptual/.append style = {YellowOrange, fill = YellowOrange!15},
-			internal/.append style = {color = Red, fill = Red!15},
-			disk/.append style = {color = Blue, cylinder body fill = Blue!15, cylinder end fill = Blue!40}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\scalebox{1}{
-			\begin{tikzpicture}[node distance = 4ex]
-				\node[application]								(app2) 	[]				{\begin{tabular}{c}Application\\Program\end{tabular}};
+    \tikzset{%
+        every node/.style = {font = \sffamily},
+        application/.style = {rectangle, draw, thick},
+        layer/.style = {rectangle, draw, thick},
+        external/.style = {layer},
+        conceptual/.style = {layer},
+        internal/.style = {layer},
+        disk/.style = {cylinder, cylinder uses custom fill, shape border rotate = 90, draw, minimum height = 1cm, minimum width = 1.5cm, thick},
+        interfacearrow/.style = {<->, thick, draw = black}
+    }
+
+    \nottoggle{bwmode}{
+        \tikzset{%
+            application/.append style = {color = Black, fill = Black!15},
+            external/.append style = {color = OliveGreen, fill = OliveGreen!15},
+            conceptual/.append style = {YellowOrange, fill = YellowOrange!15},
+            internal/.append style = {color = Red, fill = Red!15},
+            disk/.append style = {color = Blue, cylinder body fill = Blue!15, cylinder end fill = Blue!40}
+        }
+    }
+
+    \begin{figure}[ht!]
+        \centering
+        \scalebox{1}{
+            \begin{tikzpicture}[node distance = 4ex]
+                \node[application]								(app2) 	[]				{\begin{tabular}{c}Application\\Program\end{tabular}};
 				\node[application]								(app1) 	[left = of app2]		{\begin{tabular}{c}Application\\Program\end{tabular}};
 				\node[application]								(app3) 	[right = of app2]		{\begin{tabular}{c}Application\\Program\end{tabular}};
 				\node[draw = none]								(extlay)	[below = of app2]	{};
@@ -67,50 +67,51 @@
 				\path[interfacearrow]		(int)			--		(dis3);
 			\end{tikzpicture}
 		}
+        \vspace{.75em}
 		\caption{ANSI-SPARC Architecture for Databases}
 		\label{fig:ansisparcarchitecture}
 	\end{figure}
 \end{@empty}
-	
-	The \emph{abstraction} of the data representation increases from the lowermost to the uppermost layer in this model. The \emph{application programs} access the \emph{user representations} of the database provided by the \emph{external layers}. This representation offers different views on the database depending on the \emph{specific application program needs}. The \emph{conceptual level} offers a \emph{holistic representation} of the data which corresponds to the \emph{data model} of the DBMS that can be e.g. relational or object-oriented. The \emph{internal layer} stores a \emph{physical representation} of the data on the \emph{disk(s)} (\cite{udemy_ANSI-SPARC}). The main concern of these layers is to offer \emph{physical} (internal layer), \emph{logical} (conceptual layer) and \emph{data independence} and \emph{distribution independence} (internal layer).
+
+    The \emph{abstraction} of the data representation increases from the lowermost to the uppermost layer in this model. The \emph{application programs} access the \emph{user representations} of the database provided by the \emph{external layers}. This representation offers different views on the database depending on the \emph{specific application program needs}. The \emph{conceptual level} offers a \emph{holistic representation} of the data which corresponds to the \emph{data model} of the DBMS that can be e.g. relational or object-oriented. The \emph{internal layer} stores a \emph{physical representation} of the data on the \emph{disk(s)} (\cite{udemy_ANSI-SPARC}). The main concern of these layers is to offer \emph{physical} (internal layer), \emph{logical} (conceptual layer) and \emph{data independence} and \emph{distribution independence} (internal layer).
 
 \subsection[5-Layer DBMS Architecture]{The 5-Layer DBMS Architecture}
 
-	The implementation of a DBMS can't be based directly on this conceptual model because it only defines some levels to achieve data independence. It can only be used for a very coarse-grained assignment of functionality to the different layers. Therefore there are many other architectures roughly based on the \emph{ANSI/SPARC DBMS Model} that enable a systematical implementation of a DBMS. One of those is the five-layer architecture (\cite{Haerder:1983} \cite{Haerder:1985}) that assigns concrete functionality to its layers and that defines the interfaces between these layers as in figure \ref{fig:fivelayerarchitecture}. The following description will be top-down as the buffer management can be found in the lower part of the architecture.
-	
+    The implementation of a DBMS can't be based directly on this conceptual model because it only defines some levels to achieve data independence. It can only be used for a very coarse-grained assignment of functionality to the different layers. Therefore there are many other architectures roughly based on the \emph{ANSI/SPARC DBMS Model} that enable a systematical implementation of a DBMS. One of those is the five-layer architecture (\cite{Haerder:1983} \cite{Haerder:1985}) that assigns concrete functionality to its layers and that defines the interfaces between these layers as in figure \ref{fig:fivelayerarchitecture}. The following description will be top-down as the buffer management can be found in the lower part of the architecture.
+
 \begin{@empty}
-	\tikzset{%
-		every node/.style = {font = \sffamily},
-		layer/.style = {rectangle, draw, thick},
-		application/.style = {layer},
-		datastructures/.style = {layer},
-		accesspaths/.style = {layer},
-		storagestructures/.style = {layer},
-		propagationcontrol/.style = {layer},
-		fileservices/.style = {layer},
-		disk/.style = {cylinder, cylinder uses custom fill, shape border rotate = 90, draw, minimum height = 1cm, minimum width = 4cm, thick},
-		disktext/.style = {},
-		interfacearrow/.style = {<->, thick, draw = black}
-	}
+    \tikzset{%
+        every node/.style = {font = \sffamily},
+        layer/.style = {rectangle, draw, thick},
+        application/.style = {layer},
+        datastructures/.style = {layer},
+        accesspaths/.style = {layer},
+        storagestructures/.style = {layer},
+        propagationcontrol/.style = {layer},
+        fileservices/.style = {layer},
+        disk/.style = {cylinder, cylinder uses custom fill, shape border rotate = 90, draw, minimum height = 1cm, minimum width = 4cm, thick},
+        disktext/.style = {},
+        interfacearrow/.style = {<->, thick, draw = black}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			application/.append style = {color = Black, fill = Black!15},
-			datastructures/.append style = {color = YellowOrange, fill = YellowOrange!15},
-			accesspaths/.append style = {color = RedOrange, fill = RedOrange!15},
-			storagestructures/.append style = {color = Red, fill = Red!15},
-			propagationcontrol/.append style = {color = BrickRed, fill = BrickRed!15},
-			fileservices/.append style = {color = Purple, fill = Purple!15},
-			disk/.append style = {color = Blue, cylinder body fill = Blue!15, cylinder end fill = Blue!40},
-			disktext/.append style = {color = Blue},
-		}
-	}
+    \nottoggle{bwmode}{
+        \tikzset{%
+            application/.append style = {color = Black, fill = Black!15},
+            datastructures/.append style = {color = YellowOrange, fill = YellowOrange!15},
+            accesspaths/.append style = {color = RedOrange, fill = RedOrange!15},
+            storagestructures/.append style = {color = Red, fill = Red!15},
+            propagationcontrol/.append style = {color = BrickRed, fill = BrickRed!15},
+            fileservices/.append style = {color = Purple, fill = Purple!15},
+            disk/.append style = {color = Blue, cylinder body fill = Blue!15, cylinder end fill = Blue!40},
+            disktext/.append style = {color = Blue},
+        }
+    }
 
-	\begin{figure}[ht!]
-		\centering
-		\scalebox{1}{
-			\begin{tikzpicture}[node distance = 5ex]
-				\node[application]							(tp)			[]				{Transaction Programs};
+    \begin{figure}[ht!]
+        \centering
+        \scalebox{1}{
+            \begin{tikzpicture}[node distance = 5ex]
+                \node[application]							(tp)			[]				{Transaction Programs};
 				\node[datastructures]						(lgs)			[below = of tp]		{Logical Data Structures};
 				\node[accesspaths]							(lap)			[below = of lgs]		{Logical Access Paths};
 				\node[storagestructures]						(ss)			[below = of lap]		{Storage Structures};
@@ -127,265 +128,265 @@
 				\path[interfacearrow]		(ss)		--	node[left]	{Buffer Interface}			node[right]	{\small \lstinline|fix()|\emph{, }\lstinline|unfix()|\emph{, }\lstinline|refix()|\emph{ page}}	(pc);
 				\path[interfacearrow]		(pc)		--	node[left]	{File Interface}				node[right]	{\small \lstinline|fread()|\emph{, }\lstinline|fwrite()|\emph{ block}}					(fs);
 				\path[interfacearrow]		(fs)		--	node[left]	{Device Interface}			node[right]	{\emph{channel programs}}											(storage);
-			\end{tikzpicture}
-		}
-		\caption{Five Layer Architecture for DBMS}
-		\label{fig:fivelayerarchitecture}
-	\end{figure}
+            \end{tikzpicture}
+        }
+        \vspace{.75em}
+        \caption{Five Layer Architecture for DBMS}
+        \label{fig:fivelayerarchitecture}
+    \end{figure}
 \end{@empty}
 
-	The \emph{transaction programs} use the \emph{set-oriented interface} of the layer of \emph{logical data structures} (\emph{non-procedural access layer}). This interface is usually very powerful and offers the capabilities to process complex descriptive DBMS query languages like \emph{SQL}, \emph{QBE} or \emph{XQuery} as input. As the identifiers used by these languages are part of the metadata, this layer is responsible to map those to the internal identifiers of the \emph{record-oriented interface}. Like all the other components of a DBMS, this layer uses the \emph{metadata management system} to store its metadata which are e.g. metadata that describe structures like \emph{relations}, \emph{views} and \emph{tuples}. This layer also needs to map the complex set operators of the \emph{set-oriented interface} to those simple ones of the \emph{record-oriented interface}, that usually uses an \emph{iterator}-like interface on records. The \emph{non-procedural access layer} also has to offer data integrity, access control, transaction management and it is the most import layer for the \emph{query optimizer}.
-	
-	The \emph{navigational access layer} which operates on \emph{logical access paths} uses the \emph{internal record interface} to offer navigational access though the records to the overlying layer. The control over the returned records is very limited at this interface. E.g. a selection (based on explicit attribute values) of records from a specific set can be returned one-record-at-a-time where the overlying layer can iterate over. The layer needs to process the sorting and it has to navigate through the access path structures provided by the \emph{internal record interface}. The internal records, provided by the underlying layer are also of a different format (e.g. datatypes) as the external records are and therefore a mapping is required here. The \emph{record-oriented interface} would be the uppermost interface of navigational or hierarchical DBMS.
-	
-	The \emph{record and access path management} offers access to \emph{access path structures} like B* trees or hash indexes through the \emph{internal record interface}. This layer has to manage the mapping between records and pages as the interface below only offers pages whereas the \emph{internal record interface} uses records as addressing unit. The importance to realize such \emph{index structures} in a separate layer is quite high compared to the layers above because the selection of the best fitting \emph{index structure} is mandatory for the performance of the whole DBMS and the later extension in this area is quite probable. For one-dimensional data, this probably doesn't hold as B* tree and hash indexes usually offer high performance (regarding to metrics like storage overhead, insert, update, delete and search performance) for that case. But there isn't a single multi-dimensional index structure that always nearly outperforms all the other ones. A comprehensive but far not complete and especially not very recent (there is still a lot of research done in that field) overview of such multi-dimensional access paths can be found in \cite{Gaede:1998}. Many implementations of general purpose DBMS offer multiple \emph{index structures} and secondary indexes which are both features that needs to be supported by this layer. There are also multiple addressing schemes available, to locate records inside pages which is important for the \emph{index structures} and other features of this layer. Other common capabilities of the \emph{record and access path management} are support for variable-sized fields, large fields that are stored out-of-line and references between records.
-	
-	The \emph{propagation control} offers the \emph{buffer interface} with pages as addressing units. As the overlying layers only process data in main memory and as the \emph{file services} only offer file streams, this layer is used to provide an image of the persistently stored data in memory. 
-	
-	The \emph{file management} offers \emph{file services} through the \emph{file interface}. It needs to abstract from the \emph{device interface} offered by the \emph{secondary storage devices} to offer dynamically growing files and blocks of different length within those files to the overlying layer. Therefore it needs to manage data structures to store file addresses (on the storage device) and block borders as well as addresses of unused parts of the \emph{secondary storage devices}. It needs to take into account the special characteristics of the used storage device like HDDs and SSDs. Especially HDDs with its physical addressing based on cylinders, tracks and sectors aren't trivial to abstract from. Consecutive blocks within a file should be e.g. located on cylinders that are physically close together to decrease the access latency by reducing the number of random accesses.
-	
-	A more detailed discussion of the design and implementation of a DBMS is beyond the scope of this work. Comprehensive descriptions on this topic can be found in \cite{Database_Systems_-_The_Complete_Book}, \cite{Datenbanksysteme_-_Konzepte_und_Techniken_der_Implementierung} and \cite{Datenbanken_-_Implementierungstechniken}.
+    The \emph{transaction programs} use the \emph{set-oriented interface} of the layer of \emph{logical data structures} (\emph{non-procedural access layer}). This interface is usually very powerful and offers the capabilities to process complex descriptive DBMS query languages like \emph{SQL}, \emph{QBE} or \emph{XQuery} as input. As the identifiers used by these languages are part of the metadata, this layer is responsible to map those to the internal identifiers of the \emph{record-oriented interface}. Like all the other components of a DBMS, this layer uses the \emph{metadata management system} to store its metadata which are e.g. metadata that describe structures like \emph{relations}, \emph{views} and \emph{tuples}. This layer also needs to map the complex set operators of the \emph{set-oriented interface} to those simple ones of the \emph{record-oriented interface}, that usually uses an \emph{iterator}-like interface on records. The \emph{non-procedural access layer} also has to offer data integrity, access control, transaction management and it is the most import layer for the \emph{query optimizer}.
+
+    The \emph{navigational access layer} which operates on \emph{logical access paths} uses the \emph{internal record interface} to offer navigational access though the records to the overlying layer. The control over the returned records is very limited at this interface. E.g. a selection (based on explicit attribute values) of records from a specific set can be returned one-record-at-a-time where the overlying layer can iterate over. The layer needs to process the sorting and it has to navigate through the access path structures provided by the \emph{internal record interface}. The internal records, provided by the underlying layer are also of a different format (e.g. datatypes) as the external records are and therefore a mapping is required here. The \emph{record-oriented interface} would be the uppermost interface of navigational or hierarchical DBMS.
+
+    The \emph{record and access path management} offers access to \emph{access path structures} like B* trees or hash indexes through the \emph{internal record interface}. This layer has to manage the mapping between records and pages as the interface below only offers pages whereas the \emph{internal record interface} uses records as addressing unit. The importance to realize such \emph{index structures} in a separate layer is quite high compared to the layers above because the selection of the best fitting \emph{index structure} is mandatory for the performance of the whole DBMS and the later extension in this area is quite probable. For one-dimensional data, this probably doesn't hold as B* tree and hash indexes usually offer high performance (regarding to metrics like storage overhead, insert, update, delete and search performance) for that case. But there isn't a single multi-dimensional index structure that always nearly outperforms all the other ones. A comprehensive but far not complete and especially not very recent (there is still a lot of research done in that field) overview of such multi-dimensional access paths can be found in \cite{Gaede:1998}. Many implementations of general purpose DBMS offer multiple \emph{index structures} and secondary indexes which are both features that needs to be supported by this layer. There are also multiple addressing schemes available, to locate records inside pages which is important for the \emph{index structures} and other features of this layer. Other common capabilities of the \emph{record and access path management} are support for variable-sized fields, large fields that are stored out-of-line and references between records.
+
+    The \emph{propagation control} offers the \emph{buffer interface} with pages as addressing units. As the overlying layers only process data in main memory and as the \emph{file services} only offer file streams, this layer is used to provide an image of the persistently stored data in memory. 
+
+    The \emph{file management} offers \emph{file services} through the \emph{file interface}. It needs to abstract from the \emph{device interface} offered by the \emph{secondary storage devices} to offer dynamically growing files and blocks of different length within those files to the overlying layer. Therefore it needs to manage data structures to store file addresses (on the storage device) and block borders as well as addresses of unused parts of the \emph{secondary storage devices}. It needs to take into account the special characteristics of the used storage device like HDDs and SSDs. Especially HDDs with its physical addressing based on cylinders, tracks and sectors aren't trivial to abstract from. Consecutive blocks within a file should be e.g. located on cylinders that are physically close together to decrease the access latency by reducing the number of random accesses.
+
+    A more detailed discussion of the design and implementation of a DBMS is beyond the scope of this work. Comprehensive descriptions on this topic can be found in \cite{Database_Systems_-_The_Complete_Book}, \cite{Datenbanksysteme_-_Konzepte_und_Techniken_der_Implementierung} and \cite{Datenbanken_-_Implementierungstechniken}.
 
 \subsection[Motivation for a DBMS Buffer]{Motivation for the Usage of a DBMS Buffer} \label{subsec:motivationbuffer}
 
-	Just like any other software system that needs non-volatile storage with high capacity or network access, a DBMS suffers from high \emph{I/O latency}. The \emph{non-volatility} is needed to guarantee the durability of the database and the support for \emph{high capacity} is a requirement as many OLTP databases are quite large in size. 
-	
+    Just like any other software system that needs non-volatile storage with high capacity or network access, a DBMS suffers from high \emph{I/O latency}. The \emph{non-volatility} is needed to guarantee the durability of the database and the support for \emph{high capacity} is a requirement as many OLTP databases are quite large in size. 
+
 \begin{@empty}
-	\tikzset{%
-		changes/.style = { -> , very thick, > = stealth}
-	}
+    \tikzset{%
+        changes/.style = { -> , very thick, > = stealth}
+    }
+    
+    \nottoggle{bwmode}{
+        \tikzset{%
+            volatile/.style = {fill = red!50},
+            nonvolatile/.style = {fill = green!50},
+            changes/.append style = {color = red}
+        }
+    }{
+        \tikzset{%
+            volatile/.style = {pattern = crosshatch, pattern color = black!25},
+            nonvolatile/.style = {pattern = crosshatch dots, pattern color = black!25}
+        }
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			volatile/.style = {fill = red!50},
-			nonvolatile/.style = {fill = green!50},
-			changes/.append style = {color = red}
-		}
-	}{
-		\tikzset{%
-			volatile/.style = {pattern = crosshatch, pattern color = black!25},
-			nonvolatile/.style = {pattern = crosshatch dots, pattern color = black!25}
-		}
-	}
+    \begin{figure}
+    \centering
+    \begin{minipage}{\linewidth}
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[font = \sffamily]
+                % Center points of the baseline of each pyramid layer (0: Peak of the pyramid; 1: Center of the baseline of the top layer; ...)
+                \node[]  (0)                                                                       {};
+                \node[]  (1)   [below = 1.5cm of 0.center, anchor = center]                        {};
+                \node[]  (2a)  [below = (1/3)*1.25cm of 1.center, anchor = center]                 {};
+                \node[]  (2b)  [below = (1/3)*1.25cm of 2a.center, anchor = center]                {};
+                \node[]  (2c)  [below = (1/3)*1.25cm of 2b.center, anchor = center]                {};
+                \node[]  (3)   [below = 0.75cm of 2c.center, anchor = center]                      {};
+                \node[]  (4)   [below = 0.75cm of 3.center, anchor = center]                       {};
+                \node[]  (5)   [below = 0.75cm of 4.center, anchor = center]                       {};
+                \node[]  (6)   [below = 0.75cm of 5.center, anchor = center]                       {};
 
-	\begin{figure}[ht!]
-		\centering
-		\begin{minipage}{\linewidth}
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}
-						% Center points of the baseline of each pyramid layer (0: Peak of the pyramid; 1: Center of the baseline of the top layer; ...)
-						\node[]			(0)															{};
-						\node[]			(1)		[below = 1.5cm of 0.center, anchor = center]					{};
-						\node[]			(2a)		[below = (1/3)*1.25cm of 1.center, anchor = center]				{};
-						\node[]			(2b)		[below = (1/3)*1.25cm of 2a.center, anchor = center]				{};
-						\node[]			(2c)		[below = (1/3)*1.25cm of 2b.center, anchor = center]				{};
-						\node[]			(3)		[below = 0.75cm of 2c.center, anchor = center]					{};
-						\node[]			(4)		[below = 0.75cm of 3.center, anchor = center]					{};
-						\node[]			(5)		[below = 0.75cm of 4.center, anchor = center]					{};
-						\node[]			(6)		[below = 0.75cm of 5.center, anchor = center]					{};
+                % Anchor points of the pyramid (n0: Left anchor point; n1: Right anchor point):
+                \node[]  (10)  [left = (2/3)*1.5cm of 1.center, anchor = center]                   {};
+                \node[]  (11)  [right = (2/3)*1.5cm of 1.center, anchor = center]                  {};
+                \node[]  (2a0) [left = (2/3)*(1.5cm+(1/3)*1.25cm) of 2a.center, anchor = center]   {};
+                \node[]  (2a1) [right = (2/3)*(1.5cm+(1/3)*1.25cm) of 2a.center, anchor = center]  {};
+                \node[]  (2b0) [left = (2/3)*(1.5cm+(2/3)*1.25cm) of 2b.center, anchor = center]   {};
+                \node[]  (2b1) [right = (2/3)*(1.5cm+(2/3)*1.25cm) of 2b.center, anchor = center]  {};
+                \node[]  (2c0) [left = (2/3)*(1.5cm+(3/3)*1.25cm) of 2c.center, anchor = center]   {};
+                \node[]  (2c1) [right = (2/3)*(1.5cm+(3/3)*1.25cm) of 2c.center, anchor = center]  {};
+                \node[]  (30)  [left = (2/3)*3.5cm of 3.center, anchor = center]                   {};
+                \node[]  (31)  [right = (2/3)*3.5cm of 3.center, anchor = center]                  {};
+                \node[]  (40)  [left = (2/3)*4.25cm of 4.center, anchor = center]                  {};
+                \node[]  (41)  [right = (2/3)*4.25cm of 4.center, anchor = center]                 {};
+                \node[]  (50)  [left = (2/3)*5cm of 5.center, anchor = center]                     {};
+                \node[]  (51)  [right = (2/3)*5cm of 5.center, anchor = center]                    {};
+                \node[]  (60)  [left = (2/3)*5.75cm of 6.center, anchor = center]                  {};
+                \node[]  (61)  [right = (2/3)*5.75cm of 6.center, anchor = center]                 {};
 
-						% Anchor points of the pyramid (n0: Left anchor point; n1: Right anchor point):
-						\node[]			(10)		[left = (2/3)*1.5cm of 1.center, anchor = center]					{};
-						\node[]			(11)		[right = (2/3)*1.5cm of 1.center, anchor = center]				{};
-						\node[]			(2a0)		[left = (2/3)*(1.5cm+(1/3)*1.25cm) of 2a.center, anchor = center]	{};
-						\node[]			(2a1)		[right = (2/3)*(1.5cm+(1/3)*1.25cm) of 2a.center, anchor = center]	{};
-						\node[]			(2b0)		[left = (2/3)*(1.5cm+(2/3)*1.25cm) of 2b.center, anchor = center]	{};
-						\node[]			(2b1)		[right = (2/3)*(1.5cm+(2/3)*1.25cm) of 2b.center, anchor = center]	{};
-						\node[]			(2c0)		[left = (2/3)*(1.5cm+(3/3)*1.25cm) of 2c.center, anchor = center]	{};
-						\node[]			(2c1)		[right = (2/3)*(1.5cm+(3/3)*1.25cm) of 2c.center, anchor = center]	{};
-						\node[]			(30)		[left = (2/3)*3.5cm of 3.center, anchor = center]					{};
-						\node[]			(31)		[right = (2/3)*3.5cm of 3.center, anchor = center]				{};
-						\node[]			(40)		[left = (2/3)*4.25cm of 4.center, anchor = center]				{};
-						\node[]			(41)		[right = (2/3)*4.25cm of 4.center, anchor = center]				{};
-						\node[]			(50)		[left = (2/3)*5cm of 5.center, anchor = center]					{};
-						\node[]			(51)		[right = (2/3)*5cm of 5.center, anchor = center]					{};
-						\node[]			(60)		[left = (2/3)*5.75cm of 6.center, anchor = center]				{};
-						\node[]			(61)		[right = (2/3)*5.75cm of 6.center, anchor = center]				{};
-		
-						% "Center" of the pyramid (shifted towards top) used for the designation of performance measures:
-						\node[]			(cen)		[below = 2.5cm of 0.center]								{};
-		
-						% Designation of performance measures:
-						\node[rotate = 55]	(cpu)		[left = 3.5cm of cen.center, anchor = center]					{\footnotesize \textit{\textbf{Capacity per CPU}}};
-						\node[rotate = -55]	(acc)		[right = 4.5cm of cen.center, anchor = center]					{\footnotesize \textit{\textbf{Access Time}}};
-		
-						% Fills the pyramid to mark volatile and non-volatile layers:
-						\fill[volatile]
-							(0.center) -- (30.center) -- (31.center) -- cycle;
-						\fill[nonvolatile]
-							(30.center) -- (31.center) -- (61.center) -- (60.center) -- cycle;
-		
-						% Key the markings for volatile and non-volatile layers
-						\node[draw, volatile]		(red)		[left = 4cm of 0.center, anchor = north]		{};
-						\node[]					(legred)	[right = 0cm of red.east, anchor = west]		{\footnotesize Volatile};
-						\node[draw, nonvolatile]	(green)	[below = 0.2cm of red.south, anchor = north]	{};
-						\node[]					(leggreen)	[right = 0cm of green.east, anchor = west]		{\footnotesize Non-volatile};
+                % "Center" of the pyramid (shifted towards top) used for the designation of performance measures:
+                \node[]  (cen) [below = 2.5cm of 0.center]                                         {};
 
-						% Storage layer names:
-						\node[]	(reg)		[above = 0cm of 1.center, anchor = south]		{\footnotesize Registers};
-						\node[]	(l1)		[above = 0cm of 2a.center, anchor = south]	{\footnotesize L1 Cache};
-						\node[]	(l2)		[above = 0cm of 2b.center, anchor = south]	{\footnotesize L2 Cache};
-						\node[]	(l3)		[above = 0cm of 2c.center, anchor = south]	{\footnotesize L3 Cache};
-						\node[]	(mem)	[above = 0.05cm of 3.center, anchor = south]	{\small Main Memory};
-						\node[]	(ssd)		[above = 0.05cm of 4.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.) - SDD}};
-						\node[]	(mas)	[above = 0.05cm of 5.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.) - HDD}};
-						\node[]	(mem)	[above = 0.05cm of 6.center, anchor = south]	{\small Offline Storage \scriptsize \textit{(Tertiary Storage)}};
+                % Designation of performance measures:
+                \node[rotate = 55]  (cpu) [left = 3.5cm of cen.center, anchor = center]  {\footnotesize \textit{\textbf{Capacity per CPU}}};
+                \node[rotate = -55] (acc) [right = 4.5cm of cen.center, anchor = center] {\footnotesize \textit{\textbf{Access time}}};
 
-						% Anchor points for the brace used to mark the example data from Intel Xeon:
-						\node[]	(0h)		[right = 2.75cm of 0]		{};
-						\node[]	(31h)		[right = 2.75cm of 31]	{};
-		
-						% Draw the pyramid:
-						\path[ - , thick]
-							(0.center)			edge		(10.center)
-							(0.center)			edge		(11.center)
-							(10.center)		edge		(11.center)
-							(10.center)		edge		(2a0.center)
-							(11.center)		edge		(2a1.center)
-							(2a0.center)		edge		(2a1.center)
-							(2a0.center)		edge		(2b0.center)
-							(2a1.center)		edge		(2b1.center)
-							(2b0.center)		edge		(2b1.center)
-							(2b0.center)		edge		(2c0.center)
-							(2b1.center)		edge		(2c1.center)
-							(2c0.center)		edge		(2c1.center)
-							(2c0.center)		edge		(30.center)
-							(2c1.center)		edge		(31.center)
-							(30.center)		edge		(31.center)
-							(30.center)		edge		(40.center)
-							(31.center)		edge		(41.center)
-							(40.center)		edge		(41.center)
-							(40.center)		edge		(50.center)
-							(41.center)		edge		(51.center)
-							(50.center)		edge		(51.center)
-							(50.center)		edge		(60.center)
-							(51.center)		edge		(61.center)
-							(60.center)		edge		(61.center);
-		
-						% Draw the connections between the brace used to mark the example data from Intel Xeon and the appropriate pyramid layers:
-						\path[dotted]
-							(0.center)				edge		(0h.center)
-							(31.center)			edge		(31h.center);
-			
-						% Add the capacities:
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(0.center) -- (10.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\SI{128}{\byte}\protect\footnote{Only considered general purpose registers.}};
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(10.center) -- (2a0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{256}{\kibi\byte}};
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(2a0.center) -- (2b0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{1}{\mebi\byte}};
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(2b0.center) -- (2c0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{8}{\mebi\byte}};
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(2c0.center) -- (30.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\SI{64}{\gibi\byte}};
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(30.center) -- (40.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\tebi\byte}};
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(40.center) -- (50.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\tebi\byte}--\si{\pebi\byte}};
-						\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
-							(50.center) -- (60.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\pebi\byte}};
+                % Fills the pyramid to mark volatile and non-volatile layers:
+                \fill[volatile]    (0.center) -- (30.center) -- (31.center) -- cycle;
+                \fill[nonvolatile] (30.center) -- (31.center) -- (61.center) -- (60.center) -- cycle;
 
-						% Add the access times:
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(0.center) -- (11.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{1}{\cy} $\approx$ \SI{0.25}{\nano\second}};
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(11.center) -- (2a1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{4}{\cy} $\approx$ \SI{1}{\nano\second}};
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(2a1.center) -- (2b1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{12}{\cy} $\approx$ \SI{3}{\nano\second}};
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(2b1.center) -- (2c1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{42}{\cy} $\approx$ \SI{11}{\nano\second}};
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(2c1.center) -- (31.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{51}{\nano\second}};
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(31.center) -- (41.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{\approx 0.1}{\milli\second} \tiny \cite{samsung:ssdprimer}};
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(41.center) -- (51.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\numrange{5}{20}\si{\milli\second} \tiny \cite{EntHDD} \cite{HDD2016}};
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(51.center) -- (61.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {$s - min$};
+                % Key the markings for volatile and non-volatile layers
+                \node[draw, volatile]    (red)      [left = 4cm of 0.center, anchor = north]      {};
+                \node[]                  (legred)   [right = 0cm of red.east, anchor = west]      {\footnotesize Volatile};
+                \node[draw, nonvolatile] (green)    [below = 0.2cm of red.south, anchor = north]  {};
+                \node[]                  (leggreen) [right = 0cm of green.east, anchor = west]    {\footnotesize Non-volatile};
 
-						% Mark the source of the performance data of the volatile layers:
-						\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-							(0h.center) -- (31h.center) node[black, midway, xshift = -0.625cm, yshift = 0.1cm, anchor = west] {\footnotesize \begin{tabular}{r}\textit{\textbf{Example System:}}\\\textit{Intel\textsuperscript{\tiny\textregistered} Xeon\textsuperscript{\tiny\textregistered}}\\\textit{E3-1280 v5}\\\textit{(Skylake)}\\\cite{7cpu:skylake}\end{tabular}};
-			
-						% Orientation of changes of performance data:
-						\path[changes]
-							([xshift = (-1/3)*4cm+0.25cm]60.center)			edge		node[above, rotate = 90]		{\footnotesize Price per Capacity}	([xshift = (-1/3)*14cm-0.25cm]0.center)
-							([xshift = (1/3)*18cm+0.5cm]0.center)			edge		node[above, rotate = -90]		{\footnotesize Access Time}		([xshift = (1/3)*8cm]61.center);
-			\end{tikzpicture}
-		}
-		% TODO: Once finally set, remove the minipage and put the footnote at the correct place manually
-		\end{minipage}
-		\caption{Storage Hierarchy of Computer Systems} \label{fig:storagehierarchy}
-		\protect
-	\end{figure}
+                % Storage layer names:
+                \node[] (reg) [above = 0cm of 1.center, anchor = south]     {\footnotesize Registers};
+                \node[] (l1)  [above = 0cm of 2a.center, anchor = south]    {\footnotesize L1 cache};
+                \node[] (l2)  [above = 0cm of 2b.center, anchor = south]    {\footnotesize L2 cache};
+                \node[] (l3)  [above = 0cm of 2c.center, anchor = south]    {\footnotesize L3 cache};
+                \node[] (mem) [above = 0.05cm of 3.center, anchor = south]  {\small Main memory};
+                \node[] (ssd) [above = 0.05cm of 4.center, anchor = south]  {\small Online storage \scriptsize \textit{(secondary s.) - SDD}};
+                \node[] (mas) [above = 0.05cm of 5.center, anchor = south]  {\small Online storage \scriptsize \textit{(secondary s.) - HDD}};
+                \node[] (mem) [above = 0.05cm of 6.center, anchor = south]  {\small Offline storage \scriptsize \textit{(tertiary storage)}};
+
+                % Anchor points for the brace used to mark the example data from Intel Xeon:
+                \node[] (0h)        [right = 2.75cm of 0]     {};
+                \node[] (31h)       [right = 2.75cm of 31]    {};
+
+                % Draw the pyramid:
+                \path[ - , thick]
+                (0.center)         edge        (10.center)
+                (0.center)         edge        (11.center)
+                (10.center)        edge        (11.center)
+                (10.center)        edge        (2a0.center)
+                (11.center)        edge        (2a1.center)
+                (2a0.center)       edge        (2a1.center)
+                (2a0.center)       edge        (2b0.center)
+                (2a1.center)       edge        (2b1.center)
+                (2b0.center)       edge        (2b1.center)
+                (2b0.center)       edge        (2c0.center)
+                (2b1.center)       edge        (2c1.center)
+                (2c0.center)       edge        (2c1.center)
+                (2c0.center)       edge        (30.center)
+                (2c1.center)       edge        (31.center)
+                (30.center)        edge        (31.center)
+                (30.center)        edge        (40.center)
+                (31.center)        edge        (41.center)
+                (40.center)        edge        (41.center)
+                (40.center)        edge        (50.center)
+                (41.center)        edge        (51.center)
+                (50.center)        edge        (51.center)
+                (50.center)        edge        (60.center)
+                (51.center)        edge        (61.center)
+                (60.center)        edge        (61.center);
+
+                % Draw the connections between the brace used to mark the example data from Intel Xeon and the appropriate pyramid layers:
+                \path[dotted]
+                (0.center)             edge        (0h.center)
+                (31.center)            edge        (31h.center);
+
+                % Add the capacities:
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (0.center) -- (10.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\SI{128}{\byte}\protect\footnote{Only general purpose registers are considered}};
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (10.center) -- (2a0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{256}{\kibi\byte}};
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (2a0.center) -- (2b0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{1}{\mebi\byte}};
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (2b0.center) -- (2c0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{8}{\mebi\byte}};
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (2c0.center) -- (30.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\SI{64}{\gibi\byte}};
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (30.center) -- (40.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\tebi\byte}};
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (40.center) -- (50.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\tebi\byte}--\si{\pebi\byte}};
+                \draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+                (50.center) -- (60.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\pebi\byte}};
+
+                % Add the access times:
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (0.center) -- (11.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{1}{\cy} $\approx$ \SI{0.25}{\nano\second}};
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (11.center) -- (2a1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{4}{\cy} $\approx$ \SI{1}{\nano\second}};
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (2a1.center) -- (2b1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{12}{\cy} $\approx$ \SI{3}{\nano\second}};
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (2b1.center) -- (2c1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{42}{\cy} $\approx$ \SI{11}{\nano\second}};
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (2c1.center) -- (31.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{51}{\nano\second}};
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (31.center) -- (41.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {$\approx$ \SI{0.1}{\milli\second} \tiny \footnote{\url{http://www.samsung.com/global/business/semiconductor/minisite/SSD/M2M/download/01_Why_SSDs_Are_Awesome.pdf}}};
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (41.center) -- (51.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\numrange{5}{20}\si{\milli\second} \tiny \footnote{\url{http://www.tomshardware.de/enterprise-hdd-sshd,testberichte-241390-6.html}} \footnote{\url{https://www.computerbase.de/2016-08/seagate-enterprise-capacity-3.5-hdd-10tb-test/3/#diagramm-zugriffszeiten-lesen-h2benchw-316}}};
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (51.center) -- (61.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {$s - min$};
+
+                % Mark the source of the performance data of the volatile layers:
+                \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+                (0h.center) -- (31h.center) node[black, midway, xshift = -0.625cm, yshift = 0.1cm, anchor = west] {\footnotesize \begin{tabular}{r}\textit{\textbf{Example system:}}\\\textit{Intel\textsuperscript{\tiny\textregistered} Xeon\textsuperscript{\tiny\textregistered}}\\\textit{E3-1280 v5}\\\textit{(Skylake)}\footnote{\url{https://www.7-cpu.com/cpu/Skylake.html}}\end{tabular}};
+
+                % Orientation of changes of performance data:
+                \path[changes]
+                ([xshift = (-1/3)*4cm+0.25cm]60.center) edge node[above, rotate = 90]  {\footnotesize Price per capacity} ([xshift = (-1/3)*14cm-0.25cm]0.center)
+                ([xshift = (1/3)*18cm+0.5cm]0.center)   edge node[above, rotate = -90] {\footnotesize Access time}        ([xshift = (1/3)*8cm]61.center);
+            \end{tikzpicture}
+        }
+        \end{minipage}
+    \vspace{.5em}
+    \caption[Storage hierarchy of computer systems]{Storage hierarchy of computer systems}
+    \label{fig:storagehierarchy}
+    \protect
+    \end{figure}
 \end{@empty}
-	
-	The seriousness of the problem of \emph{I/O latency} can be seen in the storage hierarchy of a modern computer shown in figure \ref{fig:storagehierarchy}. The \emph{access time gap} between main memory and traditional HDDs is \emph{more than 6 orders of magnitude} (still 5 orders of magnitude for SSDs) in size and in addition an I/O access requires a call to the OS which needs \numrange{\approx 2000}{5000} instructions compared to \num{\approx 100} instructions needed for a memory access. This makes access to online storage much more expensive than main memory access and therefore a system that frequently needs to access data (in worst-case random accesses are needed), wouldn't be able to achieve an adequate performance.
-	
+
+    The seriousness of the problem of \emph{I/O latency} can be seen in the storage hierarchy of a modern computer shown in figure \ref{fig:storagehierarchy}. The \emph{access time gap} between main memory and traditional HDDs is \emph{more than 6 orders of magnitude} (still 5 orders of magnitude for SSDs) in size and in addition an I/O access requires a call to the OS which needs $\approx$\numrange{2000}{5000} instructions compared to $\approx$\num{100} instructions needed for a memory access. This makes access to online storage much more expensive than main memory access and therefore a system that frequently needs to access data (in worst-case random accesses are needed), wouldn't be able to achieve an adequate performance.
+
 \begin{@empty}
-	\begin{table}[h]
-		\caption{Price per Capacity of Different Types of Memory/Storage Devices \textit{(as of Feb. 8, 2017)} \cite{heisehardware}} \label{tab:memorystorageprices}
-		\centering
-		\begin{minipage}{\linewidth}
-			\footnotesize
-			\begin{tabular}{|m{.15\textwidth}|m{.09\textwidth}|m{.11\textwidth}|m{.09\textwidth}|m{.09\textwidth}|m{.09\textwidth}|m{.09\textwidth}|}
+    \begin{table}[h]
+        \centering
+        \begin{minipage}{\linewidth}
+            \footnotesize
+            \begin{tabular}{|m{.15\textwidth}|m{.09\textwidth}|m{.11\textwidth}|m{.09\textwidth}|m{.09\textwidth}|m{.09\textwidth}|m{.09\textwidth}|}
 				\hline
 				\textbf{Hierarchy Layer} 							& \multicolumn{2}{c|}{\textbf{Main Memory}}							& \multicolumn{4}{c|}{\textbf{Secondary Storage}}	\\ \hline
 				\textbf{Device Type}     							& \centering DDR4-SDRAM		& \centering DDR4-SDRAM with ECC		& \centering HDD																													& \centering Server HDD\footnote{Suitable for Server and Datacenter}		& \centering SSD					& \centering Server SSD\footnote{Interface: SAS, PCIe or FC}	\\ \hline
 				\textbf{Price $\left[\si{\euro\per\giga\byte}\right]$}    	& \multicolumn{1}{r|}{\num{>5.4}}	& \multicolumn{1}{r|}{\num{>5.8}}		& \multicolumn{1}{r|}{\num{>0.027}}																								& \multicolumn{1}{r|}{\num{>0.24}}						& \multicolumn{1}{r|}{\num{>0.23}}	& \multicolumn{1}{r|}{\num{>0.35}}	\\ \hline
-			\end{tabular}
-		\end{minipage}
-	\end{table}
+            \end{tabular}
+        \end{minipage}
+        \caption[Price per Capacity of Different Types of Memory/Storage]{Price per Capacity of Different Types of Memory/Storage Devices \textit{(as of Feb. 8, 2017)} \footnote{\url{https://www.heise.de/preisvergleich/?m=1}}} \label{tab:memorystorageprices}
+    \end{table}
 \end{@empty}
-	
-	Therefore it would be better to just store the database in main memory. A very crucial problem of this solution would be the \emph{available capacity} of main memory which is much smaller than the capacity of secondary memory devices. One reason for that is the much higher price of main memory as shown in table \ref{tab:memorystorageprices}. The same capacity of main memory costs more than 20-times the money than non-volatile storage devices with high performance and even 200-times the money than slow HDDs. It's also possible to connect much more secondary storage devices to one CPU as the performance of the needed bus interface of main memory doesn't allow a distance of more than a few centimeters. The higher number of CPUs (and the high price of those) needed for the same capacity of main memory makes it evermore reasonable to use secondary storage when high storage capacity is needed. As long as the needed performance doesn't really requires to have the whole database in main memory, it's impractical to store it only there.
-	
-	Also because of the need for \emph{durability} in a DBMS with ACID properties, \emph{non-volatile} storage devices to store the database on are required. In case of a crash, a database stored in main memory would be lost and therefore the effect of every committed transaction needs to be stored on a secondary storage device.
-		
-	But it's also important to make the data available on a \emph{byte-wise addressable device} as the CPU can't process data directly on \emph{block-wise addressable devices} like SSDs and HDDs. The architecture of typical computer systems requires the main memory as an intermediate link between I/O devices and the CPU (using DMA to perform well \cite{Stallings:2013}) and therefore the usage of main memory is necessary.
-		
-	Summarizing the arguments from before, it's necessary for a DBMS to \emph{use the whole storage hierarchy}. The registers are taken into account by the compiler used to compile the DBMS as well as used to compile queries generated by the query optimizer. The CPU caches are managed by cache controllers of the CPU and therefore the DBMS doesn't need to take care about the usage of those caches. But to optimize the memory usage to fit to specific characteristics of the cache controller might be promising. Some DBMS use tertiary storage to store archive and backup data on it. As those data isn't randomly accessed, the long access time of magnetic tapes (in tape libraries) doesn't matter. The long lifetime, high capacity and low price (a magnetic tape can just be stored in a shelf and doesn't require a connection to a computer) of those storage media makes it appropriate for that purpose.
 
-	The usage of main memory as \emph{cache} for data stored on secondary storage, would therefore be the obvious solution for those remaining two layers of the storage hierarchy, as this mechanism is typically used in situations where one layer of the storage hierarchy doesn't fit the needs. The caching could be left to the operating system and its \emph{virtual memory management}. This would e.g. allow the mapping of files, stored on a block device, to main memory using \lstinline{mmap}. While this function fits the needs of the database, some properties of it makes the usage of those services for the given purpose impossible. The OS services would allow the access of persistently stored files through main memory managed with hardware acceleration. But the interface of those services isn't sufficient for a database. As the implementation of the ACID properties enforces the persisting of log records at specific points in time (\emph{Write-Ahead Logging} as in \cite{Mohan:1992}), an interface to control the writing of pages would be required. The \emph{page replacement algorithms} used by the VM layer of the OS might not be optimized for the specific reference pattern of database systems. Many DBMS use \emph{prefetching} to exploit the specific reference pattern of e.g. table scans to decrease the transaction latency due to I/O latency. This cannot be applied when the VM layer of the operating system is used to access the database as such an operation isn't supported by the virtual memory management.
-	
-	Therefore the caching of subsets of the database in main memory needs to be part of the database management system. It's implemented in the \emph{buffer management} as part of the propagation control layer. More details about the reasons why this decreases the number of secondary storage accesses can be found in chapter \ref{ch:eviction}.
-	
+    Therefore it would be better to just store the database in main memory. A very crucial problem of this solution would be the \emph{available capacity} of main memory which is much smaller than the capacity of secondary memory devices. One reason for that is the much higher price of main memory as shown in table \ref{tab:memorystorageprices}. The same capacity of main memory costs more than 20-times the money than non-volatile storage devices with high performance and even 200-times the money than slow HDDs. It's also possible to connect much more secondary storage devices to one CPU as the performance of the needed bus interface of main memory doesn't allow a distance of more than a few centimeters. The higher number of CPUs (and the high price of those) needed for the same capacity of main memory makes it evermore reasonable to use secondary storage when high storage capacity is needed. As long as the needed performance doesn't really requires to have the whole database in main memory, it's impractical to store it only there.
+
+    Also because of the need for \emph{durability} in a DBMS with ACID properties, \emph{non-volatile} storage devices to store the database on are required. In case of a crash, a database stored in main memory would be lost and therefore the effect of every committed transaction needs to be stored on a secondary storage device.
+
+    But it's also important to make the data available on a \emph{byte-wise addressable device} as the CPU can't process data directly on \emph{block-wise addressable devices} like SSDs and HDDs. The architecture of typical computer systems requires the main memory as an intermediate link between I/O devices and the CPU (using DMA to perform well \cite{Stallings:2013}) and therefore the usage of main memory is necessary.
+
+    Summarizing the arguments from before, it's necessary for a DBMS to \emph{use the whole storage hierarchy}. The registers are taken into account by the compiler used to compile the DBMS as well as used to compile queries generated by the query optimizer. The CPU caches are managed by cache controllers of the CPU and therefore the DBMS doesn't need to take care about the usage of those caches. But to optimize the memory usage to fit to specific characteristics of the cache controller might be promising. Some DBMS use tertiary storage to store archive and backup data on it. As those data isn't randomly accessed, the long access time of magnetic tapes (in tape libraries) doesn't matter. The long lifetime, high capacity and low price (a magnetic tape can just be stored in a shelf and doesn't require a connection to a computer) of those storage media makes it appropriate for that purpose.
+
+    The usage of main memory as \emph{cache} for data stored on secondary storage, would therefore be the obvious solution for those remaining two layers of the storage hierarchy, as this mechanism is typically used in situations where one layer of the storage hierarchy doesn't fit the needs. The caching could be left to the operating system and its \emph{virtual memory management}. This would e.g. allow the mapping of files, stored on a block device, to main memory using \lstinline{mmap}. While this function fits the needs of the database, some properties of it makes the usage of those services for the given purpose impossible. The OS services would allow the access of persistently stored files through main memory managed with hardware acceleration. But the interface of those services isn't sufficient for a database. As the implementation of the ACID properties enforces the persisting of log records at specific points in time (\emph{Write-Ahead Logging} as in \cite{Mohan:1992}), an interface to control the writing of pages would be required. The \emph{page replacement algorithms} used by the VM layer of the OS might not be optimized for the specific reference pattern of database systems. Many DBMS use \emph{prefetching} to exploit the specific reference pattern of e.g. table scans to decrease the transaction latency due to I/O latency. This cannot be applied when the VM layer of the operating system is used to access the database as such an operation isn't supported by the virtual memory management.
+
+    Therefore the caching of subsets of the database in main memory needs to be part of the database management system. It's implemented in the \emph{buffer management} as part of the propagation control layer. More details about the reasons why this decreases the number of secondary storage accesses can be found in chapter \ref{ch:eviction}.
+
 \section[Concept of a DBMS Buffer Management]{Concept of a DBMS Buffer Management}
 
-	The \emph{caching} is realized in the DBMS \emph{buffer pool manager} which can be found in the DBMS \emph{propagation control} layer as shown in figure \ref{fig:fivelayerarchitecture}. The upper layers access the buffer pool through an interface which basically offers the operations \lstinline{fix()} and \lstinline{unfix()}. As the processing of data inside the CPU requires the data to be byte-wise addressable, the data needs to be mapped from the block-addressable secondary storage devices to main memory.
-	
-	These requirements lead to the partial architecture as shown in figure \ref{fig:bufferarchitecture}. The \emph{transaction management and access path operators} summarize the layers of \emph{logical data structures}, \emph{logical access paths} and \emph{storage structures}. The \emph{propagation control} is called \emph{buffer pool management} and the \emph{file services} are called \emph{storage management}. The latter manages the data stored on secondary storage and therefore it requires access to those storage devices which takes \numrange{\approx 0.1}{12}\si{\milli\second} of I/O latency and \numrange{\approx 2000}{5000} instructions needed for a call to the OS. The \emph{buffer manager} manages the data cached in main memory and therefore it only requires \SI{\approx 50}{\nano\second} of latency for memory access and \num{\approx 100} instructions to fix a page. If a requested page isn't managed by the \emph{buffer manager} before the page access, it needs to be retrieved from the \emph{storage management}. Therefore the \emph{buffer pool management} is the layer that accesses the \emph{storage management} like it was defined in the \emph{5-Layer DBMS architecture}. A \emph{logical page reference} is an access to a page which can be performed by the \emph{buffer pool} without the need for the call to the \emph{storage management} while a \emph{physical page reference} requires a retrieval from secondary storage.
-	
+    The \emph{caching} is realized in the DBMS \emph{buffer pool manager} which can be found in the DBMS \emph{propagation control} layer as shown in figure \ref{fig:fivelayerarchitecture}. The upper layers access the buffer pool through an interface which basically offers the operations \lstinline{fix()} and \lstinline{unfix()}. As the processing of data inside the CPU requires the data to be byte-wise addressable, the data needs to be mapped from the block-addressable secondary storage devices to main memory.
+
+    These requirements lead to the partial architecture as shown in figure \ref{fig:bufferarchitecture}. The \emph{transaction management and access path operators} summarize the layers of \emph{logical data structures}, \emph{logical access paths} and \emph{storage structures}. The \emph{propagation control} is called \emph{buffer pool management} and the \emph{file services} are called \emph{storage management}. The latter manages the data stored on secondary storage and therefore it requires access to those storage devices which takes $\approx$\numrange{0.1}{12}\si{\milli\second} of I/O latency and $\approx$\numrange{2000}{5000} instructions needed for a call to the OS. The \emph{buffer manager} manages the data cached in main memory and therefore it only requires $\approx$\SI{50}{\nano\second} of latency for memory access and $\approx$\num{100} instructions to fix a page. If a requested page isn't managed by the \emph{buffer manager} before the page access, it needs to be retrieved from the \emph{storage management}. Therefore the \emph{buffer pool management} is the layer that accesses the \emph{storage management} like it was defined in the \emph{5-Layer DBMS architecture}. A \emph{logical page reference} is an access to a page which can be performed by the \emph{buffer pool} without the need for the call to the \emph{storage management} while a \emph{physical page reference} requires a retrieval from secondary storage.
+
 \begin{@empty}
-	\definecolor{VioletOliveGreen}{HTML}{4E5974}
-	
-	\tikzset{%
-		every node/.style = {font = \sffamily},
-		phantom/.style = {rectangle, draw = none, thick},
-		layer/.style = {rectangle, draw, thick},
-		toplayers/.style = {layer},
-		buffer/.style = {layer},
-		storage/.style = {layer},		
-		disk/.style = {cylinder, cylinder uses custom fill, shape border rotate = 90, draw, minimum height = 1cm, minimum width = 1.5cm, thick},
-		disktext/.style = {},
-		interfacearrow/.style = {<->, thick, draw = black}
-	}
+    \definecolor{VioletOliveGreen}{HTML}{4E5974}
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			toplayers/.append style = {color = VioletOliveGreen, fill = VioletOliveGreen!15},
-			buffer/.append style = {color = red, fill = red!15},
-			storage/.append style = {color = red, fill = red!15},
-			disk/.append style = {color = blue, cylinder body fill = blue!15, cylinder end fill = blue!40},
-			disktext/.style = {color = blue}
-		}
-	}
+    \tikzset{%
+        every node/.style = {font = \sffamily},
+        phantom/.style = {rectangle, draw = none, thick},
+        layer/.style = {rectangle, draw, thick},
+        toplayers/.style = {layer},
+        buffer/.style = {layer},
+        storage/.style = {layer},
+        disk/.style = {cylinder, cylinder uses custom fill, shape border rotate = 90, draw, minimum height = 1cm, minimum width = 1.5cm, thick},
+        disktext/.style = {},
+        interfacearrow/.style = {<->, thick, draw = black}
+    }
 
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}
-				\node[toplayers, minimum width = .9\textwidth]	(tam)			[]				{\begin{tabular}{c}Transaction Management\\and Access Path Operators\end{tabular}};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            toplayers/.append style = {color = VioletOliveGreen, fill = VioletOliveGreen!15},
+            buffer/.append style = {color = red, fill = red!15},
+            storage/.append style = {color = red, fill = red!15},
+            disk/.append style = {color = blue, cylinder body fill = blue!15, cylinder end fill = blue!40},
+            disktext/.style = {color = blue}
+        }
+    }
+
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}
+                \node[toplayers, minimum width = .9\textwidth]	(tam)			[]				{\begin{tabular}{c}Transaction Management\\and Access Path Operators\end{tabular}};
 				\node[phantom, minimum width = 0cm]		(help0)		[below = of tam]	{\vphantom{\begin{tabular}{c}Buffer\\Management\end{tabular}}};
 				\node[buffer, minimum width = .35\textwidth]	(bpm)		[left = of help0]		{\begin{tabular}{c}Buffer Pool\\Management\end{tabular}};
 				\node[buffer, minimum width = .35\textwidth]	(bp)			[right = of help0]	{\begin{tabular}{c}Main Memory\end{tabular}};
@@ -394,125 +395,124 @@
 				\node[disk, minimum width = 4cm]			(b) 			[below = of sm]						{};
 				\node[disk]							(a) 			[left = 4cm of b.north, anchor = north]	{};
 				\node[disk]							(c) 			[right = 4cm of b.north, anchor = north]	{};
-		
+
 				\node at (b)	[disktext, draw = none]		(ss)			[]									{\small Secondary Storage};
 
 				\node[phantom]							(help1)		[above = of bpm]	{\vphantom{\begin{tabular}{c}Mg\\Op\end{tabular}}};
 				\node[phantom]							(help2)		[below = of bpm]	{\vphantom{Sg}};
 				\node[phantom]							(help3)		[above = of a]		{\vphantom{Sg}};
 				\node[phantom]							(help4)		[above = of c]		{\vphantom{Sg}};
-		
+
 				\path[interfacearrow]
-					(help1)	edge [in = 90,out = -90]	node[right, xshift = 0.2cm]	{\footnotesize \textbf{Logical Page References} (\num{\approx 100} Instructions)}	(bpm);
+					(help1)	edge [in = 90,out = -90]	node[right, xshift = 0.2cm]	{\footnotesize \textbf{Logical Page References} ($\approx$\num{100} Instructions)}	(bpm);
 				\path[interfacearrow]
-					(bpm)	edge [in = 90,out = -90]	node[right, xshift = 0.2cm]	{\footnotesize \textbf{Physical Page References} (\numrange{\approx 2000}{5000} Instructions)}	(help2);
+					(bpm)	edge [in = 90,out = -90]	node[right, xshift = 0.2cm]	{\footnotesize \textbf{Physical Page References} ($\approx$\numrange{2000}{5000} Instructions)}	(help2);
 				\path[interfacearrow]
-					(bpm)							--					node[]				{\footnotesize \begin{tabular}{c}\textbf{Memory}\\\textbf{Access} (\SI{\approx 50}{\nano\second})\end{tabular}}	(bp);
-		
+					(bpm)							--					node[]				{\footnotesize \begin{tabular}{c}\textbf{Memory}\\\textbf{Access} ($\approx$\SI{50}{\nano\second})\end{tabular}}	(bp);
+
 				\path[interfacearrow]
 					(help3.south)		edge [in = 90,out = -90]	node[]				{\footnotesize}														(a.north)
-					(sm.south)		edge [in = 90,out = -90]	node[xshift = 1.15cm]	{\footnotesize \textbf{Disc Accesses} (\numrange{\approx 0.1}{12}\si{\milli\second})}	(b.north)
+					(sm.south)		edge [in = 90,out = -90]	node[xshift = 1.15cm]	{\footnotesize \textbf{Disc Accesses} ($\approx$\numrange{0.1}{12}\si{\milli\second})}	(b.north)
 					(help4.south)		edge [in = 90,out = -90]	node[]				{\footnotesize}														(c.north);
-			\end{tikzpicture}
-		}
-		\caption{The DBMS-Layers Above and Below the Buffer Pool Manager}
-		\label{fig:bufferarchitecture}
-	\end{figure}
+            \end{tikzpicture}
+        }
+        \vspace{.5em}
+        \caption{The DBMS-Layers Above and Below the Buffer Pool Manager}
+        \label{fig:bufferarchitecture}
+    \end{figure}
 \end{@empty}
-	
-	The \lstinline{fix()} operation, given a \emph{page ID}, returns the \emph{memory address} of the page referenced by that ID. Therefore an important task executed during this operation is to locate the page inside the \emph{buffer pool}. In case of a \emph{physical page reference}, the \emph{buffer manager} requests the page from the \emph{storage manager} using the \emph{page ID} and blocks the calling thread until the page is available at a main memory address. To allow the insertion of a page into the \emph{buffer pool}, there needs to be a free \emph{buffer frame}. Therefore there needs to be a component of the \emph{buffer pool} which manages the set of empty \emph{frames} and another component needs to take care about evicting pages in case of a full \emph{buffer pool}. In any case, the \emph{buffer pool} needs to control concurrent accesses on the \emph{frames} managed by it and on the auxiliary structures needed for this management as there might be multiple threads fixing pages concurrently. When a page is fixed by a thread, it needs to acquire the page's latch. Working on the data wouldn't be even possible on secondary storage as those devices only allow the addressing of blocks which are too large to be processed directly by the CPU and therefore the pages needs to be mapped to main memory.
-	
-	The \lstinline{unfix()} operation reverses the \lstinline{fix()} operation. The thread that fixed the page before, releases the page with calling \lstinline{unfix()}. After a transaction called \lstinline{unfix()}, it's not allowed to use the memory address given by the \lstinline{fix()} operation any further as the buffer pool doesn't guarantee that the page can be found at this memory address any more (it might be evicted by the \emph{buffer pool}). It also releases the latch of the page for the calling thread.
-	
-	To be able to offer this interface, the DBMS buffer manager have to perform various tasks with many alternative techniques how the task can be performed.
-	
-	% TODO: Add prefetching!
-	
+
+    The \lstinline{fix()} operation, given a \emph{page ID}, returns the \emph{memory address} of the page referenced by that ID. Therefore an important task executed during this operation is to locate the page inside the \emph{buffer pool}. In case of a \emph{physical page reference}, the \emph{buffer manager} requests the page from the \emph{storage manager} using the \emph{page ID} and blocks the calling thread until the page is available at a main memory address. To allow the insertion of a page into the \emph{buffer pool}, there needs to be a free \emph{buffer frame}. Therefore there needs to be a component of the \emph{buffer pool} which manages the set of empty \emph{frames} and another component needs to take care about evicting pages in case of a full \emph{buffer pool}. In any case, the \emph{buffer pool} needs to control concurrent accesses on the \emph{frames} managed by it and on the auxiliary structures needed for this management as there might be multiple threads fixing pages concurrently. When a page is fixed by a thread, it needs to acquire the page's latch. Working on the data wouldn't be even possible on secondary storage as those devices only allow the addressing of blocks which are too large to be processed directly by the CPU and therefore the pages needs to be mapped to main memory.
+
+    The \lstinline{unfix()} operation reverses the \lstinline{fix()} operation. The thread that fixed the page before, releases the page with calling \lstinline{unfix()}. After a transaction called \lstinline{unfix()}, it's not allowed to use the memory address given by the \lstinline{fix()} operation any further as the buffer pool doesn't guarantee that the page can be found at this memory address any more (it might be evicted by the \emph{buffer pool}). It also releases the latch of the page for the calling thread.
+
+    To be able to offer this interface, the DBMS buffer manager have to perform various tasks with many alternative techniques how the task can be performed.
+
 \subsection[Memory Allocation]{Memory Allocation in the Buffer Pool} \label{subsec:allocation}
 
-	The buffer management divides the limited amount of available main memory allocated to it into buffer frames. A page retrieved from secondary storage gets placed inside one of the buffer frames if it doesn't already reside in the buffer pool. But as the number of available buffer frames is limited, the buffer manager needs to decide in which frame the page should be placed in. As a database system executes multiple transactions in parallel, there are always multiple transactions fixing pages in the buffer pool. 
-	
-	Therefore it would be possible strategy to allocate a static number of buffer frames to each active transaction to guarantee each of those transactions the opportunity to use the same portion of the buffer pool. Using such a \emph{local memory allocation strategy} prevents one transaction from slowing down all other active transactions by fixing that many pages that the buffer pool will be filled by only the pages of that transaction. It also removes pages from the buffer pool when the transaction which fixed them, terminates. This might be an advantage as the locality of page references (timespan between two consecutive references of the same page) is also much higher within one transaction than between all the active transactions. This can be easily seen in figure \ref{fig:locality}. When only one transaction is running at a time, then around \SI{63}{\percent} of the page references consider pages that were used less than 20 page references before. When 100 transactions are running in parallel, then only circa \SI{54}{\percent} of the page references got such a low reuse distance. The difference between the two situations isn't bigger as pages closer to the root of the used B-tree index structure needs to be accessed frequently by every transaction. But the small difference between the two results shows also, that the lower locality shouldn't be the reason for the usage of local memory allocation. It's also possible to \emph{dynamically allocate} buffer frames to transactions as they need them. This would take into account the different complexity of transactions and therefore the amount of wasted buffer frames would be lower compared to \emph{static memory allocation}. If a static number of frames gets allocated to a transaction which doesn't fix that many pages, it would leave some buffer frames unused. To increase the efficiency of static allocation it would be possible to estimate the number of needed buffer frames when the transaction starts, to allocate enough frames to that transaction. But if the estimation is wrong, then the transaction either wastes some frames or it suffers from low performance. If a transaction which needs many pages, starts when many transactions are active, it might not get sufficient buffer frames to perform fast but even when the number of active transactions drastically decreases afterwards, the number of buffer frames allocated to that transaction cannot be increased. The static local memory allocation isn't very efficient and therefore the dynamic allocation would be used in case of local allocation.
-	
-	Another possible memory allocation strategy \emph{allocates memory globally}. This is a very simple allocation strategy as every active transaction competes for the buffer frames of the whole buffer pool. It doesn't require any additional rules how to handle the concurrent usage of the same page by multiple transactions as each page in the buffer pool can be used by each active transaction in parallel (might be restricted by the concurrency control).
-	
-	The memory allocation is typically done by the \emph{page eviction algorithm} as this is used to select frames to be freed when pages needs to be propagated from secondary storage into a full buffer pool. The strategies presented in chapter \ref{ch:eviction} realize a global memory allocation as they doesn't take into account the transaction that requests a buffer frame.
+    The buffer management divides the limited amount of available main memory allocated to it into buffer frames. A page retrieved from secondary storage gets placed inside one of the buffer frames if it doesn't already reside in the buffer pool. But as the number of available buffer frames is limited, the buffer manager needs to decide in which frame the page should be placed in. As a database system executes multiple transactions in parallel, there are always multiple transactions fixing pages in the buffer pool. 
+
+    Therefore it would be possible strategy to allocate a static number of buffer frames to each active transaction to guarantee each of those transactions the opportunity to use the same portion of the buffer pool. Using such a \emph{local memory allocation strategy} prevents one transaction from slowing down all other active transactions by fixing that many pages that the buffer pool will be filled by only the pages of that transaction. It also removes pages from the buffer pool when the transaction which fixed them, terminates. This might be an advantage as the locality of page references (timespan between two consecutive references of the same page) is also much higher within one transaction than between all the active transactions. This can be easily seen in figure \ref{fig:locality}. When only one transaction is running at a time, then around \SI{63}{\percent} of the page references consider pages that were used less than 20 page references before. When 100 transactions are running in parallel, then only circa \SI{54}{\percent} of the page references got such a low reuse distance. The difference between the two situations isn't bigger as pages closer to the root of the used B-tree index structure needs to be accessed frequently by every transaction. But the small difference between the two results shows also, that the lower locality shouldn't be the reason for the usage of local memory allocation. It's also possible to \emph{dynamically allocate} buffer frames to transactions as they need them. This would take into account the different complexity of transactions and therefore the amount of wasted buffer frames would be lower compared to \emph{static memory allocation}. If a static number of frames gets allocated to a transaction which doesn't fix that many pages, it would leave some buffer frames unused. To increase the efficiency of static allocation it would be possible to estimate the number of needed buffer frames when the transaction starts, to allocate enough frames to that transaction. But if the estimation is wrong, then the transaction either wastes some frames or it suffers from low performance. If a transaction which needs many pages, starts when many transactions are active, it might not get sufficient buffer frames to perform fast but even when the number of active transactions drastically decreases afterwards, the number of buffer frames allocated to that transaction cannot be increased. The static local memory allocation isn't very efficient and therefore the dynamic allocation would be used in case of local allocation.
+
+    Another possible memory allocation strategy \emph{allocates memory globally}. This is a very simple allocation strategy as every active transaction competes for the buffer frames of the whole buffer pool. It doesn't require any additional rules how to handle the concurrent usage of the same page by multiple transactions as each page in the buffer pool can be used by each active transaction in parallel (might be restricted by the concurrency control).
+
+    The memory allocation is typically done by the \emph{page eviction algorithm} as this is used to select frames to be freed when pages needs to be propagated from secondary storage into a full buffer pool. The strategies presented in chapter \ref{ch:eviction} realize a global memory allocation as they doesn't take into account the transaction that requests a buffer frame.
 
 \begin{@empty}
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}
-				\begin{axis}[title = {TPC-C with 100 Warehouses queried by 1 Thread},
-				 		   axis on top,
-				 		   width = \textwidth,
-						   height = .25\textheight,
-						   xlabel = {LRU stack depth},
-						   xlabel near ticks,
-						   xmode = log,
-						   xmin = 5e-1,
-						   xmax = 1e8,
-						   ymode = normal,
-						   ybar interval,
-						   x tick label as interval = false,
-						   xtick = {},
-						   xtickten = {0, 1, ..., 8},
-						   scaled y ticks = false,
-						   ylabel = {\# of references},
-						   ylabel near ticks,
-						   grid = none]
-					\addplot [fill = gray!50] table [x = Lower, y = Count] {./tex/data/lru_stackdepth_histograms/tpcc/ln_histogram_lrunfixed_stackdepth/ln_histogram_LRUnfixed_stackdepth_analysis_wh100_t1.csv};
-				\end{axis}
-			\end{tikzpicture}} \\
-			
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}
-				\begin{axis}[title = {TPC-C with 100 Warehouses queried by 100 Threads},
-						   axis on top,
-				 		   width = \textwidth,
-						   height = .25\textheight,
-						   xlabel = {LRU stack depth},
-						   xlabel near ticks,
-						   xmode = log,
-						   xmin = 5e-1,
-						   xmax = 1e8,
-						   ymode = normal,
-						   ybar interval,
-						   x tick label as interval = false,
-						   xtick = {},
-						   xtickten = {0, 1, ..., 8},
-						   scaled y ticks = false,
-						   ylabel = {\# of references},
-						   ylabel near ticks,
-						   grid = none]
-					\addplot [fill = gray!50] table [x = Lower, y = Count] {./tex/data/lru_stackdepth_histograms/tpcc/ln_histogram_lrunfixed_stackdepth/ln_histogram_LRUnfixed_stackdepth_analysis_wh100_t100.csv};
-				\end{axis}
-			\end{tikzpicture}
-		}
-		\caption{Comparison of the LRU (least recently unfixed) stack depth distribution for 1 and 100 parallel transactions (threads). The basis of this data are reference strings with the lengths of \num{66680384} and \num{81142877} generated by executing \num{500000} transactions of the TPC-C benchmark accessing \num{63362} and \num{969190} distinct pages of a database of 100 warehouses. The given number of threads defines the number of users querying the database in parallel. The LRU stack depth of a page reference is the number of different page references between this page reference and the most recent usage (used between a fix and an unfix) of the same page. If the page is fixed by another thread when the page reference happens, the stack depth will be 0 and if the page was just unfixed (without any other page references in between) by the last thread having fixed the page, the LRU stack depth of the page reference will be 0. Each of the page references is assigned to one of the histogram buckets by its LRU stack depth and therefore the height of the leftmost bar of each histogram indicates the number of page references with a LRU stack depth between 0 and 1.}
-		\label{fig:locality}
-	\end{figure}
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}
+                \begin{axis}[title = {TPC-C with 100 Warehouses queried by 1 Thread},
+                             axis on top,
+                             width = \textwidth,
+                             height = .25\textheight,
+                             xlabel = {LRU stack depth},
+                             xlabel near ticks,
+                             xmode = log,
+                             xmin = 5e-1,
+                             xmax = 1e8,
+                             ymode = normal,
+                             ybar interval,
+                             x tick label as interval = false,
+                             xtick = {},
+                             xtickten = {0, 1, ..., 8},
+                             scaled y ticks = false,
+                             ylabel = {\# of references},
+                             ylabel near ticks,
+                             grid = none]
+                    \addplot [fill = gray!50] table [x = Lower, y = Count] {./tex/data/lru_stackdepth_histograms/tpcc/ln_histogram_lrunfixed_stackdepth/ln_histogram_LRUnfixed_stackdepth_analysis_wh100_t1.csv};
+                \end{axis}
+            \end{tikzpicture}} \\
+
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}
+                \begin{axis}[title = {TPC-C with 100 Warehouses queried by 100 Threads},
+                             axis on top,
+                             width = \textwidth,
+                             height = .25\textheight,
+                             xlabel = {LRU stack depth},
+                             xlabel near ticks,
+                             xmode = log,
+                             xmin = 5e-1,
+                             xmax = 1e8,
+                             ymode = normal,
+                             ybar interval,
+                             x tick label as interval = false,
+                             xtick = {},
+                             xtickten = {0, 1, ..., 8},
+                             scaled y ticks = false,
+                             ylabel = {\# of references},
+                             ylabel near ticks,
+                             grid = none]
+                    \addplot [fill = gray!50] table [x = Lower, y = Count] {./tex/data/lru_stackdepth_histograms/tpcc/ln_histogram_lrunfixed_stackdepth/ln_histogram_LRUnfixed_stackdepth_analysis_wh100_t100.csv};
+                \end{axis}
+            \end{tikzpicture}
+        }
+        \caption[Comparison of LRU stack depth distribution for 1 and 100 threads]{Comparison of the LRU (least recently unfixed) stack depth distribution for 1 and 100 parallel transactions (threads). The basis of this data are reference strings with the lengths of \num{66680384} and \num{81142877} generated by executing \num{500000} transactions of the TPC-C benchmark accessing \num{63362} and \num{969190} distinct pages of a database of 100 warehouses. The given number of threads defines the number of users querying the database in parallel. The LRU stack depth of a page reference is the number of different page references between this page reference and the most recent usage (used between a fix and an unfix) of the same page. If the page is fixed by another thread when the page reference happens, the stack depth will be 0 and if the page was just unfixed (without any other page references in between) by the last thread having fixed the page, the LRU stack depth of the page reference will be 0. Each of the page references is assigned to one of the histogram buckets by its LRU stack depth and therefore the height of the leftmost bar of each histogram indicates the number of page references with a LRU stack depth between 0 and 1.}
+        \label{fig:locality}
+    \end{figure}
 \end{@empty}
-		
+
 \subsection[Concurrency Control]{Concurrency Control of the Buffer Pool}
 
-	Higher levels of a DBMS already participate in a \emph{concurrency control} system to control concurrent access on records. This is usually realized in a \emph{lock manager} or using \emph{MVCC} (Multiversion Concurrency Control). But as the data structures of the \emph{buffer pool manager} like pages and auxiliary data structures are also accessed concurrently, the corruption of those structures needs to be prevented by the use of latching. The access to \emph{buffer frames} needs to be mutually exclusive and therefore there needs to be a latch per page. A reasonable implementation has at least one latch mode for writes which guarantees exclusive access by one thread and it has another latch mode for read accesses where multiple threads are allowed to concurrently read a page. The concurrency control of the used \emph{auxiliary data structures} can be done using special concurrent implementations of the used data structures or by latching the whole data structure like it is done with each buffer frame.
+    Higher levels of a DBMS already participate in a \emph{concurrency control} system to control concurrent access on records. This is usually realized in a \emph{lock manager} or using \emph{MVCC} (Multiversion Concurrency Control). But as the data structures of the \emph{buffer pool manager} like pages and auxiliary data structures are also accessed concurrently, the corruption of those structures needs to be prevented by the use of latching. The access to \emph{buffer frames} needs to be mutually exclusive and therefore there needs to be a latch per page. A reasonable implementation has at least one latch mode for writes which guarantees exclusive access by one thread and it has another latch mode for read accesses where multiple threads are allowed to concurrently read a page. The concurrency control of the used \emph{auxiliary data structures} can be done using special concurrent implementations of the used data structures or by latching the whole data structure like it is done with each buffer frame.
 
 \subsection[Page Eviction]{Page Eviction from the Buffer Pool}
 
-	\textit{A detailed discussion of the concepts can be found in chapter \ref{ch:eviction}.}
+    \textit{A detailed discussion of the concepts can be found in chapter \ref{ch:eviction}.}
 
 \subsection[Without Pointer Swizzling]{Locate Pages in the Buffer Pool without Pointer Swizzling} \label{subsec:locatenoswizzle}
 
-	As the database's size exceeds the \emph{buffer pool}'s capacity, the address space of \emph{page IDs} is larger than the one of of the \emph{buffer frame IDs} and therefore some address translation is required when a page is accessed by \emph{page IDs} using the \emph{buffer manager}. The numerous possible strategies how to perform this address translation are shown in figure \ref{fig:locate}.
+    As the database's size exceeds the \emph{buffer pool}'s capacity, the address space of \emph{page IDs} is larger than the one of of the \emph{buffer frame IDs} and therefore some address translation is required when a page is accessed by \emph{page IDs} using the \emph{buffer manager}. The numerous possible strategies how to perform this address translation are shown in figure \ref{fig:locate}.
 
 \begin{@empty}
-	\tikzset{%
-		every node/.style = {rectangle, draw = black, inner xsep = -0.75mm, very thick, rounded corners}, 
-		level 1/.style={level distance = 2.5cm, sibling distance = 4cm}, 
-		level 2/.style={level distance = 2.5cm, sibling distance = 2cm}, 
-		edge from parent/.style = {draw = black, very thick}
-	}
+    \tikzset{%
+        every node/.style = {rectangle, draw = black, inner xsep = -0.75mm, very thick, rounded corners}, 
+        level 1/.style={level distance = 2.5cm, sibling distance = 4cm}, 
+        level 2/.style={level distance = 2.5cm, sibling distance = 2cm}, 
+        edge from parent/.style = {draw = black, very thick}
+    }
 
 	\nottoggle{bwmode}{
 		\tikzset{%
@@ -538,6 +538,7 @@
 		
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{Classification of search strategies to translate from page IDs to buffer frame IDs as in \cite{Effelsberg:1984}}
 		\label{fig:locate}
 	\end{figure}
@@ -575,6 +576,7 @@
 				}
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{An unsorted table used to map buffer frames to page IDs.}
 		\label{fig:unsortedTable}
 	\end{figure}
@@ -602,6 +604,7 @@
 									\nodepart{two}\begin{tabular}{c}3354 \\ $\rightarrow$ 8\end{tabular}};
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{A sorted table used to map page IDs to buffer frames.}
 		\label{fig:sortedTable}
 	\end{figure}
@@ -634,6 +637,7 @@
 				}
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{A chained table used to map page IDs to buffer frames.}
 		\label{fig:chainedTable}
 	\end{figure}
@@ -756,6 +760,7 @@
 				\draw[]		(help2.west)	--		(bucketHelp4.east);
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{Typical design of a hash table. It maps a page ID of a page in the buffer pool (left) using a hash function (center) to a hash bucket (right). A hash bucket contains an entry for each page ID currently mapped to it but
 if the hash bucket is full (two entries possible in this example), a chained hash bucket (far right) will be used. Each entry maps a page ID to a buffer frame ID where the corresponding page can be found. The used test bed \emph{Zero} uses an implementation based on this concept.}
 		\label{fig:hashtable}
@@ -820,6 +825,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 				\draw[arrow]	(load)			--						(final);
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{The whole process of fixing a page given a search key and an index page when a hash table is used to locate pages in the buffer pool. This summarizing diagram is taken from \cite{Graefe:2014}.}
 		\label{fig:locatehash}
 	\end{figure}
@@ -867,7 +873,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 				\end{axis}
 			\end{tikzpicture}
 		}
-		\caption{History of Memory Prices taken from \cite{mempricehist}.}
+		\caption[History of Memory Prices]{History of Memory Prices taken from \footnote{\url{https://hblok.net/blog/storage/}}.}
 		\label{fig:memorycost}
 	\end{figure}
 \end{@empty}
@@ -926,6 +932,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 						(center.center)		edge[selected]		(uncaching);
 				\end{tikzpicture}
 			}
+        \vspace{.25em}
 		\caption{Dimensions of Pointer Swizzling as of \cite{White:1995} and the Classification of the Presented Approach}
 		\label{fig:cassification}
 	\end{figure}
@@ -999,6 +1006,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 				\draw[arrow]	(load)			--						(final);
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{The whole process of fixing a page given a search key and an index page when pointer swizzling is used to locate pages in the buffer pool. This summarizing diagram is taken from \cite{Graefe:2014}.}
 		\label{fig:locateswizzle}
 	\end{figure}
@@ -1032,7 +1040,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 		\centering
 		\resizebox{\textwidth}{!}{
 			\begin{tikzpicture}[xscale = .5, yscale = 1.25]
-				
+
 				\draw[->]		(1985 - 1985, 0)		--		(2018 - 1985, 0);
 				\foreach \x in {1986, 1988, ..., 2017} {
 					\draw[dotted]		(\x - 1985, 0)									--		(\x - 1985, 5.5);
@@ -1042,257 +1050,220 @@ if the hash bucket is full (two entries possible in this example), a chained has
 					\draw[dotted]		(\x - 1985, 0)									--		(\x - 1985, 5.5);
 					\draw[-]			(\x - 1985, -0.125)								--		(\x - 1985, .125);
 				};
-				
+
 				% The EXODUS version history:
 				\node[softwarename]		(exodus)			at (1986 + 38 / 365 - 1985, 1)			{EXODUS};
-				
+
 				% The Architecture of the EXODUS Extensible DBMS; M. Carey, D. DeWitt, D. Frank, G. Graefe, J. Richardson, E. Shekita, and M. Muralikrishna (published: 1986-09-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1986 + 158 / 365 - 1985, 1)			{};
-				
+
 				% Object and File Management in the EXODUS Extensible Database System; M. Carey, D. DeWitt, J. Richardson, and E. Shekita (published: 1986-08-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1986 + 227 / 365 - 1985, 1)			{};
-				
+
 				% Software Modularization with the EXODUS Optimizer Generator; G. Graefe (published: 1986-09-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1986 + 349 / 365 - 1985, 1)			{};
-				
+
 				% Extensible Database Systems; M. Carey and D. DeWitt (published: 1986-xx-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1986 + 182 / 365 - 1985, 1)			{};
-				
+
 				% The EXODUS Optimizer Generator; G. Graefe and D. DeWitt (published: 1987-05-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1987 + 135 / 365 - 1985, 1)			{};
-				
+
 				% Programming Constructs for Database System Implementation in EXODUS; J. Richardson and M. Carey (published: 1987-05-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1987 + 135 / 365 - 1985, 1)			{};
-				
+
 				% An Overview of the EXODUS Project; M. Carey and D. DeWitt (published: 1987-06-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1987 + 166 / 365 - 1985, 1)			{};
-				
+
 				% Rule-Based Query Optimization in Extensible Database Systems; G. Graefe (published: 1987-08-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1987 + 227 / 365 - 1985, 1)			{};
-				
+
 				% Persistence in EXODUS; J. Richardson, M., Carey, D. DeWitt, and D. Schuh (published: 1987-08-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1987 + 227 / 365 - 1985, 1)			{};
-				
+
 				% A Data Model and Query Language for EXODUS; M. Carey, D. DeWitt, and S. Vandenberg (published: 1988-06-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1988 + 167 / 366 - 1985, 1)			{};
-				
+
 				% Implementing Persistence in E; J. Richardson and M. Carey (published: 1989-01-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1989 + 15 / 365 - 1985, 1)			{};
-				
+
 				% Performance Enhancement Through Replication in an Object-Oriented DBMS; E. Shekita and M. Carey (published: 1989-06-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1988 + 166 / 365 - 1985, 1)			{};
-				
+
 				% E: A Persistent Systems Implementation Language; J. Richardson (published: 1989-08-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1989 + 227 / 365 - 1985, 1)			{};
-				
+
 				% Storage Management for Objects in EXODUS;  M. Carey, D. DeWitt, J. Richardson, and E. Shekita (published: 1989-xx-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1989 + 182 / 365 - 1985, 1)			{};
-				
+
 				% Persistence in the E Language: Issues and Implementation; J. Richardson and M. Carey (published: 1989-12-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1989 + 349 / 365 - 1985, 1)			{};
-				
+
 				% A Performance Evaluation of Pointer-Based Joins; E. Shekita and M. Carey (published: 1990-05-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1990 + 135 / 365 - 1985, 1)			{};
-				
+
 				% The EXODUS Extensible DBMS Project: An Overview; M. Carey, D. DeWitt, G. Graefe, D. Haight, J. Richardson, D. Schuh, E. Shekita, and S. Vandenberg (published: 1990-xx-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1990 + 182 / 365 - 1985, 1)			{};
-				
+
 				% Persistence in E Revisited -- Implementation Experiences; D. Schuh, M. Carey, and D. DeWitt (published: 1990-09-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1990 + 258 / 365 - 1985, 1)			{};
-				
+
 				% Cricket: A Mapped Persistent Object Store; E. Shekita, M. Zwilling (published: 1990-09-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1990 + 258 / 365 - 1985, 1)			{};
-				
+
 				% High-Performance Implementation Techniques for Next-Generation Database Systems; E. Shekita (published: 1990-12-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1990 + 349 / 365 - 1985, 1)			{};
-				
+
 				% Extensible Database Management Systems; M. Carey and L. Haas (published: 1990-12-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1990 + 349 / 365 - 1985, 1)			{};
-				
+
 				% Data Caching Tradeoffs in Client-Server DBMS Architectures; M. Carey, M. Franklin, M. Livny, and E. Shekita (published: 1991-05-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1991 + 135 / 365 - 1985, 1)			{};
-				
+
 				% Algebraic Support for Complex Objects with Arrays, Identity, and Inheritance; S. Vandenberg, D. DeWitt (published: 1991-06-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1991 + 166 / 365 - 1985, 1)			{};
-				
+
 				% Crash Recovery in Client-Server EXODUS; Franklin, M., Zwilling, M., Tan, C., Carey, M. and D. DeWitt (published: 1992-06-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1992 + 167 / 366 - 1985, 1)			{};
-				
+
 				% A Performance Study of Alternative Object Faulting and Pointer Swizzling Strategies; White, S. and D. DeWitt (published: 1992-08-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1992 + 228 / 366 - 1985, 1)			{};
-				
+
 				% Global Memory Management in Client-Server DBMS Architectures; Franklin, M., Carey, M., and M. Livny (published: 1992-08-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1992 + 228 / 366 - 1985, 1)			{};
-				
+
 				% Client-Server Caching Revisited; Franklin, M., and M. Carey (published: 1992-08-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1992 + 228 / 366 - 1985, 1)			{};
-				
+
 				% The OO7 Benchmark; Carey, M., DeWitt, D. and J. Naughton (published: 1993-05-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1993 + 135 / 365 - 1985, 1)			{};
-				
+
 				% The Design of the E Programming Language; J. Richardson, M. Carey, and D. Schuh (published: 1993-07-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1993 + 196 / 365 - 1985, 1)			{};
-				
+
 				% Storage Reclamation and Reorganization in Client-Server Persistent Object Stores; Yong, Voon-Fee, Naughton, J., and Yu, J. (published: 1994-02-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1994 + 45 / 365 - 1985, 1)			{};
-				
+
 				% QuickStore: A High Performance Mapped Object Store; White, S. and D. DeWitt (published: 1994-05-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1994 + 135 / 365 - 1985, 1)			{};
-				
+
 				% Pointer Swizzling Techniques for Object-Oriented Database Systems; Seth John White (published: 1994-09-xx according to http://research.cs.wisc.edu/exodus/exodus.papers.html)
 				\node[release]			at (1994 + 258 / 365 - 1985, 1)			{};
-				
+
 				\draw[progress]			(exodus)					--			(1994 + 378 / 365 - 1985, 1);
 				\draw[discont]			(1994 + 378 / 365 - 1985, .85)	--			(1994 + 378 / 365 - 1985, 1.15);
-				
+
 				\node[historytype, anchor = east]	at (2017 - 1985, 1)			{publications};
-				
+
 				% The SHORE version history:
 				\node[softwarename]		(shore)			at (1995 + 5 / 365 - 1985, 2)			{Shore};
-				
+
 				\node[release]			at (1995 + 125 / 365 - 1985, 2)			{};
 				\node[releaselabelbelow]	at (1995 + 125 / 365 - 1985, 2)			{0.9};
-				
+
 				\node[release]			at (1995 + 261 / 365 - 1985, 2)			{};
 				\node[releaselabelabove]	at (1995 + 261 / 365 - 1985, 2)			{0.9.3};
-				
+
 				\node[release]			at (1996 + 219 / 366 - 1985, 2)			{};
 				\node[releaselabelbelow]	at (1996 + 219 / 366 - 1985, 2)			{\textbf{1.0}};
-				
+
 				\node[release]			at (1997 + 221 / 365 - 1985, 2)			{};
 				\node[releaselabelabove]	at (1997 + 221 / 365 - 1985, 2)			{1.1};
-				
+
 				\node[release]			at (1997 + 288 / 365 - 1985, 2)			{};
 				\node[releaselabelbelow]	at (1997 + 288 / 365 - 1985, 2)			{1.1.1};
-				
+
 				\draw[progress]			(shore)					--			(1997 + 408 / 365 - 1985, 2);
 				\draw[discont]			(1997 + 408 / 365 - 1985, 1.85)	--			(1997 + 408 / 365 - 1985, 2.15);
-	
+
 				\node[historytype, anchor = east]	at (2017 - 1985, 2)			{releases};
-				
+
 				% The Shore Storage Manager version history:
 				\node[softwarename]		(ssm)			at (1999 + 118 / 365 - 1985, 3)			{SSM};
-				
+
 				\node[release]			at (1999 + 238 / 365 - 1985, 3)			{};
 				\node[releaselabelbelow]	at (1999 + 238 / 365 - 1985, 3)			{\textbf{2.0}};
-				
+
 				\node[release]			at (2001 + 15 / 365 - 1985, 3)			{};
 				\node[releaselabelabove]	at (2001 + 15 / 365 - 1985, 3)			{IS 0};
-				
+
 				\node[release]			at (2001 + 288 / 365 - 1985, 3)			{};
 				\node[releaselabelbelow]	at (2001 + 288 / 365 - 1985, 3)			{IS 1};
-				
+
 				\node[release]			at (2002 + 45 / 365 - 1985, 3)			{};
 				\node[releaselabelabove]	at (2002 + 45 / 365 - 1985, 3)			{IS 2};
-				
+
 				\node[release]			at (2007 + 158 / 365 - 1985, 3)			{};
 				\node[releaselabelbelow, yshift = -.25em]	at (2007 + 158 / 365 - 1985, 3)			{\textbf{5.0}};
-				
+
 				\node[release]			at (2007 + 230 / 365 - 1985, 3)			{};
 				\node[releaselabelabove]	at (2007 + 230 / 365 - 1985, 3)			{5.0.1};
-				
+
 				\node[release]			at (2007 + 275 / 365 - 1985, 3)			{};
 				\node[releaselabelbelow, yshift = .25em]	at (2007 + 275 / 365 - 1985, 3)			{5.0.2};
-				
+
 				\node[release]			at (2008 + 148 / 366 - 1985, 3)			{};
 				\node[releaselabelabove]	at (2008 + 148 / 366 - 1985, 3)			{5.0.3};
-				
+
 				\draw[progress]			(ssm)					--			(2008 + 268 / 366 - 1985, 3);
 				\draw[discont]			(2008 + 268 / 366 - 1985, 2.85)	--			(2008 + 268 / 366 - 1985, 3.15);
-	
+
 				\node[historytype, anchor = west]	at (1986 - 1985, 3)			{releases};
-				
+
 				% The Shore-MT version history:
 				\node[softwarename]		(shoremt)			at (2010 + 231 / 365 - 1985, 4)			{Shore-MT};
-				
+
 				\node[release]			at (2010 + 351 / 365 - 1985, 4)			{};
 				\node[releaselabelbelow]	at (2010 + 351 / 365 - 1985, 4)			{\textbf{6.0}};
-				
+
 				\node[release]			at (2011 + 101 / 365 - 1985, 4)			{};
 				\node[releaselabelabove]	at (2011 + 101 / 365 - 1985, 4)			{6.0.1};
-				
+
 				\node[release]			at (2012 + 3 / 366 - 1985, 4)			{};
 				\node[releaselabelbelow]	at (2012 + 3 / 366 - 1985, 4)			{6.0.2};
-							
+
 				\draw[progress, ->]			(shoremt)					--			(2017 - 1985, 4);
-				
+
 				\node[historytype, anchor = west]	at (1986 - 1985, 4)			{releases};
-				
+
 				% The Zero version history:
 				\node[softwarename]		(zero)			at (2011 + 320 / 365 - 1985, 5)			{Zero};
-				
+
 				% Goetz Graefe, Hideaki Kimura, Harumi A. Kuno; Foster b-trees (published: 2012-08-xx according to http://dl.acm.org/citation.cfm?id=2338630)
 				\node[release]			at (2012 + 227 / 366 - 1985, 5)			{};
-				
+
 				% Hideaki Kimura, Goetz Graefe, Harumi A. Kuno; Efficient Locking Techniques for Databases on Modern Hardware (presented: 2012-08-27 according to http://www.adms-conf.org/adms_2012.html)
 				\node[release]			at (2012 + 240 / 366 - 1985, 5)			{};
-					
+
 				% Goetz Graefe, Harumi A. Kuno; Definition, Detection, and Recovery of Single-Page Failures, a Fourth Class of Database Failures (published: 2012-03-xx according to http://www.vldb.org/pvldb/vol5.html)
 				\node[release]			at (2012 + 75 / 366 - 1985, 5)			{};
-				
+
 				% Goetz Graefe, Mark Lillibridge, Harumi A. Kuno, Joseph Tucek, Alistair C. Veitch; Controlled lock violation (published: 2013-06-xx according to https://www.sigmod.org/2013/sigmod13-research.pdf)
 				\node[release]			at (2013 + 166 / 365 - 1985, 5)			{};
-				
+
 				% Caetano Sauer, Goetz Graefe, Theo Härder; Single-pass restore after a media failure (published: 2015-03-07 according to http://subs.emis.de/LNI/Proceedings/Proceedings241.html)
 				\node[release]			at (2015 + 66 / 365 - 1985, 5)			{};
-				
+
 				% Goetz Graefe, Hideaki Kimura; Orthogonal key-value locking (published: 2015-03-07 according to http://subs.emis.de/LNI/Proceedings/Proceedings241.html)
 				\node[release]			at (2015 + 66 / 365 - 1985, 5)			{};
-				
+
 				% Goetz Graefe, Haris Volos, Hideaki Kimura, Harumi A. Kuno, Joseph Tucek, Mark Lillibridge, Alistair C. Veitch; In-Memory Performance for Big Data (published: 2014-09-xx according to http://www.vldb.org/pvldb/vol8.html)
 				\node[release]			at (2014 + 258 / 365 - 1985, 5)			{};
-						
+
 				\draw[progress, ->]			(zero)					--			(2017 - 1985, 5);
-	
+
 				\node[historytype, anchor = west]	at (1986 - 1985, 5)			{publications};
-			
+
 			\end{tikzpicture}
 		}
+        \vspace{.5em}
 		\caption{History of \emph{EXODUS} (publications, \cite{EXODUSPapers}), \emph{Shore} (versions, \cite{ShoreReleases}), \emph{Shore Storage Manager} (versions, \cite{ShoreReleases}, \cite{ShoreSMReleases}), \emph{Shore-MT} (versions, \cite{ShoreMTReleases}) and \emph{Zero} (publications, \cite{ZeroPapers}) - \textit{The version/publication history is subject to correction!}}
 		\label{fig:testbedhistory}
 	\end{figure}
 
 	\textbf{\emph{Shore-MT}} is a basis for researchers to experiment with new techniques and applications in the area of persistent data management, especially when multi-threading is required. Many features that can be found in modern DBMS, like transactions with ACID-properties, B+ tree indexes and many more, are already build in the storage manager and therefore \emph{Shore-MT} is an excellent framework for researchers to evaluate new techniques in a realistic DBMS context. The ease of extension of \emph{Shore-MT} makes it reasonable to evaluate techniques like pointer swizzling in the buffer manager using this storage manager and therefore it's commonly used by researchers. The availability of \emph{Shore-Kits}, a suite of standardized database benchmarks for \emph{Shore-MT}, even further supports researchers by executing meaningful performance evaluations for OLTP and OLAP scenarios.
-	
+
 	\textbf{\emph{Zero}} was forked of \emph{Shore-MT} for the evaluation of the Foster B-tree in 2012 (\cite{Graefe:2012}). In contrast to \emph{Shore-MT} which offers different index structures, \emph{Zero} only offers the \emph{Foster B-tree} (which has crucial features for the pointer swizzling in the buffer manager). Following the investigation of S. Harizopoulos et al. in \cite{Harizopoulos:2008} on the bottlenecks of a DBMS, where the usual OLTP workload fits in main memory, other new techniques were introduced to \emph{Zero} to eliminate these bottlenecks. These are e.g. the \emph{Orthogonal Key-Value Locking Protocol} or an improved lock manager design. The latest research activities using \emph{Zero} as a test-bed, which are done by Caetano Sauer (my advisor for this work) among others, are in the area of \emph{Instant Recovery}.
-	
-%\subsection{Implementation of Pointer Swizzling Independent Parts of the DBMS Buffer Management}
-
-%\subsubsection{Root Pages and the Tree Structure}
-%
-%\subsubsection{Control Blocks and Latching} \label{subsubsec:cb_latch}
-%
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[h]
-%		\caption{Implementation of \lstinline{get_cbp()} and \lstinline{get_cb()}} \label{lst:get_cb}
-%		\lstinputlisting[linerange = {1-9}]{./tex/code_snippets/bf_tree_m>>get_cb.cpp}
-%	\end{code}
-%\end{@empty}
-%	
-%	The function \lstinline{get_cb()} (listing \ref{lst:get_cb}, lines 7-9) only casts a pointer to the control block returned by \lstinline{get_cb()} (listing \ref{lst:get_cb}, lines 1-5) into a reference using \lstinline{*} and the return type \lstinline{bf_tree_cb_t&}. But as \lstinline{_control_blocks} not only contains control blocks but also latches (\lstinline{latch_t}), the index of the control block inside \lstinline{_control_blocks} is different from the index to the frame in \lstinline{_buffer} which is actually represented by the parameter \lstinline{idx} of function \lstinline{get_cbp()} in listing \label{lst:get_cb}. The calculation of the \lstinline{real_idx} in line 3 is result of the initialization of \lstinline{_control_blocks} in the constructor of \lstinline{bf_tree_m} - \lstinline{bf_tree_m()} in listing \ref{lst:bf_tree_m_control_blocks}.
-%	
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[h]
-%		\caption{Implementation of the initialization of \lstinline{_control_blocks} inside the constructor \lstinline{bf_tree_m()}} \label{lst:bf_tree_m_control_blocks}
-%		\lstinputlisting[linerange = {1-2, 48-73, 96}]{./tex/code_snippets/bf_tree_m>>bf_tree_m.cpp}
-%	\end{code}
-%\end{@empty}
-%
-%	The array \lstinline{_control_blocks} uses an optimization for the CPU's cache line length. This optimization only works if each of the instances of \lstinline{bf_tree_cb_t} and \lstinline{latch_t} exactly takes 64 Bytes which is checked using an assertion in the lines 48 and 49 of listing \ref{lst:bf_tree_m_control_blocks}. As \lstinline{bf_tree_cb_t} and \lstinline{latch_t} contain pointers, references and library functions as data members, the size of instances of those types can differ from system to system. The line 50 calculates the size of the \lstinline{_control_blocks} array. It needs to contain one control block and one latch per frame (there are \lstinline{nbufpages} frames) in the bufferpool plus 
-	
-%\subsubsection{Fixing a Page (Pointer Swizzling Independent Part)}
-
-%\subsubsection{Unfixing a Page (Pointer Swizzling Independent Part)}
-
-%\subsubsection{Pinning and Refixing a Page}
 
 \subsection{Design of the Buffer Management of \emph{Zero}} \label{subsec:zerodesign}
 
@@ -1339,41 +1310,42 @@ if the hash bucket is full (two entries possible in this example), a chained has
 			$-$ \texttt{\_is\_valid\_index(}in \texttt{idx}:\texttt{bf\_idx)}: \texttt{bool}																								\\
 			$-$ \texttt{\_is\_active\_index(}in \texttt{idx}:\texttt{bf\_idx)}: \texttt{bool}																								\\	\hline
 		\end{tabularx}}
+        \vspace{.5em}
 		\caption{Overview of the Class \lstinline{bf_tree_m} in UML Notation}
 		\label{fig:bufferdesign}
 	\end{figure}
 \end{@empty}
 
 	The main component of \emph{Zero}'s buffer manager is the class \lstinline{bf_tree_m}. As \emph{Zero} is designed object-oriented, an overview of this class is given in figure \ref{fig:bufferdesign} using the UML class diagram syntax. 
-	
+
 	The actual buffer pool which stores the pages is the member \lstinline{_buffer}. It's an array of \lstinline{_block_cnt} elements of type \lstinline{generic_page}. The index \lstinline{0} is never used as this is expected to be an invalid buffer frame index. The member \lstinline{_block_cnt} is initialized with the size of the buffer pool counted in pages. The type \lstinline{bf_idx} is an integer type that is used for buffer frame indexes. A \lstinline{generic_page} is the super type of pages and therefore any page that can be cached in the buffer pool is a \lstinline{generic_page}. The array \lstinline{_root_pages} holds the buffer frame indexes of root pages that are stored in the buffer pool. A root page is the root page of an index structure like a Foster B-tree and therefore there is no other page with a pointer on a root page. The \lstinline{_control_blocks} array holds one \lstinline{bf_tree_cb_t} for each buffer frames. A detailed description of those control blocks can be found later in this subsection.
-	
+
 	The \lstinline{_hashtable} represents the hash table used to locate a page when pointer swizzling isn't used. But even with pointer swizzling, this auxiliary structure will be of use. The \lstinline{_freelist} is a list of free buffer frames used to allocate a buffer frame during a page miss. It needs to be a queue to allow the usage of CLOCK page eviction strategies which require the reuse of frames in the order in which they were freed. After the startup of the buffer pool, the first buffer index returned by the \lstinline{_freelist} is the index \lstinline{1} and the last returned index before pages need to be evicted is \lstinline{_block_cnt - 1}.An approximate number of free frames is stored in \lstinline{_approx_freelist_length} to allow the eviction of pages until a specific number of frames are free. The hash table and the list of free pages needs to be protected against concurrent accesses as multiple thread might access the buffer pool in parallel.
-	
+
 	The \lstinline{_evictioner} is the component of the buffer pool that takes cares about the eviction of pages. It is used by the buffer pool when some free buffer frames are needed and it gets called to update its statistics about buffered pages inside some methods. Multiple implementations of the class \lstinline{page_evictioner_base} are discussed in chapter \ref{ch:eviction}. To prevent the concurrent execution of the evictioner on multiple threads, the \lstinline{_eviction_lock} is used to prevent multiple executions.
-	
+
 	The \lstinline{_cleaner} takes care about the propagating of updates of pages to the secondary storage. When a page gets updated, the update only takes place in the buffered copy of the page (and the update is logged in the transactional log). Afterwards the page is marked dirty until the cleaner updated the persistent copy of the page. A dirty page isn't allowed to be evicted and therefore the optimization of this component is a major concern. In \cite{Sauer:2016} multiple designs of cleaners are evaluated and the different implementations are also part of \emph{Zero}. The cleaner runs in an own thread and therefore it just needs to be started by a thread that encounters the need of cleaned pages.
-	
+
 	The \lstinline{_cleaner_decoupled} is set when the decoupled cleaner should be used. When the buffer pool should use pointer swizzling to locate pages, then \lstinline{_enable_swizzling} is set and when the buffer pool log (implementation in appendix \ref{ch:bufferpoollog}) should be used to log fix, unfix and refix events, then \lstinline{_logstats_fix} is set.
-	
+
 	The constructor of the class \lstinline{bf_tree_m()} initializes the members as discussed before. To allow the buffer pool to consider the program options used when the DBMS was started, the \lstinline{sm_options} are passed to it. The destructor \lstinline{~bf_tree_m()} deallocates the memory dynamically allocated during the instantiation of the buffer pool. But before, the buffer pool components cleaner and evictioner should be stopped and destroyed using \lstinline{shutdown()}.
-	
+
 	To get the control block of a specific buffer frame, the \lstinline{get_cbp()} method can be used and to find out if a page pointer is swizzled the static method \lstinline{is_swizzled_pointer()} can be used. If the pointer to a specific page represented by a \lstinline{generic_page} is swizzled, the method \lstinline{is_swizzled()} returns \lstinline{true}. As the evictioner is only allowed to evict pages that doesn't contain swizzled pointers, the method \lstinline{has_swizzled_child()} calculates if a page contains swizzled pointers.
-	
+
 	To get the next free buffer pool frame's frame index from the \lstinline{_freelist}, the method \lstinline{_grab_free_block()} needs to be used. It returns the index of the free frame through the parameter \lstinline{ret}. If the \lstinline{_approx_freelist_length} is \lstinline{0} and if the parameter \lstinline{evict} is set, it triggers the evictioner through \lstinline{_get_replacement_block()}. If eviction was needed it sets the parameter \lstinline{evicted}. The method \lstinline{_get_replacement_block()} locks the evictioner and executes it when it encounters a full buffer pool. When the evictioner freed a frame, it adds it to the list of free frames using the method \lstinline{_add_free_block()}. This needs to be also used when the usage of a requested free frame failed.
-	
+
 	The valid indexes of buffer frame only range from \lstinline{0} to \lstinline{_block_cnt - 1} due to limited size of the buffer pool and the usage of the first frame as invalid frame. To check if a given frame index is in this range, the method \lstinline{_is_valid_index()} is defined. If it should also be checked that the frame is actually in use (a page is cached there), the method \lstinline{_is_active_index()} needs to be called.
-	
+
 	The main interface of the buffer pool takes care about the \emph{fixing} and \emph{unfixing} of pages. This interface is split into 5 methods that offer different services.
-	
+
 	To fix a root page, the method \lstinline{fix_root()} needs to be called. The parameter \lstinline{store} defines which root page should be fixed and returned through the parameter \lstinline{page}. The \lstinline{mode} defines the kind of latch that should be acquired when the page gets fixed. A \lstinline{LATCH_SH} is used when the page should be only read and a \lstinline{LATCH_EX} needs to be used when the page should be updated. Only one thread at a time can have an exclusive latch to mutually exclude concurrent writes. But it usually takes longer to acquire an exclusive latch as there are no other threads allowed to have a shared latch as well, when one thread has acquired an exclusive latch. The acquired latch can later be up- or downgraded. If the parameter \lstinline{conditional} is set, the page gets only fixed, if the latch can be acquired without waiting on other thread releasing the latch. This is e.g. used by the evictioner as it wouldn't evict a page that is currently latched by another thread. If the parameter \lstinline{virgin} isn't set, \lstinline{fix_root()} doesn't fix the requested page when the buffer pool is full.
-	
+
 	To fix a page that isn't the root of an index structure, the appropriate method to call is \lstinline{fix_nonroot()}. The page is identified using its \lstinline{PageID} which can be an actual page identifier or it can be a swizzled pointer containing a buffer frame index. As pointer swizzling needs the parent of a page to swizzle the pointer there during a page miss, the parent page is passed in the parameter \lstinline{parent}. As the only possible access path to access a page is by using its parent, the parent needs to be fixed by the calling thread as well and therefore this doesn't add any overhead to the process. The parameters \lstinline{page}, \lstinline{mode} and \lstinline{virgin_page} (like \lstinline{virgin}) are used as in \lstinline{fix_root()}. If the parameter \lstinline{only_if_hit} is set, the page is only fixed, when it is available in the buffer pool.
-	
+
 	\emph{Zero}'s buffer pool also offers a mechanism called \emph{refix}. This allows a thread to unfix a page without requiring the effort of a usual fix to refix the page later on. To use this mechanism a thread needs to pin a page by calling \lstinline{pin_for_refix()} passing the page. Until the thread doesn't unpin the page using \lstinline{unpin_for_refix()}, the page cannot be evicted from the buffer pool. The thread needs to keep the frame index of the page to use the refix as the major overhead of a fix during a page hit with disabled pointer swizzling would be caused by locating the page in the buffer pool. To refix a pinned page, the method \lstinline{refix_direct()} needs to be called. The parameters \lstinline{page}, \lstinline{mode} and \lstinline{conditional} are used as before and the parameter \lstinline{idx} needs to contain the kept index of the buffer frame where the requested page can be found.
-	
+
 	The most complex method of the buffer pool is the \lstinline{fix()} method. This method is used by the methods \lstinline{fix_root()} and \lstinline{fix_nonroot()} to perform the common tasks. It locates the requested page, retrieves it from the storage manager if needed and acquires the latch. If swizzling is enabled, it cares about following a swizzled pointer and it does the swizzling of a pointer in the parent of a requested page. The majority of the code presented in the subsections \ref{subsec:pagehit} and \ref{subsec:pagemiss} is part of this method.
-		
+
 \begin{@empty}
 	\begin{figure}[ht!]
 		\centering
@@ -1393,6 +1365,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 			$+$ \texttt{unpin()}: \texttt{void}																																\\
 			$+$ \texttt{latch()}: \texttt{latch\_t\&}																															\\	\hline
 		\end{tabularx}}
+        \vspace{.5em}
 		\caption{Overview of the Class \lstinline{bf_tree_cb_t} in UML Notation}
 		\label{fig:cbdesign}
 	\end{figure}
@@ -1401,21 +1374,21 @@ if the hash bucket is full (two entries possible in this example), a chained has
 	Methods returning a value of type \lstinline{w_rc_t} can throw exceptions through this return type. If such a method is called inside the macro \lstinline{W_DO()}, the calling method immediately returns if the called method returned an error. To manually check for an error, the class \lstinline{w_rc_t} offers the method \lstinline{is_error()} which returns \lstinline{true} if the method which returned the instance of \lstinline{w_rc_t} encountered an error. An instance that isn't an error is \lstinline{RCOK} while an error can be generated using \lstinline{RC(e)} where \lstinline{e} is an error code. 
 
 	The class \lstinline{bf_tree_cb_t} shown in figure \ref{fig:cbdesign} realizes the control blocks which are used to store meta data for each buffer frame of the buffer manager.
-	
+
 	It stores the page ID of the page that is currently buffered in the corresponding frame in the \lstinline{_pid} member. If the corresponding buffer frame is used, the \lstinline{_used} bit is set and if the pointer to the page contained in the frame is swizzled, then the \lstinline{_swizzled} bit is set. As the access of the lastly mentioned members doesn't require a thread to have the frame latched, those need to manage consistent updates that happen concurrently.
-	
+
 	The \lstinline{_pin_cnt} gets initialized with \lstinline{0} and incremented by one when the contained page gets fixed, when the pointer to the page gets swizzled and when a pointer inside the page gets swizzled. It gets decremented on the opposite actions. A \lstinline{_pin_cnt} that is greater \lstinline{0} prevents the eviction of the contained page as the state where the page is fixed, swizzled or where it contains swizzled pointers requires the page to stay in the buffer pool. When the evictioner selects a page to become evicted, it sets the \lstinline{_pin_cnt} of the corresponding buffer frame to \lstinline{-1} to prevent the further usage of the page.
-	
+
 	The methods \lstinline{pin()} and \lstinline{unpin()} increment and decrement the \lstinline{_pin_cnt} thread-safe and therefore concurrent actions doesn't interfere.
-	
+
 	The method \lstinline{is_dirty()} called on the control block of a buffer frame returns \lstinline{true}, if the page contained in the frame is dirty and \lstinline{latch()} returns the latch of the  buffer frame which is stored outside the control block but inside the memory allocated for it.
-	
+
 	When a page gets removed from the buffer frame, the control block corresponding to the buffer frame where the page was cached, gets cleared using \lstinline{clear_except_latch()}. The latch mustn't be cleared as it mustn't be released until the control block is cleared. A newly initialized control block holds the \lstinline{_pid} passed in \lstinline{pid} to the method \lstinline{init()}. Therefore the frame is marked used and not swizzled.
 
 \subsection[Comparison of the Implementations for a Page Hit]{Implementation of \lstinline{fix()} for a Page Hit in a Buffer Pool With and Without Pointer Swizzling} \label{subsec:pagehit}
 
 	The \lstinline{fix()} operation is used by \lstinline{fix_root()} and \lstinline{fix_nonroot()}. The last one just passes its arguments to the \lstinline{fix()} method as it uses the same parameters. The first one doesn't call \lstinline{fix()} during a page hit. In that case, this operation just needs to lookup the buffer frame index of the frame where the requested page can be found using the store ID in the array \lstinline{_root_pages}. As there only exists a very limited amount of root pages those cannot be evicted from the buffer pool and their addresses gets always swizzled - even when pointer swizzling in the buffer pool is deactivated - in that array. Afterwards the method acquires the latch in the requested mode and it pins the page calling \lstinline{bf_tree_cb_t::pin()}. Therefore the overhead of \lstinline{fix_root()} is always very small.
-	
+
 \subsubsection{A Page Hit Without Pointer Swizzling} \label{subsubsec:pagehitwithout}
 
 \begin{@empty}
@@ -1424,17 +1397,18 @@ if the hash bucket is full (two entries possible in this example), a chained has
 		style = basic
 	}
 	\begin{code}[ht!]
+        \vspace{.5em}
 		\caption{Implementation of \lstinline{bf_tree_m::fix()} in case of a page hit without having a swizzled page identifier} \label{lst:fixnoswizzlehit}
 		\lstinputlisting[linerange = {1-5, 46-54, 125-126, 128-128, 132-137, 140-143, 145-145, 151-153, 157-157, 235-237}]{./tex/code_snippets/bf_tree_m>>fix.cpp}
 	\end{code}
 \end{@empty}
-	
+
 	In case of a page hit (without having \lstinline{pid} swizzled), the major operation to be executed by \lstinline{fix()} is to locate the buffer pool frame where the requested page can be found. The part of the implementation of the \lstinline{fix()} method which is executed during a page hit when pointer swizzling is deactivated is shown in \emph{listing \ref{lst:fixnoswizzlehit}}.
-	
+
 	The whole task of fixing a page runs inside an infinite \lstinline{while}-loop which is used to implicitly retry the operation when an error occurs. If the task performs without an error then the whole function gets terminated by calling a \lstinline{return}-statement as in \emph{line 235}. If an error happens somewhere during the \lstinline{fix()} then an automatic retry happens by using a \lstinline{continue}-statement as in \emph{line 141}.
-	
+
 	In \emph{line 50} the frame index of the page specified with parameter \lstinline{pid} is searched. As the given \lstinline{PageID} isn't swizzled, a hash table lookup is needed. The \lstinline{pid} is the input parameter of the lookup whereas the \lstinline{bf_idx_pair} \lstinline{p} is needed as an output parameter. Therefore parameter \lstinline{p} gets set by \lstinline{bf_hashtable::lookup()}. A \lstinline{bf_idx_pair} is a pair of \lstinline{bf_idx} values where the \lstinline{bf_hashtable} uses the first value (\lstinline{.first}) to store the index of the frame corresponding to the indexed \lstinline{PageID} and the second value (\lstinline{.second}) for the index of the frame where the parent page can be found (this is needed for the swizzling and unswizzling of pointers). An instance of \lstinline{bf_idx_pair} is prepared in \emph{line 48} and an instance of type \lstinline{bf_idx} is prepared in \emph{line 49} as the rest of the function only uses the index of the requested frame. The initialization of \lstinline{idx} with \lstinline{0} is used to mark the current value as invalid.
-	
+
 \begin{@empty}
 	\lstset{
 		language = [ISO]C++,
@@ -1445,23 +1419,23 @@ if the hash bucket is full (two entries possible in this example), a chained has
 		\lstinputlisting[linerange = {91-94, 96-103, 105-109, 111-121, 293-295, 297-299}]{./tex/code_snippets/bf_hashtable.cpp}
 	\end{code}
 \end{@empty}
-	
+
 	The method \lstinline{bf_hashtable::lookup()}, used by \lstinline{bf_tree_m::fix()}, calculates the \lstinline{hash}-value on \emph{line 297} in \emph{listing \ref{lst:bf_hashtablelookup}} using a function that just uses a built-in hash function (\lstinline{w_hashing::uhash::hash32()}). The hash function tries to equally distribute the actually used \lstinline{PageID} values among the range of a 32 bit integer value and the modulo operator inside the index calculation for the \lstinline{_table} distributes the hash values equally among the \lstinline{_size} hash buckets. In the next step it calls \lstinline{bf_hashbucket::find()} on the hash table bucket corresponding to the calculated hash value. The hash table bucket of type \lstinline{bf_hashbucket<T>} can be found in the array \lstinline{_table} which is indexed using the hash value. As  \emph{listing \ref{lst:bf_hashtablelookup}} reveals, the hash table is implemented as a template class that allows the mapping of \lstinline{PageID} values to arbitrary values but it is only used with \lstinline{T == bf_idx_pair}.
-	
+
 	The method \lstinline{bf_hashbucket::find()} needs to lock the hash bucket it's searching in using a read lock on \emph{line 93} to prevent concurrent changes to it, which would cause errors during the execution of the method. If a concurrent change would add an entry, this entry might not be found by the \lstinline{find()} method as the \lstinline{for}-loops defined on \emph{lines 96-97}, \emph{106-108} and \emph{111-112} only run over that much entries that were used (\lstinline{_used_count}) when the \lstinline{for}-loop checked the condition the last time. If a concurrent change removes an entry, the \lstinline{for}-loops might read at invalid (unused) indices, the algorithm might try to look inside not existing chained chunks or some entries might be rearranged and therefore skipped during the iteration over the hash bucket.
-	
+
 	The first \lstinline{for}-loop only iterates over the used fields (\lstinline{_used_count}) of the \emph{first chunk} (corresponding hash bucket without chained buckets) of the hash bucket (\lstinline{HASHBUCKET_INITIAL_CHUNK_SIZE == 4}) and compares the found keys (\lstinline{PageID} values) with the \lstinline{key} parameter representing the searched \lstinline{PageID} value on \emph{line 98}. If the key was found, the reference to the corresponding value (which represents the \lstinline{bf_idx_pair} where the \lstinline{generic_page} with \lstinline{PageID} \lstinline{key} can be found in the buffer pool) gets copied into the output parameter \lstinline{value} and, together with the success indicator (\lstinline{return true}), returned to the calling \lstinline{fix()} method.
-	
+
 	But if the key wasn't found in the first chunk, the \lstinline{for}-loop defined on \emph{lines 106-108} iterates over the \emph{linked chunks} (chained buckets) which are of type \lstinline{bf_hashbucket_chunk_linked<T>}. Therefore it moves the pointer that always points to the chunk where it currently operates on (\lstinline{cur_chunk}) to the \lstinline{next_chunk} pointer of the \lstinline{cur_chunk} within each iteration until the last entry was checked (\lstinline{cur_count >= _used_count} $\implies$ A chained bucket isn't fully populated). Within each of the iterations of the outer \lstinline{for}-loop there is an inner \lstinline{for}-loop that works pretty much the same as the \lstinline{for}-loop on \emph{lines 96-102}. The major difference is that it has to work on a chained chunk (\lstinline{cur_chunk}) and that it has to update the \lstinline{cur_count}-value for the outer \lstinline{for}-loop to allow the check inside the loop condition if there is another entry inside the chunk and if there is another chained chunk. The reader can convince herself that this process needs much more instructions than a page hit in the next subsection \ref{subsubsec:pagehitwith}.
-	
+
 	Back in the method body of the \lstinline{bf_tree_m::fix()} method, the searched buffer index (not the one of the parent of the searched page) gets extracted on \emph{line 51} if the hash table has found an entry for the searched \lstinline{PageID}. If the hash table failed to find a matching entry, the page isn't in the buffer pool (still \lstinline{idx == 0} which is an unused index) and therefore the code for a page miss (on \emph{55-124}), as described in subsection \ref{subsubsec:pagemisswithout}, needs to be executed.
-	
+
 	As another major part of fixing a page is to acquire it's latch for the current thread, the control block of the corresponding buffer pool frame is needed. Therefore the method \lstinline{get_cb()} is called with the just found buffer frame index \lstinline{idx} as parameter on \emph{line 128}.
-	
+
 	On \emph{lines 133-135} the thread acquires the latch of the page depending on the requested latch mode which was given in parameter \lstinline{mode}. The parameter \lstinline{conditional} specifies, if the latch should only be acquired in the case, that the latch in the specified mode can be acquired immediately (\lstinline{sthread_t::WAIT_IMMEDIATE}), if \lstinline{conditional} isn't set, waiting on the latch (\lstinline{sthread_t::WAIT_FOREVER}) can be tolerated. If an error happens during the execution of \lstinline{latch_acquire()}, the function \lstinline{fix()} immediately returns with the error in its return parameter as the function \lstinline{latch_acquire()} (and \lstinline{latch()} as well) was called inside the macro \lstinline{W_DO()}.
-	
+
 	As the fixing of a page requires the page to be pinned (it's pin count needs to be incremented), the \lstinline{pin()} method gets called on the control block on \emph{line 145}. But before that happens, it needs to be checked that the page isn't currently selected as eviction victim by a concurrently running evictioner or if it is even already replaced with another page. The evictioner sets the pin count (\lstinline{_pin_cnt}) of an eviction victim to \lstinline{-1}, and therefore the check \lstinline{cb._pin_cnt < 0} catches this case. If the page in the latched frame was already replaced after this thread found the page using the hash table, the second check on \emph{line 137}, \lstinline{cb._pid != pid} would catch this case as the searched \lstinline{pid} would differ from the actual \lstinline{cb._pid} in the control block. Afterwards, the latch on the not needed page would be released on \emph{line 140} and an automatic retry of fixing the requested page would be started by restarting the \lstinline{while}-loop with the \lstinline{continue}-statement on \emph{line 141}.
-	
+
 	In the last step on \emph{line 152}, the output parameter \lstinline{page} which is a reference to a pointer to a \lstinline{generic_page} is set by getting the actual memory address of the fixed page from the \lstinline{_buffer} array using the \lstinline{idx} that was retrieved before. To leave the infinite \lstinline{while}-loop and to signal the absence of errors during the execution of the \lstinline{fix()} method, the value \lstinline{RCOK} gets returned on \emph{line 235}.
 
 \subsubsection{A Page Hit With Pointer Swizzling} \label{subsubsec:pagehitwith}
@@ -1533,298 +1507,3 @@ if the hash bucket is full (two entries possible in this example), a chained has
 	If the pointer was swizzled by another thread after the initial check on \emph{line 159}, the pointer cannot be swizzled again. Therefore this property needs to be checked again. To prevent two threads from concurrently swizzling a pointer, the check is done atomically together with the setting of the \lstinline{_swizzled} value inside the control block of the corresponding buffer frame. This atomic operation cannot be divided into two operations where another thread reads or writes the value in between. Therefore there can only be one thread that recognizes itself to be the one who swizzles the page. The function call of \lstinline{std::atomic_compare_exchange_strong()} on \emph{lines 205-206} checks if \lstinline{cb._swizzled} equals \lstinline{old_value} which is of type \lstinline{bool} and if so, it sets \lstinline{cb._swizzled} to \lstinline{true}. If the function call returns \lstinline{false}, then \lstinline{cb._swizzled} was already \lstinline{true} and therefore the swizzling is done by another thread. In that case, the current thread can leave the \lstinline{fix()} method on \emph{line 214} without an error.
 	
 	If this thread is allowed to swizzle the pointer, it retrieves the memory address of the pointer inside the parent page on \emph{line 219} using the slot ID of the corresponding slot inside the fixed page \lstinline{p}. This pointer contains the page ID of the page to be swizzled before the code on \emph{line 220} was executed. \emph{This line} replaces this page ID with the buffer index \lstinline{idx} of the frame in which the page that gets swizzled can be found. To be able to identify the pointer as being swizzled, the \lstinline{SWIZZLED_PID_BIT} (used by \lstinline{is_swizzled_pointer()}) is set using an bitwise-$\vee$ (\lstinline{|}) on the \lstinline{idx}.
-	
-	% TODO: Unswizzling
-
-%\paragraph{Page Miss}
-%	
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[H]
-%		\caption{Implementation of \lstinline{bf_tree_m::fix()} in case of a page miss without pointer swizzling} \label{lst:fixnoswizzlemiss}
-%		\lstinputlisting[linerange = {1-5, 35-47, 49-49, 51-51, 53-53, 56-62, 65-73, 75-78, 81-81, 83-88, 90-91}]{./tex/code_snippets/bf_tree_m>>fix.cpp}
-%	\end{code}	
-%	\begin{code}[H]
-%		\ContinuedFloat
-%		\caption{Implementation of \lstinline{bf_tree_m::fix()} in case of a page miss without pointer swizzling (cont.)}
-%		\lstinputlisting[linerange = {92-101, 105-105, 109-110, 112-114, 192-194}]{./tex/code_snippets/bf_tree_m>>fix.cpp}
-%	\end{code}
-%\end{@empty}
-%	
-%	A page miss starts exactly like a page hit with the lookup in the hash table as it needs to be detected that it is a page miss. See the previous paragraph for further details on how the hash table lookup works. But in case of a page miss, the \lstinline{idx} equals $0$ after the lookup and therefore the condition of the \lstinline{if}-statement on \emph{line 43} of \emph{listing \ref{lst:fixnoswizzlemiss}} evaluates to \lstinline{true}.
-%	
-%	At first it checks if the caller prohibited the execution of retrieving a page from secondary storage as there might be cases where having the requested page fixed isn't worth the caused tremendous latency. So if \lstinline{only_if_hit} is set, it returns an error code for a resource in use.
-%	
-%	But if the caller allows the retrieval of the page with page ID \lstinline{pid} from secondary storage, there needs to be an empty frame in the buffer pool to buffer that page. The \lstinline{bf_idx} of a free buffer frame gets retrieved by the method \lstinline{_grab_free_block()} through its output parameter on \emph{line 49}.
-%		
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[H]
-%		\caption{Implementation of \lstinline{bf_tree_m::_grab_free_block()}} \label{lst:bf_grab_free_block}
-%		\lstinputlisting[linerange = {8-11, 16-19, 23-29, 31-31, 34-37, 39-50, 52-57}]{./tex/code_snippets/bf_tree_m>>_grab_free_block.cpp}
-%	\end{code}
-%\end{@empty}
-%
-%	The method \lstinline{bf_tree_m::_grab_free_block()} as implemented in \emph{listing \ref{lst:bf_grab_free_block}} either returns a frame index of a buffer frame that was already free before or it starts the eviction process and returns the index of a newly freed frame. 
-%	
-%	In a first step, the method sets the value of the found index of a free buffer frame \lstinline{ret} to the invalid value $0$ on \emph{line 10}. Then it starts an infinite \lstinline{while}-loop around the whole process of searching a free buffer frame, as it is done in \lstinline{bf_tree_m::fix()} to automatically retry the process (using \lstinline{continue}) until a frame is found or until an unresolvable error happens where in both cases a \lstinline{return}-statement would be used to leave the loop.
-%	
-%	The search process begins with checking, if the list of free buffer frames, \lstinline{_freelist} maintained by the buffer manager, contains an index of a free frame. % To get an exact result here, it's needed to latch the \lstinline{_freelist} (and the rest of the corresponding linked list data structure) like on \emph{line 17}. But to save some cost in cases where the \lstinline{_freelist} might be empty, it's first checked without acquiring a latch and in the case that another thread already freed frames of the buffer pool (would cause \lstinline{_freelist_len > 0}), the additional call of 
-%	% Find a reason why it's useful to save the latching only when eviction is needed because eviction will be very infrequent
-%	To get an exact result here, it's needed to latch the \lstinline{_freelist} (and the rest of the corresponding linked list data structure) like on \emph{line 17}. If another thread would concurrently use the last buffer frame that was free, this thread might select the same frame to get used or it wouldn't find a free frame which would cause an error. If another thread would concurrently start the eviction, this thread might start the eviction unnecessarily as well. As finding a free frame results in the manipulation of the list of free buffer frames, the latch is needed further on.
-%	
-%	As the \lstinline{_freelist} is managed in a FILO manner, the head of the list stored in \lstinline{FREELIST_HEAD} is the found index of a free buffer frame which is assigned to the output parameter \lstinline{ret} on \emph{lines 19} and \emph{23}. As the removal of the found frame from the list of free frames (it will be used by the caller of the \lstinline{_grab_free_block()}) decreases the list length, the \lstinline{_freelist_len} value needs to be managed on \emph{line 25}. The next free frame index would be the invalid buffer frame index $0$ (set on \emph{line 27}) when the buffer index is full (checked in \lstinline{line 26}) or it would be the index to which the head of the list as it was before the current execution of \lstinline{_grab_free_block()} linked to. This index could be found in \lstinline{_freelist[FREELIST_HEAD]} as the index of each array element that can be found starting from \lstinline{FREELIST_HEAD} equals the index of a free buffer frame and as the value at that index contains the index to the following list entry. This removal is done on \emph{lines 28-31} of \emph{listing \ref{lst:bf_grab_free_block}}. Figure \ref{fig:freelist} illustrates the operations on this list of free buffer frames. The found buffer index is then returned in the parameter \lstinline{idx} and the return value \lstinline{RCOK} states that no error happened and that a valid result can be found in the first parameter.
-%	
-%	\tikzset{%
-%		every node/.style = {font = \sffamily},
-%		field/.style = {draw = black, square, minimum width = 5ex, font = \Large},
-%		idx/.style = {draw = none, xshift = 1ex, yshift = -.25ex, font = \footnotesize},
-%		fieldname/.style = {draw = none},
-%		pointer/.style = {->, thick},
-%		transition/.style = {->, thick, double},
-%		transnode/.style = {right, xshift = 1ex}
-%	}
-%
-%	\begin{figure}[ht!]
-%		\centering
-%		\scalebox{.8}{
-%			\begin{tikzpicture}[node distance = 0ex]
-%				\node[field]								(head) 	[]					{2};
-%				\node[field, draw = none]						(help0) 	[right = of head]			{};
-%				\node[field]								(fi0) 		[right = 2.5ex of help0]	{};
-%				\node[field]								(fi1) 		[right = of fi0]			{};
-%				\node[field]								(fi2) 		[right = of fi1]			{4};
-%				\node[field]								(fi3) 		[right = of fi2]			{6};
-%				\node[field]								(fi4) 		[right = of fi3]			{3};
-%				\node[field]								(fi5) 		[right = of fi4]			{};
-%				\node[field]								(fi6) 		[right = of fi5]			{};
-%				\node[field]								(fi7) 		[right = of fi6]			{};
-%				\node[field, draw = none]						(help1) 	[right = of fi7]			{};
-%				\node[field]								(len)		[right = 2.5ex of help1]	{4};
-%				
-%				\node[idx]									(in0)		[above = of fi0.north west]	{0};
-%				\node[idx]									(in1)		[above = of fi1.north west]	{1};
-%				\node[idx]									(in2)		[above = of fi2.north west]	{2};
-%				\node[idx]									(in3)		[above = of fi3.north west]	{3};
-%				\node[idx]									(in4)		[above = of fi4.north west]	{4};
-%				\node[idx]									(in5)		[above = of fi5.north west]	{5};
-%				\node[idx]									(in6)		[above = of fi6.north west]	{6};
-%				\node[idx]									(in7)		[above = of fi7.north west]	{7};
-%				
-%				\node[fieldname]							(inhead)	[above = 5ex of head.center]	{\lstinline{FREELIST_HEAD}};
-%				\node[fieldname]							(inlist)	[above = 5ex of fi3.east]		{\lstinline{_freelist}};
-%				\node[fieldname]							(inlen)	[above = 5ex of len.center]	{\lstinline{_freelist_len}};
-%				
-%				\draw[] 			($(in0.north west) + (-0.1, .05)$)  rectangle ($(fi7.south east) + (0.1, -0.7)$);
-%
-%				\path[pointer]		(head.south 2/3)		edge	[bend right = 35]		(fi2.south 1/3)
-%								(fi2.south 2/3)			edge [bend right = 45]		(fi4.south 2/3)
-%								(fi4.south 1/3)			edge [bend left = 45]			(fi3.south 2/3)
-%								(fi3.south 1/3)			edge [bend right = 45]		(fi6.south 1/3);
-%			\end{tikzpicture}
-%		} \\
-%		\scalebox{.8}{
-%			\begin{tikzpicture}
-%				\node[draw = none]						(top) 		[]					{};
-%				\node[draw = none]						(bottom) 	[below = 5ex of top]		{};
-%
-%				\path[]		(top)		edge	[transition]		node	[transnode]	{\lstinline{_grab_free_block(2, false)}}		(bottom);
-%			\end{tikzpicture}
-%		} \\
-%		\scalebox{.8}{
-%			\begin{tikzpicture}[node distance = 0ex]
-%				\node[field]								(head) 	[]					{4};
-%				\node[field, draw = none]						(help0) 	[right = of head]			{};
-%				\node[field]								(fi0) 		[right = 2.5ex of help0]	{};
-%				\node[field]								(fi1) 		[right = of fi0]			{};
-%				\node[field]								(fi2) 		[right = of fi1]			{};
-%				\node[field]								(fi3) 		[right = of fi2]			{6};
-%				\node[field]								(fi4) 		[right = of fi3]			{3};
-%				\node[field]								(fi5) 		[right = of fi4]			{};
-%				\node[field]								(fi6) 		[right = of fi5]			{};
-%				\node[field]								(fi7) 		[right = of fi6]			{};
-%				\node[field, draw = none]						(help1) 	[right = of fi7]			{};
-%				\node[field]								(len)		[right = 2.5ex of help1]	{3};
-%				
-%				\node[idx]									(in0)		[above = of fi0.north west]	{0};
-%				\node[idx]									(in1)		[above = of fi1.north west]	{1};
-%				\node[idx]									(in2)		[above = of fi2.north west]	{2};
-%				\node[idx]									(in3)		[above = of fi3.north west]	{3};
-%				\node[idx]									(in4)		[above = of fi4.north west]	{4};
-%				\node[idx]									(in5)		[above = of fi5.north west]	{5};
-%				\node[idx]									(in6)		[above = of fi6.north west]	{6};
-%				\node[idx]									(in7)		[above = of fi7.north west]	{7};
-%				
-%				\node[fieldname]							(inhead)	[above = 5ex of head.center]	{\lstinline{FREELIST_HEAD}};
-%				\node[fieldname]							(inlist)	[above = 5ex of fi3.east]		{\lstinline{_freelist}};
-%				\node[fieldname]							(inlen)	[above = 5ex of len.center]	{\lstinline{_freelist_len}};
-%				
-%				\draw[] 			($(in0.north west) + (-0.1, .05)$)  rectangle ($(fi7.south east) + (0.1, -0.7)$);
-%
-%				\path[pointer]		(head.south 2/3)		edge	[bend right = 20]		(fi4.south 2/3)
-%								(fi4.south 1/3)			edge [bend left = 45]			(fi3.south 2/3)
-%								(fi3.south 1/3)			edge [bend right = 45]		(fi6.south 1/3);
-%			\end{tikzpicture}
-%		} \\
-%		\scalebox{.8}{
-%			\begin{tikzpicture}
-%				\node[draw = none]						(top) 		[]					{};
-%				\node[draw = none]						(bottom) 	[below = 5ex of top]		{};
-%
-%				\path[]		(top)		edge	[transition]		node	[transnode]	{\lstinline{_add_free_block(1)}}		(bottom);
-%			\end{tikzpicture}
-%		} \\
-%		\scalebox{.8}{
-%			\begin{tikzpicture}[node distance = 0ex]
-%				\node[field]								(head) 	[]					{1};
-%				\node[field, draw = none]						(help0) 	[right = of head]			{};
-%				\node[field]								(fi0) 		[right = 2.5ex of help0]	{};
-%				\node[field]								(fi1) 		[right = of fi0]			{4};
-%				\node[field]								(fi2) 		[right = of fi1]			{};
-%				\node[field]								(fi3) 		[right = of fi2]			{6};
-%				\node[field]								(fi4) 		[right = of fi3]			{3};
-%				\node[field]								(fi5) 		[right = of fi4]			{};
-%				\node[field]								(fi6) 		[right = of fi5]			{};
-%				\node[field]								(fi7) 		[right = of fi6]			{};
-%				\node[field, draw = none]						(help1) 	[right = of fi7]			{};
-%				\node[field]								(len)		[right = 2.5ex of help1]	{4};
-%				
-%				\node[idx]									(in0)		[above = of fi0.north west]	{0};
-%				\node[idx]									(in1)		[above = of fi1.north west]	{1};
-%				\node[idx]									(in2)		[above = of fi2.north west]	{2};
-%				\node[idx]									(in3)		[above = of fi3.north west]	{3};
-%				\node[idx]									(in4)		[above = of fi4.north west]	{4};
-%				\node[idx]									(in5)		[above = of fi5.north west]	{5};
-%				\node[idx]									(in6)		[above = of fi6.north west]	{6};
-%				\node[idx]									(in7)		[above = of fi7.north west]	{7};
-%				
-%				\node[fieldname]							(inhead)	[above = 5ex of head.center]	{\lstinline{FREELIST_HEAD}};
-%				\node[fieldname]							(inlist)	[above = 5ex of fi3.east]		{\lstinline{_freelist}};
-%				\node[fieldname]							(inlen)	[above = 5ex of len.center]	{\lstinline{_freelist_len}};
-%				
-%				\draw[] 			($(in0.north west) + (-0.1, .05)$)  rectangle ($(fi7.south east) + (0.1, -0.7)$);
-%
-%				\path[pointer]		(head.south 2/3)		edge	[bend right = 45]		(fi1.south 1/3)
-%								(fi1.south 2/3)			edge	[bend right = 45]		(fi4.south 2/3)
-%								(fi4.south 1/3)			edge [bend left = 45]			(fi3.south 2/3)
-%								(fi3.south 1/3)			edge [bend right = 45]		(fi6.south 1/3);
-%			\end{tikzpicture}
-%		}
-%
-%		\caption{The operations of the linked list of buffer frames.} \label{fig:freelist}
-%	\end{figure}
-%	
-%	If the list of free buffer frames is empty {\lstinline{_freelist_len == 0}}, page eviction is needed to retrieve a free frame. If eviction isn't intended by the caller (it causes a high latency), it can unset the parameter \lstinline{evict} and the method would return an error stating that the buffer is full (\emph{line 43}).
-%	
-%	If a free frame should be returned in any case, \lstinline{_grab_free_block()} calls the method \lstinline{bf_tree_m::_get_replacement_block()} on \emph{line 40} to start the eviction thread. The usage of \lstinline{W_DO()} propagates exceptions thrown in \lstinline{_get_replacement_block()} upwards to the caller but when no exception is thrown there, the \lstinline{while}-loop will restart after the eviction thread freed one buffer frame.
-%	
-%	% Find a reason for the while-loop
-%	The \lstinline{_get_replacement_block()} method wakes up the eviction thread of the buffer pool (\lstinline{bf_tree_m::get_evictioner()}) calling \lstinline{wakeup()} on it on \emph{line 53}. As the eviction thread notifies one waiting thread per evicted page, the call of \lstinline{wait_for_notify()} on the eviction thread returns when a free buffer frame for this thread should be available. More details about the implementation and used algorithms of the page eviction can be found in chapter \ref{ch:eviction}.
-%	
-%	As the \lstinline{_grab_free_block()} method was called in the \lstinline{fix()} method surrounded by \lstinline{W_DO()}, exceptions thrown inside this method (e.g. buffer pool full when eviction was disabled) gets propagated up to the calling method of the \lstinline{fix()} method (e.g. \lstinline{bf_tree_m::fix_nonroot()} or \lstinline{bf_tree_m::fix_root()}).
-%	
-%	Just like in the case of a page hit, the first step after finding a buffer frame to work on (in case of a page hit, the page was already there) is to get the control block of that frame on \emph{line 51}. But as the page needs to be written this time, an exclusive latch (\lstinline{LATCH_EX}) is needed to prevent other threads from accessing the frame while this thread is still retrieving it from the secondary storage and while the management of e.g. the hash table is still active. Therefore the thread acquires such a latch on \emph{lines 56-57} to have exclusive access to the frame that should be used for the requested page. As the buffer frame is expected to be empty, there shouldn't be any other thread with a latch on this frame. If there would be another thread with such a latch, this thread would need to get another frame to buffer the requested page. Therefore the latch should only be acquired, when it is possible immediately (\lstinline{sthread_t::WAIT_IMMEDIATE}). The status code of the exception mechanism is assigned to the \lstinline{check_rc} variable and it is checked if an error happened during the latching on \emph{line 58}. If an error happened then the buffer frame couldn't be latched and therefore the buffer frame cannot be filled with the requested page. As the frame is still empty, it's \lstinline{bf_idx} can be added to the list of free buffer frames again calling the method \lstinline{_add_free_block()} with parameter \lstinline{idx}. 
-%		
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[H]
-%		\caption{Implementation of \lstinline{bf_tree_m::_add_free_block()}} \label{lst:bf_add_free_block}
-%		\lstinputlisting[linerange = {60-62, 67-70}]{./tex/code_snippets/bf_tree_m>>_grab_free_block.cpp}
-%	\end{code}
-%\end{@empty}
-%	
-%	The \lstinline{bf_tree_m::_add_free_block()} method in \emph{listing \ref{lst:bf_add_free_block}} needs to latch the list of free buffer frame at first on \emph{line 62} as it changes the data structure. As adding a new buffer frame to list list increases its length, \emph{line 67} takes care about maintaining the \lstinline{_freelist_len} value. The new head of the list is the added buffer index \lstinline{idx} which need to be assigned to \lstinline{FREELIST_HEAD} on \emph{line 69}. But before that the new entry (at \lstinline{_freelist[idx]}) needs to point to the previous head, as assigned on \emph{line 68}. Figure \ref{fig:freelist} illustrates the operations on this list of free buffer frames.
-%	
-%	After the frame that couldn't be used is again marked as free, the \lstinline{continue}-statement on \emph{line 60} restarts the fixing from scratch.
-%	
-%	The next step of adding a page to the buffer pool is to insert it into the hash table. As the hash table uses \lstinline{bf_idx_pair}-values to store the buffer index of a page together with the one of its parent page, the \lstinline{bf_idx} of the parent needs to be found before. The buffer frame index of the parent page can be found using the \lstinline{parent} parameter which is the pointer (memory address) to the parent page inside the buffer pool. Therefore in the case of the existence of a parent page, the actual \lstinline{bf_idx} of that parent page is just the offset of that page from the memory address of the buffer (\lstinline{_buffer}), as expressed on \emph{line 65}. If the page with page identifier \lstinline{pid} doesn't have a parent (e.g. it's a root page or the parent page is just not given as argument), the unused \lstinline{bf_idx} could be used to mark this fact. The \lstinline{pid} as the key together with the \lstinline{bf_idx_pair}, constructed from the index of the frame that will be used in this execution of \lstinline{fix()} and the index of the parent page, as value can now be inserted to the hash table as on \emph{lines 66-67} in \emph{listing \ref{lst:fixnoswizzlemiss}}.
-%	
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[H]
-%		\caption{Implementation of \lstinline{bf_hashtable::insert_if_not_exists()}} \label{lst:bf_hashtableinsert}
-%		\lstinputlisting[linerange = {154-194, 196-201, 204-205}]{./tex/code_snippets/bf_hashtable.cpp}
-%	\end{code}	
-%	\begin{code}[H]
-%		\ContinuedFloat
-%		\caption{Implementation of \lstinline{bf_hashtable::insert_if_not_exists()} (cont.)}
-%		\lstinputlisting[linerange = {288-292}]{./tex/code_snippets/bf_hashtable.cpp}
-%	\end{code}
-%\end{@empty}
-%	
-%	The method \lstinline{bf_hashtable::insert_if_not_exists()} only calculates the \lstinline{hash}-value on \emph{line 290} in \emph{listing \ref{lst:bf_hashtableinsert}} using a function that just uses a built-in hash function (\lstinline{w_hashing::uhash::hash32()}) and on the \emph{next line} it calls \lstinline{bf_hashbucket::append_if_not_exists()} on the hash bucket corresponding to the calculated hash value.
-%	
-%	The method \lstinline{append_if_not_exists()} needs to lock the hash bucket it's inserting into using a write lock on \emph{line 156}, to prevent concurrent reads to it, which would be erroneous because of the changes done by this thread. Concurrent writes done by other threads are also prohibited as well because they would cause the same errors to this change as they would have to a \lstinline{lookup()} that was discussed before.
-%	
-%	The \lstinline{for}-loop on \emph{lines 158-163} searches inside the first chunk of key-value-pairs to check if it can find the \lstinline{key} that should be inserted. If the key could be found in the hash table, it doesn't get inserted again and the method would return \lstinline{false} on \emph{line 161}. This search process is equal to the initial one in the method \lstinline{bf_hashbucket::find()} but with a different reaction to a found key.
-%	
-%	If it wasn't found and if there is still at least one field left in the first chunk (\lstinline{_used_count < HASHBUCKET_INITIAL_CHUNK_SIZE}) then the new key-value-pair can be inserted in this chunk. The \lstinline{key} gets inserted on \emph{line 167} and the \lstinline{value} gets inserted on \emph{line 166}. The \lstinline{_used_count} needs to be increased by $1$ on \emph{line 168} as there is now one more entry in the hash bucket and the success inserting the entry to the hash table can be signaled to the caller on \emph{line 169} by returning \lstinline{true}. If the hash bucket exactly contains \lstinline{HASHBUCKET_INITIAL_CHUNK_SIZE} entries and therefore doesn't have any linked chunks (\lstinline{_chunk.next_chunk == NULL}), then a linked chunk of type \lstinline{bf_hashbucket_chunk_linked} needs to be created as there is a entry to be inserted into the chunk. The new chunk, created on \emph{line 172-174}, will have a size of \lstinline{HASHBUCKET_INITIAL_CHUNK_SIZE*HASHBUCKET_INITIAL_EXPANSION}, which is $16$-times the size of the first chunk. The new chunk gets assigned to the \lstinline{next_chunk} pointer of the initial chunk of the hash bucket on \emph{line 172}.
-%	
-%	Again, the next part (\emph{lines 177-186}) of the method works like the traversal of the following chunks done in the nested \lstinline{for}-loop of \lstinline{bf_hashbucket::find()}. The outer \lstinline{for}-loop iterates over the chunks and the inner \lstinline{for}-loop iterates over the entries inside each chunk until the \lstinline{key} got found. Different to the \lstinline{find()} method, the action taken when the key was found, is to return \lstinline{false}, as the key couldn't be inserted.
-%	
-%	After the iteration over each chunk on \emph{lines 181-186}, in additional operation is, to check if the new entry can be inserted inside the current chunk or if a new chunk needs to be appended. This needs to be checked after every chunk and therefore needs to be done within the outer \lstinline{for}-loop. \emph{Line 188} checks, if the current chunk still have fields left (\lstinline{_used_count - cur_count < cur_chunk->size}). If it does have at least one left, there can't be another chunk (only the last chunk in the linked list can have free fields) and therefore the first free field at index 
-%
-%\subsubsection{Unfixing a Page}
-%
-%\subsection{Implementation of the Buffer Management with Pointer Swizzling} \label{subsec:bufferwithimpl}
-%
-%\subsubsection{Fixing a Page} \label{subsubsec:swizzle_fix}
-%
-%	Fixing a page is where the performance advantage of pointer swizzling comes in place. But this only holds for the first case of fixing, where the buffer access is a \emph{page hit}. A \emph{page miss} is slightly slower with pointer swizzling as the pointer to the retrieved page needs to be swizzled as additional step.
-%
-%\paragraph{Page Hit}
-%	
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[H]
-%		\caption{Implementation of \lstinline{bf_tree_m::fix()} in case of a page hit with having a swizzled page identifier} \label{lst:fixswizzlehit}
-%		\lstinputlisting[linerange = {1-6, 9-9, 11-15, 21-21, 29-33, 194-194}]{./tex/code_snippets/bf_tree_m>>fix.cpp}
-%	\end{code}
-%\end{@empty}
-%	
-%	 In the case of a page hit, the \lstinline{pid} parameter usually contains a swizzled page identifier. It's possible that a page page hit occurs without having the pointer swizzled, e.g. when the swizzling is still in process (on another thread) or when the swizzling of that specific pointer isn't possible. In that case, the appropriate frame gets located as it would be on a page hit without pointer swizzling but the swizzling would occur as described in the next paragraph about page misses with pointer swizzling. To check that the page identifier is actually swizzled, \lstinline{fix()} calls the \lstinline{static} function \lstinline{is_swizzled_pointer()} in \emph{line 6} of \emph{listing \ref{lst:fixswizzlehit}} which is defined in \emph{listing \ref{lst:is_swizzled_pointer}}.
-%
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[H]
-%		\caption{Implementation of \lstinline{bf_tree_m::is_swizzled_pointer()}} \label{lst:is_swizzled_pointer}
-%		\lstinputlisting[linerange = {1-10}]{./tex/code_snippets/bf_tree_m>>is_swizzled_pointer.cpp}
-%	\end{code}
-%\end{@empty}
-%	
-%	As the 30th bit (\lstinline{0x80000000}) is reserved for marking swizzled page IDs, this can be used by \lstinline{is_swizzled_pointer()}. The bitwise $\wedge$ (\lstinline{&}) in \emph{line 7} of \emph{listing \ref{lst:fixswizzlehit}} would return \lstinline{0} if this bit isn't set in the parameter \lstinline{pid}. When a swizzled \lstinline{pid} was found in \emph{line 6} of \emph{listing \ref{lst:fixswizzlehit}}, the unsetting of the 30th bit using a $\oplus$ (\lstinline{^}) with that bit set in line 9 returns a valid \lstinline{bf_idx} of the frame where the requested page can be found.
-%	
-%	The following steps are nearly identical to the ones in the case of a page hit without swizzling. The thread acquires the latch of the page (\emph{lines 13-15}), pins the page (\emph{line 21}) and it returns the page through the output parameter \lstinline{page} (\emph{lines 30-32}). But as the pointer to the page is already swizzled, the page couldn't be evicted and therefore an check of the current \lstinline{_pin_cnt} isn't necessary here.
-%
-%\paragraph{Page Miss}
-%	
-%\begin{@empty}
-%	\lstset{
-%		language = [ISO]C++,
-%		style = basic
-%	}
-%	\begin{code}[H]
-%		\caption{Implementation of \lstinline{bf_tree_m::fix()} when a pointer needs to be swizzled} \label{lst:fixswizzlemiss}
-%		\lstinputlisting[linerange = {1-5, 35-36, 148-148, 150-151, 155-163, 166-168, 171-173, 178-180, 182-183, 185-185, 187-188, 190-190, 192-194}]{./tex/code_snippets/bf_tree_m>>fix.cpp}
-%	\end{code}
-%\end{@empty}
-%
-%\subsubsection{Unfixing a Page}

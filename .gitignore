@@ -119,6 +119,8 @@ acs-*.bib
 
 # listings
 *.lol
+*.code
+*.algorithm
 
 # makeidx
 *.idx

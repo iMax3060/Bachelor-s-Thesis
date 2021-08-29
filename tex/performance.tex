@@ -656,6 +656,7 @@
 			\scalebox{1}{\shared}	&	\scalebox{1}{\exclusive}
 		\end{tabular}
 		\ref{legendname}
+        \vspace{.5em}
 		\caption{Average execution time of the \lstinline{fix()} method for a TPC-C run with a buffer pool size of \SI{20}{\gibi\byte} like in figure \ref{fig:tpccperformance}.}
 		\label{fig:operationperformance20G}
 	\end{figure}
@@ -739,6 +740,7 @@
 			\scalebox{1}{\shared}	&	\scalebox{1}{\exclusive}
 		\end{tabular}
 		\ref{legendname}
+        \vspace{.5em}
 		\caption{Average execution time of the \lstinline{fix()} method for a TPC-C run with a buffer pool size of \SI{500}{\mebi\byte} like in figure \ref{fig:tpccperformance}.}
 		\label{fig:operationperformance500M}
 	\end{figure}
@@ -1050,6 +1052,7 @@
 			\rotatebox{90}{\textbf{Transactional Locking Off}} 	&	\scalebox{1}{\loggingOffLockingOff}		&	\scalebox{1}{\loggingOnLockingOff}				\\ \hline
 			\rotatebox{90}{\textbf{Transactional Locking On}} 	&	\scalebox{1}{\loggingOffLockingOn}		&	\scalebox{1}{\loggingOnLockingOn}				\\ \hline
 		\end{tabular}
+        \vspace{.5em}
 		\caption{Transaction throughput of the DBMS with a buffer pool, with a buffer pool and pointer swizzling and without a buffer pool running TPC-C as measured in \cite{Graefe:2014}. The database contains 100 warehouses and 12 terminals are running transactions concurrently. The buffer pool is larger than the database and the buffer pool is warmed up (initially filled). The system configuration can be found in \cite{Graefe:2014}.}
 		\label{fig:graefetpccperformance}
 	\end{figure}
