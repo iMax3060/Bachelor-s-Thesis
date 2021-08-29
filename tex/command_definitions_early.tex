@@ -9,55 +9,55 @@
 \newtoggle{alignheadings}
 
 \renewcommand*{\chapterformat}{%
-	\iftoggle{alignheadings}{%
-		\IfChapterUsesPrefixLine{%
-			\chapapp~\thechapter\autodot\enskip%
-		}{%
-			\makebox[0pt][r]{\thechapter\autodot\enskip}%
-		}%
-	}{%
-		\mbox{\chapappifchapterprefix{\nobreakspace}\thechapter \autodot\IfUsePrefixLine{}{\enskip}}%
-	}%
+    \iftoggle{alignheadings}{%
+        \IfChapterUsesPrefixLine{%
+            \chapapp~\thechapter\autodot\enskip%
+        }{%
+            \makebox[0pt][r]{\thechapter\autodot\enskip}%
+        }%
+    }{%
+        \mbox{\chapappifchapterprefix{\nobreakspace}\thechapter \autodot\IfUsePrefixLine{}{\enskip}}%
+    }%
 }
 
 \renewcommand*{\sectionformat}{%
-	\iftoggle{alignheadings}{%
-		\makebox[0pt][r]{\thesection\autodot\enskip}%
-	}{%
-		\thesection\autodot\enskip%
-	}%
+    \iftoggle{alignheadings}{%
+        \makebox[0pt][r]{\thesection\autodot\enskip}%
+    }{%
+        \thesection\autodot\enskip%
+    }%
 }
-	
+
 \renewcommand*{\subsectionformat}{%
-	\iftoggle{alignheadings}{%
-		\makebox[0pt][r]{\thesubsection\autodot\enskip}%
-	}{%
-		\thesubsection\autodot\enskip%
-	}%
+    \iftoggle{alignheadings}{%
+        \makebox[0pt][r]{\thesubsection\autodot\enskip}%
+    }{%
+        \thesubsection\autodot\enskip%
+    }%
 }
-	
+
 \renewcommand*{\subsubsectionformat}{%
-	\iftoggle{alignheadings}{%
-		\makebox[0pt][r]{\thesubsubsection\autodot\enskip}%
-	}{%
-		\thesubsubsection\autodot\enskip%
-	}%
+    \iftoggle{alignheadings}{%
+        \makebox[0pt][r]{\thesubsubsection\autodot\enskip}%
+    }{%
+        \thesubsubsection\autodot\enskip%
+    }%
 }
-	
+
 \renewcommand*{\paragraphformat}{%
-	\iftoggle{alignheadings}{%
-		\makebox[0pt][r]{\theparagraph\autodot\enskip}%
-	}{%
-		\theparagraph\autodot\enskip%
-	}%
+    \iftoggle{alignheadings}{%
+        \makebox[0pt][r]{\theparagraph\autodot\enskip}%
+    }{%
+        \theparagraph\autodot\enskip%
+    }%
 }
-	
+
 \renewcommand*{\subparagraphformat}{%
-	\iftoggle{alignheadings}{%
-		\makebox[0pt][r]{\thesubparagraph\autodot\enskip}%
-	}{%
-		\thesubparagraph\autodot\enskip%
-	}%
+    \iftoggle{alignheadings}{%
+        \makebox[0pt][r]{\thesubparagraph\autodot\enskip}%
+    }{%
+        \thesubparagraph\autodot\enskip%
+    }%
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
 
@@ -66,7 +66,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Defines a toggle to switch between grayscale and colored output:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
-\usepackage{etoolbox}			% allows the usage of different 
+\usepackage{etoolbox}            % allows the usage of different 
 
 \newtoggle{bwmode}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
@@ -76,14 +76,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Writes some text (i.e. "This page intentionally left blank.") on every blank page:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
-\usepackage{scrlayer}				% allows the creation of individual page styles
+\usepackage{scrlayer}                % allows the creation of individual page styles
 
 \newcommand*{\blankpage}{%
-	\vspace*{\fill}%
-	\begin{center}%
-		\textcolor{gray}{This page intentionally left blank.}%
-	\end{center}%
-	\vspace{\fill}%
+    \vspace*{\fill}%
+    \begin{center}%
+        \textcolor{gray}{This page intentionally left blank.}%
+    \end{center}%
+    \vspace{\fill}%
 }
 
 \DeclareNewLayer[
@@ -101,10 +101,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
 \newcounter{indianfoot}
 \newcommand{\useindianfootnotes}{
-	\renewcommand{\thefootnote}{%
-		\setcounter{indianfoot}{0}%
-		\addtocounter{indianfoot}{\value{footnote}}%
-		\arabic{indianfoot}}%
+    \renewcommand{\thefootnote}{%
+        \setcounter{indianfoot}{0}%
+        \addtocounter{indianfoot}{\value{footnote}}%
+        \arabic{indianfoot}}%
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
 
@@ -115,11 +115,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% begindefinition
 \newcounter{indianmpfoot}
 \newcommand{\useindianmpfootnotes}{
-	\renewcommand\thempfootnote{\arabic{mpfootnote}}
-%	\renewcommand{\thempfootnote}{%
-%		\setcounter{indianmpfoot}{0}%
-%		\addtocounter{indianmpfoot}{\value{mpfootnote}}%
-%		\arabic{indianmpfoot}}%
+    \renewcommand\thempfootnote{\arabic{mpfootnote}}
+%    \renewcommand{\thempfootnote}{%
+%        \setcounter{indianmpfoot}{0}%
+%        \addtocounter{indianmpfoot}{\value{mpfootnote}}%
+%        \arabic{indianmpfoot}}%
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% enddefinition
 
@@ -207,21 +207,6 @@
                 \lstinputlisting{#3}%
             }% \only
         }
-
-% Patch line number key to call line background macro
-%        \lst@Key{numbers}{none}{%
-%            \def\lst@PlaceNumber{\lst@linebgrd}%
-%            \lstKV@SwitchCases{#1}{%
-%                none&\\%
-%                left&\def\lst@PlaceNumber{\llap{\normalfont
-%                \lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\lst@linebgrd}\\%
-%                right&\def\lst@PlaceNumber{\rlap{\normalfont
-%                \kern\linewidth \kern\lst@numbersep
-%                \lst@numberstyle{\thelstnumber}}\lst@linebgrd}%
-%            }{%
-%                \PackageError{Listings}{Numbers #1 unknown}\@ehc%
-%            }%
-%        }
 
 % New keys
         \lst@Key{linebackgroundcolor}{}{%

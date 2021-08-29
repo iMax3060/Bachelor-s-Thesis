@@ -146,7 +146,6 @@
         {siunitx}                                % allows the easy typesetting of numbers, units and combinations including lists and ranges
 \sisetup{
     range-phrase = \text{--},                    % select the phrase between upper and lower bounds of ranges (here: -)
-    binary-units = true,                         % enable/disable loading of binary prefixes
     per-mode = fraction,                         % select how to display \per (symbol: uses exponents; fraction: uses fractions)
     fraction-function = \sfrac}                  % select the kind of fraction used in siunitx (e.g. frac, cfrac, rfrac, sfrac, ...)
 \DeclareSIUnit{\euro}{\text{\texteuro}}          % define the unit \euro using the €-symbol
@@ -194,8 +193,8 @@
         linkcolor = black,
         citecolor = black,
         urlcolor = MidnightBlue,
-        pdftitle = {Evaluation of Pointer Swizzling Techniques for DBMS Buffer Management},
-        pdfauthor = {Max Fabian Gilbert}
+        pdftitle = {\doctitle},
+        pdfauthor = {\student}
     }
 }{
     \hypersetup{
@@ -203,8 +202,8 @@
         linkcolor = black,
         citecolor = black,
         urlcolor = black,
-        pdftitle = {Evaluation of Pointer Swizzling Techniques for DBMS Buffer Management},
-        pdfauthor = {Max Fabian Gilbert}
+        pdftitle = {\doctitle},
+        pdfauthor = {\student}
     }
 }
 
@@ -300,8 +299,6 @@
 
     \include{./tex/titlepage}
 
-    % declaration of authorship
-
     \pagenumbering{Roman}
 
     \include{./tex/declaration}
@@ -337,11 +334,7 @@
     \printbibliography                      % generates the bibliography
                 [
                     env = bibliography,     % select the environment to control the layout of the bibliography
-                    heading = bibliography, % select the heading of the bibliography, alternatives can be defined using \defbibheading
-%                    title = Bibliography,  % select the title of the bibliography
-%                    prenote = prenote,     % select a note to be printed directly after the heading of the bibliography defined by \defbibnote
-%                    postnote = postnote,   % select a note to be printed directly after the list of references of the bibliography defined by \defbibnote
-%                    filter = bibfilter     % select a filter as defined in \defbibfilter
+                    heading = bibliography  % select the heading of the bibliography, alternatives can be defined using \defbibheading
                 ]
 
 \end{document}

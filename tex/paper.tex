@@ -2,12 +2,12 @@
 
 \section[Definition of a Database Management System]{Definition of a Database Management System}
 
-    A \emph{database} is a collection of persistently stored data that should be somehow used by application programs. Mainly to reduce the complexity of application programs (especially of information systems) that access such databases, a specialized kind of software evolved in the mid-1960's that takes care about the database access - the \emph{database management system} (\emph{DBMS}). Early works on database management systems were e.g. done in the \emph{Data Base Task Group} of the \emph{CODASYL} which was founded in 1965 (\cite{wikipedia.En_Data_Base_Task_Group}). To fulfil this task, according to \cite{Database_Systems_-_The_Complete_Book} a DBMS is expected to offer the following features:
+    A \emph{database} is a collection of persistently stored data that should be somehow used by application programs. Mainly to reduce the complexity of application programs (especially of information systems) that access such databases, a specialized kind of software evolved in the mid-1960's that takes care about the database access - the \emph{database management system} (\emph{DBMS}). Early works on database management systems were e.g. done in the \emph{Data Base Task Group} of the \emph{CODASYL} which was founded in 1965 \cite{wikipedia.En_Data_Base_Task_Group}. To fulfil this task, according to \cite{GarciaMolina:2009} a DBMS is expected to offer the following features:
     \begin{itemize}
         \item Offer an interface to \emph{create new databases} and to define the \emph{logical structure of the data}.
         \item Offer an interface to \emph{query} and \emph{modify} the data.
         \item \emph{Persistently} store \emph{very large amounts of data} that can be accessed with a \emph{high performance}.
-        \item Offer \emph{ACID} (\cite{HaerderReuter83}) properties.
+        \item Offer \emph{ACID} \cite{HaerderReuter83} properties.
     \end{itemize}
 
 \section[Structure of a DBMS]{The Structure of a Database Management System}
@@ -16,7 +16,7 @@
 
 \subsection[ANSI/SPARC DBMS Model]{The ANSI/SPARC DBMS Model}
 
-    The \emph{ANSI/SPARC DBMS Model} (\cite{Jardine:1976}) offers a conceptual, three-layer architecture that divides a data independent DBMS as seen in figure \ref{fig:ansisparcarchitecture}. The model defines finer-grained architectures as well but the understanding of those isn't needed for the classification of the buffer management as component of a DBMS.
+    The \emph{ANSI/SPARC DBMS Model} \cite{Jardine:1976} offers a conceptual, three-layer architecture that divides a data independent DBMS as seen in figure \ref{fig:ansisparcarchitecture}. The model defines finer-grained architectures as well but the understanding of those isn't needed for the classification of the buffer management as component of a DBMS.
 
 \begin{@empty}
     \tikzset{%
@@ -73,11 +73,11 @@
 	\end{figure}
 \end{@empty}
 
-    The \emph{abstraction} of the data representation increases from the lowermost to the uppermost layer in this model. The \emph{application programs} access the \emph{user representations} of the database provided by the \emph{external layers}. This representation offers different views on the database depending on the \emph{specific application program needs}. The \emph{conceptual level} offers a \emph{holistic representation} of the data which corresponds to the \emph{data model} of the DBMS that can be e.g. relational or object-oriented. The \emph{internal layer} stores a \emph{physical representation} of the data on the \emph{disk(s)} (\cite{udemy_ANSI-SPARC}). The main concern of these layers is to offer \emph{physical} (internal layer), \emph{logical} (conceptual layer) and \emph{data independence} and \emph{distribution independence} (internal layer).
+    The \emph{abstraction} of the data representation increases from the lowermost to the uppermost layer in this model. The \emph{application programs} access the \emph{user representations} of the database provided by the \emph{external layers}. This representation offers different views on the database depending on the \emph{specific application program needs}. The \emph{conceptual level} offers a \emph{holistic representation} of the data which corresponds to the \emph{data model} of the DBMS that can be e.g. relational or object-oriented. The \emph{internal layer} stores a \emph{physical representation} of the data on the \emph{disk(s)} \cite{udemy_ANSI-SPARC}. The main concern of these layers is to offer \emph{physical} (internal layer), \emph{logical} (conceptual layer) and \emph{data independence} and \emph{distribution independence} (internal layer).
 
 \subsection[5-Layer DBMS Architecture]{The 5-Layer DBMS Architecture}
 
-    The implementation of a DBMS can't be based directly on this conceptual model because it only defines some levels to achieve data independence. It can only be used for a very coarse-grained assignment of functionality to the different layers. Therefore there are many other architectures roughly based on the \emph{ANSI/SPARC DBMS Model} that enable a systematical implementation of a DBMS. One of those is the five-layer architecture (\cite{Haerder:1983} \cite{Haerder:1985}) that assigns concrete functionality to its layers and that defines the interfaces between these layers as in figure \ref{fig:fivelayerarchitecture}. The following description will be top-down as the buffer management can be found in the lower part of the architecture.
+    The implementation of a DBMS can't be based directly on this conceptual model because it only defines some levels to achieve data independence. It can only be used for a very coarse-grained assignment of functionality to the different layers. Therefore there are many other architectures roughly based on the \emph{ANSI/SPARC DBMS Model} that enable a systematical implementation of a DBMS. One of those is the five-layer architecture \cite{Haerder:1983} \cite{Haerder:1985} that assigns concrete functionality to its layers and that defines the interfaces between these layers as in figure \ref{fig:fivelayerarchitecture}. The following description will be top-down as the buffer management can be found in the lower part of the architecture.
 
 \begin{@empty}
     \tikzset{%
@@ -146,7 +146,7 @@
 
     The \emph{file management} offers \emph{file services} through the \emph{file interface}. It needs to abstract from the \emph{device interface} offered by the \emph{secondary storage devices} to offer dynamically growing files and blocks of different length within those files to the overlying layer. Therefore it needs to manage data structures to store file addresses (on the storage device) and block borders as well as addresses of unused parts of the \emph{secondary storage devices}. It needs to take into account the special characteristics of the used storage device like HDDs and SSDs. Especially HDDs with its physical addressing based on cylinders, tracks and sectors aren't trivial to abstract from. Consecutive blocks within a file should be e.g. located on cylinders that are physically close together to decrease the access latency by reducing the number of random accesses.
 
-    A more detailed discussion of the design and implementation of a DBMS is beyond the scope of this work. Comprehensive descriptions on this topic can be found in \cite{Database_Systems_-_The_Complete_Book}, \cite{Datenbanksysteme_-_Konzepte_und_Techniken_der_Implementierung} and \cite{Datenbanken_-_Implementierungstechniken}.
+    A more detailed discussion of the design and implementation of a DBMS is beyond the scope of this work. Comprehensive descriptions on this topic can be found in \cite{GarciaMolina:2009}, \cite{Datenbanksysteme_-_Konzepte_und_Techniken_der_Implementierung} and \cite{Datenbanken_-_Implementierungstechniken}.
 
 \subsection[Motivation for a DBMS Buffer]{Motivation for the Usage of a DBMS Buffer} \label{subsec:motivationbuffer}
 
@@ -173,7 +173,7 @@
     \begin{figure}
     \centering
     \begin{minipage}{\linewidth}
-        \resizebox{\textwidth}{!}{
+        \resizebox{\textwidth}{!}{%
             \begin{tikzpicture}[font = \sffamily]
                 % Center points of the baseline of each pyramid layer (0: Peak of the pyramid; 1: Center of the baseline of the top layer; ...)
                 \node[]  (0)                                                                       {};
@@ -299,7 +299,7 @@
                 \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
                 (31.center) -- (41.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {$\approx$ \SI{0.1}{\milli\second} \tiny \footnote{\url{http://www.samsung.com/global/business/semiconductor/minisite/SSD/M2M/download/01_Why_SSDs_Are_Awesome.pdf}}};
                 \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-                (41.center) -- (51.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\numrange{5}{20}\si{\milli\second} \tiny \footnote{\url{http://www.tomshardware.de/enterprise-hdd-sshd,testberichte-241390-6.html}} \footnote{\url{https://www.computerbase.de/2016-08/seagate-enterprise-capacity-3.5-hdd-10tb-test/3/#diagramm-zugriffszeiten-lesen-h2benchw-316}}};
+                (41.center) -- (51.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\numrange{5}{20}\si{\milli\second} \tiny \footnote{\url{http://www.tomshardware.de/enterprise-hdd-sshd,testberichte-241390-6.html}} \footnote{\url{https://www.computerbase.de/2016-08/seagate-enterprise-capacity-3.5-hdd-10tb-test/3/\#diagramm-zugriffszeiten-lesen-h2benchw-316}}};
                 \draw [decorate, decoration = {brace, amplitude = 3.75pt}]
                 (51.center) -- (61.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {$s - min$};
 
@@ -489,7 +489,7 @@
                 \end{axis}
             \end{tikzpicture}
         }
-        \caption[Comparison of LRU stack depth distribution for 1 and 100 threads]{Comparison of the LRU (least recently unfixed) stack depth distribution for 1 and 100 parallel transactions (threads). The basis of this data are reference strings with the lengths of \num{66680384} and \num{81142877} generated by executing \num{500000} transactions of the TPC-C benchmark accessing \num{63362} and \num{969190} distinct pages of a database of 100 warehouses. The given number of threads defines the number of users querying the database in parallel. The LRU stack depth of a page reference is the number of different page references between this page reference and the most recent usage (used between a fix and an unfix) of the same page. If the page is fixed by another thread when the page reference happens, the stack depth will be 0 and if the page was just unfixed (without any other page references in between) by the last thread having fixed the page, the LRU stack depth of the page reference will be 0. Each of the page references is assigned to one of the histogram buckets by its LRU stack depth and therefore the height of the leftmost bar of each histogram indicates the number of page references with a LRU stack depth between 0 and 1.}
+        \caption[LRU stack depth distribution for 1 and 100 threads]{Comparison of the LRU (least recently unfixed) stack depth distribution for 1 and 100 parallel transactions (threads). The basis of this data are reference strings with the lengths of \num{66680384} and \num{81142877} generated by executing \num{500000} transactions of the TPC-C benchmark accessing \num{63362} and \num{969190} distinct pages of a database of 100 warehouses. The given number of threads defines the number of users querying the database in parallel. The LRU stack depth of a page reference is the number of different page references between this page reference and the most recent usage (used between a fix and an unfix) of the same page. If the page is fixed by another thread when the page reference happens, the stack depth will be 0 and if the page was just unfixed (without any other page references in between) by the last thread having fixed the page, the LRU stack depth of the page reference will be 0. Each of the page references is assigned to one of the histogram buckets by its LRU stack depth and therefore the height of the leftmost bar of each histogram indicates the number of page references with a LRU stack depth between 0 and 1.}
         \label{fig:locality}
     \end{figure}
 \end{@empty}
@@ -539,7 +539,7 @@
 			\end{tikzpicture}
 		}
         \vspace{.5em}
-		\caption{Classification of search strategies to translate from page IDs to buffer frame IDs as in \cite{Effelsberg:1984}}
+		\caption[Classification of buffer frame search strategies]{Classification of search strategies to translate from page IDs to buffer frame IDs as in \cite{Effelsberg:1984}}
 		\label{fig:locate}
 	\end{figure}
 \end{@empty}
@@ -761,8 +761,7 @@
 			\end{tikzpicture}
 		}
         \vspace{.5em}
-		\caption{Typical design of a hash table. It maps a page ID of a page in the buffer pool (left) using a hash function (center) to a hash bucket (right). A hash bucket contains an entry for each page ID currently mapped to it but
-if the hash bucket is full (two entries possible in this example), a chained hash bucket (far right) will be used. Each entry maps a page ID to a buffer frame ID where the corresponding page can be found. The used test bed \emph{Zero} uses an implementation based on this concept.}
+		\caption[Typical hash table design]{Typical design of a hash table. It maps a page ID of a page in the buffer pool (left) using a hash function (center) to a hash bucket (right). A hash bucket contains an entry for each page ID currently mapped to it but if the hash bucket is full (two entries possible in this example), a chained hash bucket (far right) will be used. Each entry maps a page ID to a buffer frame ID where the corresponding page can be found. The used test bed \emph{Zero} uses an implementation based on this concept.}
 		\label{fig:hashtable}
 	\end{figure}
 \end{@empty}
@@ -826,7 +825,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 			\end{tikzpicture}
 		}
         \vspace{.5em}
-		\caption{The whole process of fixing a page given a search key and an index page when a hash table is used to locate pages in the buffer pool. This summarizing diagram is taken from \cite{Graefe:2014}.}
+		\caption[Control flow of fixing a page without pointer swizzling]{The control flow of fixing a page given a search key and an index page when a hash table is used to locate pages in the buffer pool. This summarizing diagram is taken from \cite{Graefe:2014}.}
 		\label{fig:locatehash}
 	\end{figure}
 \end{@empty}
@@ -873,12 +872,15 @@ if the hash bucket is full (two entries possible in this example), a chained has
 				\end{axis}
 			\end{tikzpicture}
 		}
-		\caption[History of Memory Prices]{History of Memory Prices taken from \footnote{\url{https://hblok.net/blog/storage/}}.}
+        \vspace{.25em}
+		\caption[History of memory prices]{History of memory prices\footnotemark}
 		\label{fig:memorycost}
 	\end{figure}
 \end{@empty}
 
-	Many applications suffer from this overhead when locating persistent objects cached in main memory. In general, applications like \textit{persistent programming languages}, \textit{database programming languages}, \textit{object oriented database systems}, \textit{persistent object stores} or \textit{object servers} work on persistent objects stored on secondary storage. But the same reasons why a buffer pool is used in DBMS also hold for the need of an object cache in those applications. Generally, those applications use unique object identifiers to reference persistent objects and therefore it's needed to translate this address to a memory address during an object reference. To eliminate this overhead, \emph{pointer swizzling} was introduced in the late 80's and classified in \cite{White:1995}. \emph{To swizzle a pointer means to transform the address of the persistent object referenced there to a more direct address of the transient object in a way that this transformation could be used during multiple indirections of this pointer} (\cite{Moss:1992}). White and DeWitt identified \emph{7 dimensions} on which different approaches of pointer swizzling can be characterized. The classification of the pointer swizzling approach for the DBMS buffer pool proposed by Graefe et al. in \cite{Graefe:2014} is shown in figure \ref{fig:cassification}.
+    \footnotetext{\url{https://hblok.net/blog/storage/}}
+
+	Many applications suffer from this overhead when locating persistent objects cached in main memory. In general, applications like \textit{persistent programming languages}, \textit{database programming languages}, \textit{object oriented database systems}, \textit{persistent object stores} or \textit{object servers} work on persistent objects stored on secondary storage. But the same reasons why a buffer pool is used in DBMS also hold for the need of an object cache in those applications. Generally, those applications use unique object identifiers to reference persistent objects and therefore it's needed to translate this address to a memory address during an object reference. To eliminate this overhead, \emph{pointer swizzling} was introduced in the late 80's and classified in \cite{White:1995}. \emph{To swizzle a pointer means to transform the address of the persistent object referenced there to a more direct address of the transient object in a way that this transformation could be used during multiple indirections of this pointer} \cite{Moss:1992}. White and DeWitt identified \emph{7 dimensions} on which different approaches of pointer swizzling can be characterized. The classification of the pointer swizzling approach for the DBMS buffer pool proposed by Graefe et al. in \cite{Graefe:2014} is shown in figure \ref{fig:cassification}.
 	
 \begin{@empty}
 	\tikzset{%
@@ -933,7 +935,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 				\end{tikzpicture}
 			}
         \vspace{.25em}
-		\caption{Dimensions of Pointer Swizzling as of \cite{White:1995} and the Classification of the Presented Approach}
+		\caption[Dimensions of pointer swizzling]{Dimensions of pointer swizzling as of \cite{White:1995} and the classification of the presented approach}
 		\label{fig:cassification}
 	\end{figure}
 \end{@empty}
@@ -942,7 +944,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 	
 	As a DBMS typically cannot use hardware acceleration, the swizzling and unswizzling of references in done in \emph{software}.
 	
-	The buffer pool's addressing unit is the page and therefore those are the persistent objects that needs to be concerned by the pointer swizzling approach. The references that are swizzled are the page identifiers. The proposed approach of pointer swizzling inside the buffer pool only allows a primary Foster B-tree index (\cite{Graefe:2012}) on the database and therefore there exists only one pointer to each page. Those pointers are always swizzled when the referenced child page also resides in main memory. The pointers to the root pages of the Foster B-tree are stored separately and those got also swizzled. As the buffer pool doesn't omit the swizzling of some of the pointers it knows, the approach is \emph{full} swizzling.
+	The buffer pool's addressing unit is the page and therefore those are the persistent objects that needs to be concerned by the pointer swizzling approach. The references that are swizzled are the page identifiers. The proposed approach of pointer swizzling inside the buffer pool only allows a primary Foster B-tree index \cite{Graefe:2012} on the database and therefore there exists only one pointer to each page. Those pointers are always swizzled when the referenced child page also resides in main memory. The pointers to the root pages of the Foster B-tree are stored separately and those got also swizzled. As the buffer pool doesn't omit the swizzling of some of the pointers it knows, the approach is \emph{full} swizzling.
 	
 	As a collection (e.g. a table) in a DBMS can be much larger than the buffer pool, it's not always possible to load a whole collection which is indexed in one Foster B-tree into the main memory. Therefore the proposed approach cannot use eager but \emph{lazy} swizzling. This means that only a subset of the pointers, inside a page which is cached in the buffer pool, need to be swizzled. Eager swizzling would require the swizzling of all the page IDs inside pages that a in the buffer pool. This would require that all those pages are also available in the buffer pool. An hierarchical index structure like a Foster B-tree would therefore cause an eager loading of the pages where all the pages that are part of the index structure are loaded into main memory when the root gets accessed. But as lazy swizzling allows a page pointer inside a buffered page to be not swizzled, it's unclear during the dereferencing of such a pointer, if it's a page hit (pointer is swizzled and therefore a memory address) or if it's a page miss (pointer is a page ID and the page needs to be requested from the storage management). This additional check of the semantics of a discovered pointer adds some overhead. In the proposed approach, each swizzled pointer has set a bit that is never set in valid page IDs. Therefore the check only requires the checking if this bit is set and the unsetting of this bit to receive the memory address of the referenced page. The tradeoff of this approach is the additional bit needed in every pointer that cannot be used to extend the possible number of pages in the DBMS but the usage of \SI{64}{\bit} architectures in modern computer systems makes this drawback negligible.
 	
@@ -1007,7 +1009,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 			\end{tikzpicture}
 		}
         \vspace{.5em}
-		\caption{The whole process of fixing a page given a search key and an index page when pointer swizzling is used to locate pages in the buffer pool. This summarizing diagram is taken from \cite{Graefe:2014}.}
+		\caption[Control flow of fixing a page with pointer swizzling]{The control flow of fixing a page given a search key and an index page when pointer swizzling is used to locate pages in the buffer pool. This summarizing diagram is taken from \cite{Graefe:2014}.}
 		\label{fig:locateswizzle}
 	\end{figure}
 \end{@empty}
@@ -1020,7 +1022,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 	
 \subsubsection[History of \emph{Zero}]{The History of \emph{Zero}}
 	
-	\emph{Zero} (\cite{Zero}), that gets developed by Goetz Graefe's research group at \emph{HP Labs} and the \emph{Database and Information Systems Group} at the \emph{University of Kaiserslautern}, is a fork of the \emph{Shore-MT Storage Manager} (\cite{ShoreMT}, short for ``\textbf{Shore} Storage Manager: The \textbf{M}ulti-\textbf{T}hreaded Version''), which is, as the name suggests the successor of the \emph{Shore Storage Manager} (\cite{SSM}, acronym for ``\textbf{S}calable \textbf{H}eterogeneous \textbf{O}bject \textbf{RE}pository''). \emph{Shore-MT} has been developed at the \emph{Carnegie Mellon University} and \emph{École polytechnique fédérale de Lausanne} since the mid 2000's whereas \emph{Shore}'s development started in the early 1990's at the \emph{University of Wisconsin}. Originally \emph{Shore} (\cite{Shore}) included a whole DBMS but only the development of the storage manager continued till the time when the development of \emph{Shore-MT} started, which is as well only a storage manager. Back in the mid 1990's there was even a predecessor of \emph{Shore}, \emph{EXODUS} (\cite{EXODUS}, acronym for ``\textbf{EX}tensible \textbf{O}bject-Oriented \textbf{D}atabase \textbf{S}ystem Toolkit'', the ``\textbf{U}'' has no meaning) which was a research project at the \emph{University of Wisconsin} funded by the \emph{ARPA} (also known as \emph{DARPA}).
+	\emph{Zero}\footnote{\url{https://github.com/caetanosauer/zero}}, that gets developed by Goetz Graefe's research group at \emph{HP Labs} and the \emph{Database and Information Systems Group} at the \emph{University of Kaiserslautern}, is a fork of the \emph{Shore-MT Storage Manager}\footnote{\url{https://sites.google.com/site/shoremt/}}(short for ``\textbf{Shore} Storage Manager: The \textbf{M}ulti-\textbf{T}hreaded Version''), which is, as the name suggests the successor of the \emph{Shore Storage Manager}\footnote{\url{http://research.cs.wisc.edu/shore/}} (acronym for ``\textbf{S}calable \textbf{H}eterogeneous \textbf{O}bject \textbf{RE}pository''). \emph{Shore-MT} has been developed at the \emph{Carnegie Mellon University} and \emph{École polytechnique fédérale de Lausanne} since the mid 2000's whereas \emph{Shore}'s development started in the early 1990's at the \emph{University of Wisconsin}. Originally \emph{Shore}\addtocounter{footnote}{-1}\footnotemark (included a whole DBMS but only the development of the storage manager continued till the time when the development of \emph{Shore-MT} started, which is as well only a storage manager. Back in the mid 1990's there was even a predecessor of \emph{Shore}, \emph{EXODUS}\footnote{\url{http://research.cs.wisc.edu/exodus/}} (acronym for ``\textbf{EX}tensible \textbf{O}bject-Oriented \textbf{D}atabase \textbf{S}ystem Toolkit'', the ``\textbf{U}'' has no meaning) which was a research project at the \emph{University of Wisconsin} funded by the \emph{ARPA} (also known as \emph{DARPA}).
 	
 	Figure \ref{fig:testbedhistory} gives an overview on the development (based on new releases of the software or publications about software for the case that a version history is unavailable) of these database management system prototypes.
 	
@@ -1257,13 +1259,20 @@ if the hash bucket is full (two entries possible in this example), a chained has
 			\end{tikzpicture}
 		}
         \vspace{.5em}
-		\caption{History of \emph{EXODUS} (publications, \cite{EXODUSPapers}), \emph{Shore} (versions, \cite{ShoreReleases}), \emph{Shore Storage Manager} (versions, \cite{ShoreReleases}, \cite{ShoreSMReleases}), \emph{Shore-MT} (versions, \cite{ShoreMTReleases}) and \emph{Zero} (publications, \cite{ZeroPapers}) - \textit{The version/publication history is subject to correction!}}
+		\caption[History of EXODUS, Shore, Shore Storage Manager, Shore-MT and Zero]{History of \emph{EXODUS} publications\footnotemark, \emph{Shore} versions\footnotemark, \emph{Shore Storage Manager} versions\addtocounter{footnote}{-1}\footnotemark\textsuperscript{, }\footnotemark, \emph{Shore-MT} versions\footnotemark and \emph{Zero} publications\footnotemark - \textit{The version/publication history is subject to correction!}}
 		\label{fig:testbedhistory}
 	\end{figure}
 
 	\textbf{\emph{Shore-MT}} is a basis for researchers to experiment with new techniques and applications in the area of persistent data management, especially when multi-threading is required. Many features that can be found in modern DBMS, like transactions with ACID-properties, B+ tree indexes and many more, are already build in the storage manager and therefore \emph{Shore-MT} is an excellent framework for researchers to evaluate new techniques in a realistic DBMS context. The ease of extension of \emph{Shore-MT} makes it reasonable to evaluate techniques like pointer swizzling in the buffer manager using this storage manager and therefore it's commonly used by researchers. The availability of \emph{Shore-Kits}, a suite of standardized database benchmarks for \emph{Shore-MT}, even further supports researchers by executing meaningful performance evaluations for OLTP and OLAP scenarios.
 
-	\textbf{\emph{Zero}} was forked of \emph{Shore-MT} for the evaluation of the Foster B-tree in 2012 (\cite{Graefe:2012}). In contrast to \emph{Shore-MT} which offers different index structures, \emph{Zero} only offers the \emph{Foster B-tree} (which has crucial features for the pointer swizzling in the buffer manager). Following the investigation of S. Harizopoulos et al. in \cite{Harizopoulos:2008} on the bottlenecks of a DBMS, where the usual OLTP workload fits in main memory, other new techniques were introduced to \emph{Zero} to eliminate these bottlenecks. These are e.g. the \emph{Orthogonal Key-Value Locking Protocol} or an improved lock manager design. The latest research activities using \emph{Zero} as a test-bed, which are done by Caetano Sauer (my advisor for this work) among others, are in the area of \emph{Instant Recovery}.
+    \addtocounter{footnote}{-5}
+    \stepcounter{footnote}\footnotetext{\url{http://research.cs.wisc.edu/exodus/exodus.papers.html}}
+    \stepcounter{footnote}\footnotetext{\url{http://research.cs.wisc.edu/shore/\#Release}}
+    \stepcounter{footnote}\footnotetext{\url{http://ftp.cs.wisc.edu/shore/sm5.0/ChangeLog}}
+    \stepcounter{footnote}\footnotetext{\url{http://ftp.cs.wisc.edu/shore-mt/6.0.2/NEWS}}
+    \stepcounter{footnote}\footnotetext{\url{https://github.com/caetanosauer/zero}}
+
+	\textbf{\emph{Zero}} was forked of \emph{Shore-MT} for the evaluation of the Foster B-tree in 2012 \cite{Graefe:2012}. In contrast to \emph{Shore-MT} which offers different index structures, \emph{Zero} only offers the \emph{Foster B-tree} (which has crucial features for the pointer swizzling in the buffer manager). Following the investigation of S. Harizopoulos et al. in \cite{Harizopoulos:2008} on the bottlenecks of a DBMS, where the usual OLTP workload fits in main memory, other new techniques were introduced to \emph{Zero} to eliminate these bottlenecks. These are e.g. the \emph{Orthogonal Key-Value Locking Protocol} or an improved lock manager design. The latest research activities using \emph{Zero} as a test-bed, which are done by Caetano Sauer (my advisor for this work) among others, are in the area of \emph{Instant Recovery}.
 
 \subsection{Design of the Buffer Management of \emph{Zero}} \label{subsec:zerodesign}
 
@@ -1311,7 +1320,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 			$-$ \texttt{\_is\_active\_index(}in \texttt{idx}:\texttt{bf\_idx)}: \texttt{bool}																								\\	\hline
 		\end{tabularx}}
         \vspace{.5em}
-		\caption{Overview of the Class \lstinline{bf_tree_m} in UML Notation}
+		\caption[Class diagram: Zero buffer manager]{Class diagram of \textit{Zero}'s buffer manager: \lstinline{bf_tree_m}}
 		\label{fig:bufferdesign}
 	\end{figure}
 \end{@empty}
@@ -1366,7 +1375,7 @@ if the hash bucket is full (two entries possible in this example), a chained has
 			$+$ \texttt{latch()}: \texttt{latch\_t\&}																															\\	\hline
 		\end{tabularx}}
         \vspace{.5em}
-		\caption{Overview of the Class \lstinline{bf_tree_cb_t} in UML Notation}
+		\caption[Class diagram: Zero buffer frame control block]{Class diagram of \textit{Zero}'s buffer frame control block: \lstinline{bf_tree_cb_t}}
 		\label{fig:cbdesign}
 	\end{figure}
 \end{@empty}

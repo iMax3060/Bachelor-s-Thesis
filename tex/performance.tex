@@ -1,1171 +1,1169 @@
 \chapter[Performance Evaluation of Pointer Swizzling]{Performance Evaluation of the Buffer Management with Pointer Swizzling} \label{ch:performance}
 
-	The performed performance evaluation will mainly compare the \emph{buffer pool with and without pointer swizzling} for \emph{different buffer pool sizes}. The variation of the buffer pool size is used to change the hit rate of the buffer pool as the hit rate mainly depends on the page reference string (should be fixed by the benchmark), the used page replacement algorithm (performance evaluation in chapter \ref{ch:eviction}) and on the proportion between buffer pool size and working set size. The performance advance of pointer swizzling mainly depends on the hit rate as the swizzling/unswizzling of a pointer adds cost to every buffer miss and as the usage of swizzled pointers reduces the cost during a page hit. Therefore this is a way to measure the effect of pointer swizzling over a wide range of use cases.
-	
+    The performed performance evaluation will mainly compare the \emph{buffer pool with and without pointer swizzling} for \emph{different buffer pool sizes}. The variation of the buffer pool size is used to change the hit rate of the buffer pool as the hit rate mainly depends on the page reference string (should be fixed by the benchmark), the used page replacement algorithm (performance evaluation in chapter \ref{ch:eviction}) and on the proportion between buffer pool size and working set size. The performance advance of pointer swizzling mainly depends on the hit rate as the swizzling/unswizzling of a pointer adds cost to every buffer miss and as the usage of swizzled pointers reduces the cost during a page hit. Therefore this is a way to measure the effect of pointer swizzling over a wide range of use cases.
+
 \section{Expected Performance}
-	
-	Based on the \emph{results of past research}, the performance behavior of the buffer manager for different buffer pool sizes can be estimated. The past research only took into account a buffer manager without pointer swizzling (except for \cite{Graefe:2014}) but using \emph{theoretical considerations} those results can be used to estimate the performance of the buffer pool with pointer swizzling as well. Those theoretical considerations are the fundamentals for the comparison between the buffer management with and without the utilization of pointer swizzling.
-	
+
+    Based on the \emph{results of past research}, the performance behavior of the buffer manager for different buffer pool sizes can be estimated. The past research only took into account a buffer manager without pointer swizzling (except for \cite{Graefe:2014}) but using \emph{theoretical considerations} those results can be used to estimate the performance of the buffer pool with pointer swizzling as well. Those theoretical considerations are the fundamentals for the comparison between the buffer management with and without the utilization of pointer swizzling.
+
 \subsection{For Different Buffer Pool Sizes} \label{subsec:reasonhitrate}
 
-	As discussed in subsection \ref{subsec:motivationbuffer}, a DBMS using secondary storage to store its database persistently needs a buffer pool in main memory to reduce the performance impact of the slow I/O operations. But as the available capacity of main memory is usually much more limited than the capacity of secondary storage, the buffer pool can only hold a \emph{subset of the database}. Therefore there are still physical references to pages that don't reside in memory. Those physical references have a huge impact on the performance of the DBMS and therefore the reduction of those slow I/O operations improves the overall performance of the DBMS.
-	
-	The buffer management tries to decrease the number of those physical references by estimating the pages that will be used most likely in the near future to store those in the limited number of buffer frames. The estimation of the usage of pages is done using a page replacement strategy as discussed in the next chapter \ref{ch:eviction}. But the higher the amount of buffer frames available to cache pages of the database, the higher the chance that a referenced page already resides in the buffer pool. This results in the performance metrics $\textit{hit rate} = \frac{\text{\# of logical references}}{\text{\# of references}}$ and $\textit{miss rate} = \frac{\text{\# of physical references}}{\text{\# of references}}$.		
-		
+    As discussed in subsection \ref{subsec:motivationbuffer}, a DBMS using secondary storage to store its database persistently needs a buffer pool in main memory to reduce the performance impact of the slow I/O operations. But as the available capacity of main memory is usually much more limited than the capacity of secondary storage, the buffer pool can only hold a \emph{subset of the database}. Therefore there are still physical references to pages that don't reside in memory. Those physical references have a huge impact on the performance of the DBMS and therefore the reduction of those slow I/O operations improves the overall performance of the DBMS.
+
+    The buffer management tries to decrease the number of those physical references by estimating the pages that will be used most likely in the near future to store those in the limited number of buffer frames. The estimation of the usage of pages is done using a page replacement strategy as discussed in the next chapter \ref{ch:eviction}. But the higher the amount of buffer frames available to cache pages of the database, the higher the chance that a referenced page already resides in the buffer pool. This results in the performance metrics $\textit{hit rate} = \frac{\text{\# of logical references}}{\text{\# of references}}$ and $\textit{miss rate} = \frac{\text{\# of physical references}}{\text{\# of references}}$.
+
 \begin{@empty}
-	\tikzset{%
-		plot/.style = {smooth, mark = \empty},
-		optimal/.style = {very thick},
-		best/.style = {},
-		random/.style = {very thick},
-		possible/.style = {pattern = north east lines}
-	}
-	
-	\nottoggle{bwmode}{
-		\tikzset{%
-			optimal/.append style = {color = green},
-			best/.append style = {color = blue},
-			random/.append style = {color = red},
-			possible/.append style = {pattern color = blue!75}
-		}
-	}{
-		\tikzset{%
-			optimal/.append style = {color = black},
-			best/.append style = {color = black!75},
-			random/.append style = {dashed, color = black},
-			possible/.append style = {pattern color = black!75}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}
-				\begin{axis}[xlabel = \large buffer pool size $B$,
-						   xmin = 0,
-						   xmax = 105,
-						   xtick = {5, 100},
-						   xticklabels = {$B_{min}$, $D$},
-						   ylabel = \large miss rate $MR$,
-						   ymin = 0,
-						   ymax = 105,
-						   ytick = {5, 95, 100},
-						   yticklabels = {$MR_{CS}$, $MR_{max}$, $1$},
-						   legend pos = north east,
-						   area legend,
-						   axis x line = bottom,
-						   axis y line = left,
-						   width = .9\textwidth,
-						   height = .5\textheight]
-					\addplot+[plot, optimal, name path = optimal, line legend] coordinates {
-						(5, 95)
-						(20, 25)
-						(50, 7.5)
-						(100, 5)
-						};
-					\addplot+[plot, best, name path = best, empty legend] coordinates {
-						(5, 95)
-						(20, 45)
-						(30, 27.5)
-						(50, 15)
-						(100, 5)
-						};
-					\addplot+[plot, random, name path = random, line legend] coordinates {
-						(5, 95)
-						(20, 60)
-						(35, 34)
-						(50, 22.5)
-						(100, 5)
-						};
-								
-					\addplot[possible] fill between [of = best and random];
-					
-					\legend{optimal, , random, possible}
-				\end{axis}
-			\end{tikzpicture}
-		}
-		\caption{Miss rate for different fractions $\frac{\text{buffer pool size}}{\text{database size}}$ and for different page replacement strategies with typical reference strings (\cite{Effelsberg:1984}). $B_{min}$ is the minimal possible buffer size (e.g. 1 frame), $D$ is the size of the database, $MR_{CS}$ is the cold start miss rate (caused by an initially empty buffer pool) and $MR_{max}$ is the maximal miss rate.}
-		\label{fig:missratetheoretical}
-	\end{figure}
+    \tikzset{%
+        plot/.style = {smooth, mark = \empty},
+        optimal/.style = {very thick},
+        best/.style = {},
+        random/.style = {very thick},
+        possible/.style = {pattern = north east lines}
+    }
+
+    \nottoggle{bwmode}{
+        \tikzset{%
+            optimal/.append style = {color = green},
+            best/.append style = {color = blue},
+            random/.append style = {color = red},
+            possible/.append style = {pattern color = blue!75}
+        }
+    }{
+        \tikzset{%
+            optimal/.append style = {color = black},
+            best/.append style = {color = black!75},
+            random/.append style = {dashed, color = black},
+            possible/.append style = {pattern color = black!75}
+        }
+    }
+
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}
+                \begin{axis}[xlabel = \large buffer pool size $B$,
+                           xmin = 0,
+                           xmax = 105,
+                           xtick = {5, 100},
+                           xticklabels = {$B_{min}$, $D$},
+                           ylabel = \large miss rate $MR$,
+                           ymin = 0,
+                           ymax = 105,
+                           ytick = {5, 95, 100},
+                           yticklabels = {$MR_{CS}$, $MR_{max}$, $1$},
+                           legend pos = north east,
+                           area legend,
+                           axis x line = bottom,
+                           axis y line = left,
+                           width = .9\textwidth,
+                           height = .5\textheight]
+                    \addplot+[plot, optimal, name path = optimal, line legend] coordinates {
+                        (5, 95)
+                        (20, 25)
+                        (50, 7.5)
+                        (100, 5)
+                        };
+                    \addplot+[plot, best, name path = best, empty legend] coordinates {
+                        (5, 95)
+                        (20, 45)
+                        (30, 27.5)
+                        (50, 15)
+                        (100, 5)
+                        };
+                    \addplot+[plot, random, name path = random, line legend] coordinates {
+                        (5, 95)
+                        (20, 60)
+                        (35, 34)
+                        (50, 22.5)
+                        (100, 5)
+                        };
+
+                    \addplot[possible] fill between [of = best and random];
+
+                    \legend{optimal, , random, possible}
+                \end{axis}
+            \end{tikzpicture}
+        }
+        \caption{Miss rate for different fractions $\frac{\text{buffer pool size}}{\text{database size}}$ and for different page replacement strategies with typical reference strings \cite{Effelsberg:1984}. $B_{min}$ is the minimal possible buffer size (e.g. 1 frame), $D$ is the size of the database, $MR_{CS}$ is the cold start miss rate (caused by an initially empty buffer pool) and $MR_{max}$ is the maximal miss rate.}
+        \label{fig:missratetheoretical}
+    \end{figure}
 \end{@empty}
 
-	W. Effelsberg and T. Härder showed some bounds of miss rates in \cite{Effelsberg:1984}. The bounds for reasonable page replacement algorithms and for typical page reference strings are shown in figure \ref{fig:missratetheoretical}. When the whole database ($D$) fits in the buffer pool, then the miss rate will be $MR_{CS}$. This miss rate will only affect the performance of the DBMS after a cold start. After each page was referenced at least once, the whole database will be in memory and therefore no more physical references will be needed (at least for read accesses). As a typical OLTP database system doesn't restart very frequently, this miss rate will be negligible but can be further reduced using prefetching. As operating on the data is only possible when they're in memory, there needs to be at least one buffer frame and therefore the minimum buffer pool  size $B_{min} > 0$. In practice there need to be multiple frames, as some operations might fix multiple pages at a time. Therefore there is always a chance for a logical reference so that $MR_{max} < 1$. The miss rate between a buffer size of $B_{min}$ and $D$ depends on the used page replacement algorithm. The optimal, not realizable page replacement (\cite{Belady:1966}) evicts pages that will be accessed the furthest in the future. This OPT algorithm achieves a very low miss rate as the working set size of a DBMS is usually much smaller than the whole database. The random replacement algorithm would achieve a linear miss rate ($MR\left(B\right) = 1 - B \cdot \frac{1 - MR_{CS}}{D}$) when the page accesses would be random as well but as the chance for reaccessing a page that was accessed in the recent past is higher than the chance of accessing a page that wasn't accessed in the recent past, the chance that the page wasn't already evicted is still high. The possible algorithms try to use statistics about recent page references to evict pages that will be reaccessed the furthest in the future. Details about some of those algorithms can be found in chapter \ref{ch:eviction}.
-	
-	But the overall performance of a DBMS or even of a storage manager isn't only based on the hit rate of the buffer manager. Typical metrics to measure the performance of a DBMS would be \emph{transaction throughput} and \emph{transaction latency}.
-	
-	The usage of concurrent transactions can compensate a high miss rate with regard to the transaction throughput up to a certain level as the CPU can work on other transactions while an I/O operation blocks a transaction. But this advantage is limited due to the fact that the sum of the I/O latency doesn't decrease because the total number of page misses doesn't decrease for a fixed miss rate. Therefore only the used CPU-time will be increased using concurrent transactions. A disadvantage of concurrent transactions is the need of concurrency control (still an active topic of research) to guarantee transactional isolation. This adds a new bottleneck to the DBMS. Another problem of concurrent transactions is the reduced locality of the referenced pages. Each concurrently running transaction has its own working set and therefore a small buffer pool might be a major bottleneck in such a situation. Therefore a low miss rate of a buffer pool which is slightly smaller than the current working set shouldn't affect the transaction throughput at all, while a high miss rate of a small buffer pool should decrease the transaction throughput heavily.
-	
-	The latency of transactions will be directly affected by the hit rate of the buffer manager. When a transaction causes a page miss, it needs to be blocked until the file management retrieved the page to the buffer management. A reordering of the operations executed in the context of that transaction could improve the overall latency of that transaction but needs to be done on a higher level of the DBMS architecture. Therefore the average latency of transactions with similar computational complexity should be much higher with a higher miss rate as more of those transactions would encounter a page miss.
-	
+    W. Effelsberg and T. Härder showed some bounds of miss rates in \cite{Effelsberg:1984}. The bounds for reasonable page replacement algorithms and for typical page reference strings are shown in figure \ref{fig:missratetheoretical}. When the whole database ($D$) fits in the buffer pool, then the miss rate will be $MR_{CS}$. This miss rate will only affect the performance of the DBMS after a cold start. After each page was referenced at least once, the whole database will be in memory and therefore no more physical references will be needed (at least for read accesses). As a typical OLTP database system doesn't restart very frequently, this miss rate will be negligible but can be further reduced using prefetching. As operating on the data is only possible when they're in memory, there needs to be at least one buffer frame and therefore the minimum buffer pool  size $B_{min} > 0$. In practice there need to be multiple frames, as some operations might fix multiple pages at a time. Therefore there is always a chance for a logical reference so that $MR_{max} < 1$. The miss rate between a buffer size of $B_{min}$ and $D$ depends on the used page replacement algorithm. The optimal, not realizable page replacement \cite{Belady:1966} evicts pages that will be accessed the furthest in the future. This OPT algorithm achieves a very low miss rate as the working set size of a DBMS is usually much smaller than the whole database. The random replacement algorithm would achieve a linear miss rate ($MR\left(B\right) = 1 - B \cdot \frac{1 - MR_{CS}}{D}$) when the page accesses would be random as well but as the chance for reaccessing a page that was accessed in the recent past is higher than the chance of accessing a page that wasn't accessed in the recent past, the chance that the page wasn't already evicted is still high. The possible algorithms try to use statistics about recent page references to evict pages that will be reaccessed the furthest in the future. Details about some of those algorithms can be found in chapter \ref{ch:eviction}.
+
+    But the overall performance of a DBMS or even of a storage manager isn't only based on the hit rate of the buffer manager. Typical metrics to measure the performance of a DBMS would be \emph{transaction throughput} and \emph{transaction latency}.
+
+    The usage of concurrent transactions can compensate a high miss rate with regard to the transaction throughput up to a certain level as the CPU can work on other transactions while an I/O operation blocks a transaction. But this advantage is limited due to the fact that the sum of the I/O latency doesn't decrease because the total number of page misses doesn't decrease for a fixed miss rate. Therefore only the used CPU-time will be increased using concurrent transactions. A disadvantage of concurrent transactions is the need of concurrency control (still an active topic of research) to guarantee transactional isolation. This adds a new bottleneck to the DBMS. Another problem of concurrent transactions is the reduced locality of the referenced pages. Each concurrently running transaction has its own working set and therefore a small buffer pool might be a major bottleneck in such a situation. Therefore a low miss rate of a buffer pool which is slightly smaller than the current working set shouldn't affect the transaction throughput at all, while a high miss rate of a small buffer pool should decrease the transaction throughput heavily.
+
+    The latency of transactions will be directly affected by the hit rate of the buffer manager. When a transaction causes a page miss, it needs to be blocked until the file management retrieved the page to the buffer management. A reordering of the operations executed in the context of that transaction could improve the overall latency of that transaction but needs to be done on a higher level of the DBMS architecture. Therefore the average latency of transactions with similar computational complexity should be much higher with a higher miss rate as more of those transactions would encounter a page miss.
+
 \subsection{For Buffer Management with Pointer Swizzling}
 
-	The reason to use pointer swizzling is to improve the performance of dereferencing references between persistently stored data while this data is cached in memory. But there is a trade-off between faster dereferencing and the overhead of the (un)swizzling of a reference. Therefore there exists a threshold of dereferencings per (un)swizzling, above which pointer swizzling improves the overall performance.
-	
-	The implementation of pointer swizzling in \emph{Zero}'s buffer manager dereferences a swizzled pointer on each page hit and it swizzles a pointer on each page miss. The unswizzling happens during the eviction of a page from the buffer pool. Without pointer swizzling in the buffer pool, a page hit would cause a hash table lookup as described in subsection \ref{subsec:locatenoswizzle}. The average complexity of a hash table lookup is in $\mathcal{O}\left(1\right)$ (worst-case complexity in $\mathcal{O}\left(n\right)$), but with a higher constant factor than the dereferencing of a swizzled pointer. On a page miss, the pointer would just not be swizzled without pointer swizzling and therefore the reverse operation would just not happen during a page eviction. As the used index structure - the Foster B-tree - only uses one pointer per page, there needs to be only one pointer (un)swizzled per page miss (eviction). When the eviction in the buffer pool has started (after the buffer pool was completely filled the first time since startup), each page miss will trigger an eviction of another page (in batches), to free a buffer frame for the requested page. Therefore pointer swizzling will decrease the execution time of a page hit whereas it will increased the execution time of a page miss.
-	
-	Figure \ref{fig:expectedswizzlingperformance} visualizes the portion of execution time needed for page hits and for page misses with and without pointer swizzling. The total execution time needed for page misses is slightly higher for the buffer pool with pointer swizzling but the total execution time needed for page hits is heavily decreased when using this buffer pool. The lower hit rate $HR_{min}$ results in a higher portion of page misses whereas the higher hit rate $HR_{CS}$ results in a lower portion of page misses.
-			
+    The reason to use pointer swizzling is to improve the performance of dereferencing references between persistently stored data while this data is cached in memory. But there is a trade-off between faster dereferencing and the overhead of the (un)swizzling of a reference. Therefore there exists a threshold of dereferencings per (un)swizzling, above which pointer swizzling improves the overall performance.
+
+    The implementation of pointer swizzling in \emph{Zero}'s buffer manager dereferences a swizzled pointer on each page hit and it swizzles a pointer on each page miss. The unswizzling happens during the eviction of a page from the buffer pool. Without pointer swizzling in the buffer pool, a page hit would cause a hash table lookup as described in subsection \ref{subsec:locatenoswizzle}. The average complexity of a hash table lookup is in $\mathcal{O}\left(1\right)$ (worst-case complexity in $\mathcal{O}\left(n\right)$), but with a higher constant factor than the dereferencing of a swizzled pointer. On a page miss, the pointer would just not be swizzled without pointer swizzling and therefore the reverse operation would just not happen during a page eviction. As the used index structure - the Foster B-tree - only uses one pointer per page, there needs to be only one pointer (un)swizzled per page miss (eviction). When the eviction in the buffer pool has started (after the buffer pool was completely filled the first time since startup), each page miss will trigger an eviction of another page (in batches), to free a buffer frame for the requested page. Therefore pointer swizzling will decrease the execution time of a page hit whereas it will increased the execution time of a page miss.
+
+    Figure \ref{fig:expectedswizzlingperformance} visualizes the portion of execution time needed for page hits and for page misses with and without pointer swizzling. The total execution time needed for page misses is slightly higher for the buffer pool with pointer swizzling but the total execution time needed for page hits is heavily decreased when using this buffer pool. The lower hit rate $HR_{min}$ results in a higher portion of page misses whereas the higher hit rate $HR_{CS}$ results in a lower portion of page misses.
+
 \begin{@empty}
-	\tikzset{%
-		plot/.style = {smooth, mark = \empty},
-		swizzling/.style = {plot},
-		noswizzling/.style = {plot},
-		threshold/.style = {draw = black},
-		thresholdArrow/.style = {draw = black, ->},
-		thresholdNode/.style = {draw = none, font = \tiny, shape = rectangle, anchor = north, yshift = -5, text width = 45, align = center},
-	}
-	
-	\nottoggle{bwmode}{
-		\tikzset{%
-			swizzling/.append style = {color = green, fill opacity = 0.75},
-			noswizzling/.append style = {color = red, fill opacity = 0.75},
-			swizzlingHit/.style = {swizzling, fill = green!60},
-			swizzlingMiss/.style = {swizzling, fill = green!30},
-			noswizzlingHit/.style = {noswizzling, fill = red!60},
-			noswizzlingMiss/.style = {noswizzling, fill = red!30},
-			threshold/.append style = {thick},
-			thresholdArrow/.append style = {thick},
-			thresholdNode/.append style = {fill = none}
-		}
-	}{
-		\tikzset{%
-			swizzling/.append style = {dashed},
-			noswizzling/.append style = {dotted},
-			swizzlingHit/.style = {swizzling, pattern = north west lines},
-			swizzlingMiss/.style = {swizzling, pattern = north east lines},
-			noswizzlingHit/.style = {noswizzling, pattern = checkerboard, pattern color = black!40},
-			noswizzlingMiss/.style = {noswizzling, pattern = checkerboard, pattern color = black!20},
-			threshold/.append style = {very thick},
-			thresholdArrow/.append style = {very thick},
-			thresholdNode/.append style = {fill = white, inner sep = 1pt}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}
-				\begin{axis}[xlabel = \large hit rate,
-						   xmin = 0,
-						   xmax = 100,
-						   xtick = {5, 95},
-						   xticklabels = {$HR_{min}$, $HR_{CS}$},
-						   ylabel = \large total execution time,
-%						   y label style = {at = {(axis description cs:0.125, 0.5)}, anchor = south},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 101,
-						   ytick = \empty,
-						   stack plots = y,
-						   axis x line = bottom,
-						   axis y line = left,
-						   width = .9\textwidth,
-						   height = .5\textheight]
-					\addplot[noswizzlingHit, name path = noswizzlingHit] coordinates {
-						(5, 3)
-						(95, 60)}
-						\closedcycle; \label{noswizzlingHits}
-					\addplot[noswizzlingMiss, name path = noswizzlingMiss] coordinates {
-						(5, 80)
-						(95, 4)}
-						\closedcycle; \label{noswizzlingMisses}
-				\end{axis}
-				
-				\begin{axis}[xlabel = \large hit rate,
-						   xmin = 0,
-						   xmax = 100,
-						   xtick = {5, 95},
-						   xticklabels = {$HR_{min}$, $HR_{CS}$},
-						   ylabel = \large total execution time,
-						   ymin = 0,
-						   ymax = 101,
-						   ytick = \empty,
-						   stack plots = y,
-					  	   legend style = {at = {(1.05, 1.05)}, font = \footnotesize},
-						   area legend,
-						   axis x line = bottom,
-						   axis y line = left,
-						   width = .9\textwidth,
-						   height = .5\textheight,
-						   hide axis]
-					\addlegendimage{/pgfplots/refstyle = noswizzlingHits}
-					\addlegendentry{Page Hits without Pointer Swizzling}
-					\addlegendimage{/pgfplots/refstyle = noswizzlingMisses}
-					\addlegendentry{Page Misses without Pointer Swizzling}
-					
-					\path[threshold]			(33.42, 0)			--		(33.42, 101);
-					\path[thresholdArrow]	(33.42, 62.5)		--	node[thresholdNode, xshift = -15]	{faster without pointer swizzling}	(33.42 - 10, 62.5);
-					\path[thresholdArrow]	(33.42, 62.5)		--	node[thresholdNode, xshift = 15]	{faster with pointer swizzling}	(33.42 + 10, 62.5);
-					\addplot[swizzlingHit, name path = swizzlingHit] coordinates {
-						(5, 1)
-						(95, 20)}
-						\closedcycle;
-						\addlegendentry{Page Hits with Pointer Swizzling}
-					\addplot[swizzlingMiss, name path = swizzlingMiss] coordinates {
-						(5, 100)
-						(95, 5)}
-						\closedcycle;
-						\addlegendentry{Page Misses with Pointer Swizzling}
-				\end{axis}
-			\end{tikzpicture}
-		}
-		\caption{Expected sum of execution times of every execution of the \lstinline{fix()} operation for a buffer pool with and without pointer swizzling.}
-		\label{fig:expectedswizzlingperformance}
-	\end{figure}
+    \tikzset{%
+        plot/.style = {smooth, mark = \empty},
+        swizzling/.style = {plot},
+        noswizzling/.style = {plot},
+        threshold/.style = {draw = black},
+        thresholdArrow/.style = {draw = black, ->},
+        thresholdNode/.style = {draw = none, font = \tiny, shape = rectangle, anchor = north, yshift = -5, text width = 45, align = center},
+    }
+
+    \nottoggle{bwmode}{
+        \tikzset{%
+            swizzling/.append style = {color = green, fill opacity = 0.75},
+            noswizzling/.append style = {color = red, fill opacity = 0.75},
+            swizzlingHit/.style = {swizzling, fill = green!60},
+            swizzlingMiss/.style = {swizzling, fill = green!30},
+            noswizzlingHit/.style = {noswizzling, fill = red!60},
+            noswizzlingMiss/.style = {noswizzling, fill = red!30},
+            threshold/.append style = {thick},
+            thresholdArrow/.append style = {thick},
+            thresholdNode/.append style = {fill = none}
+        }
+    }{
+        \tikzset{%
+            swizzling/.append style = {dashed},
+            noswizzling/.append style = {dotted},
+            swizzlingHit/.style = {swizzling, pattern = north west lines},
+            swizzlingMiss/.style = {swizzling, pattern = north east lines},
+            noswizzlingHit/.style = {noswizzling, pattern = checkerboard, pattern color = black!40},
+            noswizzlingMiss/.style = {noswizzling, pattern = checkerboard, pattern color = black!20},
+            threshold/.append style = {very thick},
+            thresholdArrow/.append style = {very thick},
+            thresholdNode/.append style = {fill = white, inner sep = 1pt}
+        }
+    }
+
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}
+                \begin{axis}[xlabel = \large hit rate,
+                           xmin = 0,
+                           xmax = 100,
+                           xtick = {5, 95},
+                           xticklabels = {$HR_{min}$, $HR_{CS}$},
+                           ylabel = \large total execution time,
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 101,
+                           ytick = \empty,
+                           stack plots = y,
+                           axis x line = bottom,
+                           axis y line = left,
+                           width = .9\textwidth,
+                           height = .5\textheight]
+                    \addplot[noswizzlingHit, name path = noswizzlingHit] coordinates {
+                        (5, 3)
+                        (95, 60)}
+                        \closedcycle; \label{noswizzlingHits}
+                    \addplot[noswizzlingMiss, name path = noswizzlingMiss] coordinates {
+                        (5, 80)
+                        (95, 4)}
+                        \closedcycle; \label{noswizzlingMisses}
+                \end{axis}
+
+                \begin{axis}[xlabel = \large hit rate,
+                           xmin = 0,
+                           xmax = 100,
+                           xtick = {5, 95},
+                           xticklabels = {$HR_{min}$, $HR_{CS}$},
+                           ylabel = \large total execution time,
+                           ymin = 0,
+                           ymax = 101,
+                           ytick = \empty,
+                           stack plots = y,
+                      	   legend style = {at = {(1.05, 1.05)}, font = \footnotesize},
+                           area legend,
+                           axis x line = bottom,
+                           axis y line = left,
+                           width = .9\textwidth,
+                           height = .5\textheight,
+                           hide axis]
+                    \addlegendimage{/pgfplots/refstyle = noswizzlingHits}
+                    \addlegendentry{Page Hits without Pointer Swizzling}
+                    \addlegendimage{/pgfplots/refstyle = noswizzlingMisses}
+                    \addlegendentry{Page Misses without Pointer Swizzling}
+
+                    \path[threshold]			(33.42, 0)			--		(33.42, 101);
+                    \path[thresholdArrow]	(33.42, 62.5)		--	node[thresholdNode, xshift = -15]	{faster without pointer swizzling}	(33.42 - 10, 62.5);
+                    \path[thresholdArrow]	(33.42, 62.5)		--	node[thresholdNode, xshift = 15]	{faster with pointer swizzling}	(33.42 + 10, 62.5);
+                    \addplot[swizzlingHit, name path = swizzlingHit] coordinates {
+                        (5, 1)
+                        (95, 20)}
+                        \closedcycle;
+                        \addlegendentry{Page Hits with Pointer Swizzling}
+                    \addplot[swizzlingMiss, name path = swizzlingMiss] coordinates {
+                        (5, 100)
+                        (95, 5)}
+                        \closedcycle;
+                        \addlegendentry{Page Misses with Pointer Swizzling}
+                \end{axis}
+            \end{tikzpicture}
+        }
+        \caption{Expected sum of execution times of every execution of the \lstinline{fix()} operation for a buffer pool with and without pointer swizzling.}
+        \label{fig:expectedswizzlingperformance}
+    \end{figure}
 \end{@empty}
 
 \section[System Configuration]{Configuration of the Used System}
 
 \begin{@empty}
-	\begin{itemize}
-		\itemsep0em
-		\item	\textbf{CPU:} $2 \times $ \emph{Intel® Xeon® Processor E5420} @$2.50\text{GHz}$ released late 2007
-		\item	\textbf{Main Memory:} $8 \times 4\text{GB} = 32\text{GB}$ of DDR2-SDRAM @$667\text{MHz}$
-		\item	\textbf{Storage:} $3 \times 256\text{GB}$ \emph{Samsung SSD 840 PRO Series} released mid 2012 \\
-			The following data are stored on seperate SSD:
-			\begin{itemize}
-				\item	database file of \emph{Zero} (\lstinline{--sm_dbfile})
-				\item	log directory of \emph{Zero} (\lstinline{--sm_logdir})
-				\item	log file of the buffer log for \emph{Zero} (\lstinline{--sm_fix_stats_file})
-				\item	\emph{XtraDB} data file of \emph{MariaDB} (\lstinline{datadir})
-			\end{itemize}
-		\item	\textbf{OS:} \emph{Ubuntu 15.04}
-		\item	\textbf{Kernel:} \emph{Linux 3.19.0-15-generic}
-		\item	\textbf{C++-Compiler:} \emph{GCC} (\emph{GNU Compiler Collection}) \emph{5.4.1}
-	\end{itemize}
+    \begin{itemize}
+        \itemsep0em
+        \item	\textbf{CPU:} $2 \times $ \emph{Intel® Xeon® Processor E5420} @$2.50\text{GHz}$ released late 2007
+        \item	\textbf{Main Memory:} $8 \times 4\text{GB} = 32\text{GB}$ of DDR2-SDRAM @$667\text{MHz}$
+        \item	\textbf{Storage:} $3 \times 256\text{GB}$ \emph{Samsung SSD 840 PRO Series} released mid 2012 \\
+            The following data are stored on seperate SSD:
+            \begin{itemize}
+                \item	database file of \emph{Zero} (\lstinline{--sm_dbfile})
+                \item	log directory of \emph{Zero} (\lstinline{--sm_logdir})
+                \item	log file of the buffer log for \emph{Zero} (\lstinline{--sm_fix_stats_file})
+                \item	\emph{XtraDB} data file of \emph{MariaDB} (\lstinline{datadir})
+            \end{itemize}
+        \item	\textbf{OS:} \emph{Ubuntu 15.04}
+        \item	\textbf{Kernel:} \emph{Linux 3.19.0-15-generic}
+        \item	\textbf{C++-Compiler:} \emph{GCC} (\emph{GNU Compiler Collection}) \emph{5.4.1}
+    \end{itemize}
 \end{@empty}
 
 \section[Measured Performance]{Measured Performance of Pointer Swizzling in the Buffer Management}
 
-	One way to show the actual influence of a new technique is to \emph{isolate} the changed component of the system and to measure this component independently with and without the new technique. This would result in the usage of a \emph{microbenchmark} that only reads records from the layer of storage structures (the Foster B-tree structure is required for the pointer swizzling approach) with the transactional locking and logging deactivated. This would ignore the overhead imposed by higher levels of the DBMS (e.g. query optimization) as well as effects of concurrency control in the buffer pool (arbitrarily many concurrent read accesses are allowed). The deactivation of locking and logging removes the overhead due to concurrency control (transaction level) and it removes the I/O latency of the log manager. 
-	
-	Another way to show the performance advantage of new techniques shows the impact of the new technique on the \emph{whole system}. Therefore the measured performance change imposed by the new technique will depend on the influence of the changed component on the whole system. To achieve such a measurement the usage of a \emph{synthetic benchmark} like TPC-C (\cite{TPC-C}), which tries to simulate an actual OLTP application of a DBMS, would fit best. Those benchmarks are industry standards to measure the performance of a DBMS. The advantage of this kind of evaluation is that it allows an insight in how the new technique interacts with the whole system compared to the old techniques. But as there are many different configurations of the surrounding system, this kind of evaluation could lead to completely different results when other system components gets replaced as other components can be optimized independently. In the case of pointer swizzling in the buffer pool, the changes of the whole system could be enormous but the influence of the new technique and the influence of different hit rates is very isolated. Changes in other components wouldn't change the performance behavior of the DBMS for different hit rates as those components rely on the buffer pool to cache pages. The hit rate only changes the performance of the buffer pool operations and therefore changes in other components could only change the influence of the buffer pool on the overall performance by fixing more or less pages or by adding or removing overhead imposed by other components.
-	
+    One way to show the actual influence of a new technique is to \emph{isolate} the changed component of the system and to measure this component independently with and without the new technique. This would result in the usage of a \emph{microbenchmark} that only reads records from the layer of storage structures (the Foster B-tree structure is required for the pointer swizzling approach) with the transactional locking and logging deactivated. This would ignore the overhead imposed by higher levels of the DBMS (e.g. query optimization) as well as effects of concurrency control in the buffer pool (arbitrarily many concurrent read accesses are allowed). The deactivation of locking and logging removes the overhead due to concurrency control (transaction level) and it removes the I/O latency of the log manager.
+
+    Another way to show the performance advantage of new techniques shows the impact of the new technique on the \emph{whole system}. Therefore the measured performance change imposed by the new technique will depend on the influence of the changed component on the whole system. To achieve such a measurement the usage of a \emph{synthetic benchmark} like TPC-C \cite{TPC-C}, which tries to simulate an actual OLTP application of a DBMS, would fit best. Those benchmarks are industry standards to measure the performance of a DBMS. The advantage of this kind of evaluation is that it allows an insight in how the new technique interacts with the whole system compared to the old techniques. But as there are many different configurations of the surrounding system, this kind of evaluation could lead to completely different results when other system components gets replaced as other components can be optimized independently. In the case of pointer swizzling in the buffer pool, the changes of the whole system could be enormous but the influence of the new technique and the influence of different hit rates is very isolated. Changes in other components wouldn't change the performance behavior of the DBMS for different hit rates as those components rely on the buffer pool to cache pages. The hit rate only changes the performance of the buffer pool operations and therefore changes in other components could only change the influence of the buffer pool on the overall performance by fixing more or less pages or by adding or removing overhead imposed by other components.
+
 \subsection{Performance of the DBMS}
 
-	The performance evaluation of the whole DBMS was done using the implementations of TPC-C and TPC-B that are part of \emph{Shore-MT}'s \emph{Shore-Kits} which is used in \emph{Zero} as well. 	
+    The performance evaluation of the whole DBMS was done using the implementations of TPC-C and TPC-B that are part of \emph{Shore-MT}'s \emph{Shore-Kits} which is used in \emph{Zero} as well.
 
 \subsubsection{TPC-C} \label{subsub:tpcc}
 
-	\emph{TPC-C} (\cite{TPC-C}) is the industry standard benchmark for moderately complex OLTP workloads. It was approved as new OLTP benchmark in July 1992 and therefore it simulates a typical OLTP workload of that time. The benchmark simulates a wholesale supplier managing orders. It uses 9 different tables and the terminals (threads) run queries of 5 different types searching, updating, deleting and inserting on those tables. It's predecessor with an even simpler workload was TPC-A and the successor is TPC-E which simulates a tremendously more complex and modern OLTP application.
-	
-	Each benchmark run was executed on a database of 100 warehouses ($\equiv$ \SI{13.22}{\gibi\byte}) which was initialized (schema created and initial records inserted) beforehand. Before each execution, the TRIM-command was executed on the SSDs used for the database file and for the transactional log because it wasn't executed automatically. Each benchmark run used the same initial database (initialized once and saved). As the used CPUs can execute 8 threads in parallel, the used number of TPC-C terminals is 8 and therefore the system simulates 8 users concurrently running transactions on the database system. To compensate environmental effects (e.g. file accesses) on the used test system, the results are averaged over 3 runs. As synchronized commits greatly restrict the transaction throughput, the option \lstinline{asyncCommit} was set during all the benchmark runs.
+    \emph{TPC-C} \cite{TPC-C} is the industry standard benchmark for moderately complex OLTP workloads. It was approved as new OLTP benchmark in July 1992 and therefore it simulates a typical OLTP workload of that time. The benchmark simulates a wholesale supplier managing orders. It uses 9 different tables and the terminals (threads) run queries of 5 different types searching, updating, deleting and inserting on those tables. It's predecessor with an even simpler workload was TPC-A and the successor is TPC-E which simulates a tremendously more complex and modern OLTP application.
+
+    Each benchmark run was executed on a database of 100 warehouses ($\equiv$ \SI{13.22}{\gibi\byte}) which was initialized (schema created and initial records inserted) beforehand. Before each execution, the TRIM-command was executed on the SSDs used for the database file and for the transactional log because it wasn't executed automatically. Each benchmark run used the same initial database (initialized once and saved). As the used CPUs can execute 8 threads in parallel, the used number of TPC-C terminals is 8 and therefore the system simulates 8 users concurrently running transactions on the database system. To compensate environmental effects (e.g. file accesses) on the used test system, the results are averaged over 3 runs. As synchronized commits greatly restrict the transaction throughput, the option \lstinline{asyncCommit} was set during all the benchmark runs.
 
 \begin{@empty}
-	\tikzset{%
-		DBSize/.style = { - , line width = 0.625mm, dotted},
-		DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
-	}
+    \tikzset{%
+        DBSize/.style = { - , line width = 0.625mm, dotted},
+        DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditionalStyle/.style = {color = blue},
-			swizzlingStyle/.style = {color = black},
-			DBSize/.append style = {draw = purple},
-			DBSizeMark/.append style = {text = purple}
-		}
-	}{
-		\tikzset{%
-			traditionalStyle/.style = {color = black, mark = o},
-			swizzlingStyle/.style = {color = black, mark = 10-pointed star},
-			DBSize/.append style = {draw = black}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
-				\begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
-						   xlabel near ticks,
-						   xmin = 0,
-						   xmax = 20000,
-						   xtick distance = {1000},
-						   xticklabels = {,0,1,...,20},
-						   scaled x ticks = false,
-						   minor x tick num = 9,
-						   ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 18000,
-						   ymode = normal,
-						   scaled y ticks = false,
-						   grid = major,
-						   legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
-						   legend pos = north west,
-						   width = 1.5\textwidth,
-						   height = .75\textheight]		
-					\draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 18000);
-					\node[DBSizeMark]			at (axis cs: 13215, 9000)		{initial database size};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditionalStyle/.style = {color = blue},
+            swizzlingStyle/.style = {color = black},
+            DBSize/.append style = {draw = purple},
+            DBSizeMark/.append style = {text = purple}
+        }
+    }{
+        \tikzset{%
+            traditionalStyle/.style = {color = black, mark = o},
+            swizzlingStyle/.style = {color = black, mark = 10-pointed star},
+            DBSize/.append style = {draw = black}
+        }
+    }
 
-					\addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_noswizzling_performance.csv};
-					\addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_swizzling_performance.csv};
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
+                \begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
+                           xlabel near ticks,
+                           xmin = 0,
+                           xmax = 20000,
+                           xtick distance = {1000},
+                           xticklabels = {,0,1,...,20},
+                           scaled x ticks = false,
+                           minor x tick num = 9,
+                           ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 18000,
+                           ymode = normal,
+                           scaled y ticks = false,
+                           grid = major,
+                           legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
+                           legend pos = north west,
+                           width = 1.5\textwidth,
+                           height = .75\textheight]
+                    \draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 18000);
+                    \node[DBSizeMark]			at (axis cs: 13215, 9000)		{initial database size};
 
-					\coordinate (magnifyglass) at (axis cs: 8750, 3750);				
+                    \addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_noswizzling_performance.csv};
+                    \addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_swizzling_performance.csv};
 
-					\draw[]	(axis cs: 1000, 0)	--	(axis cs: 1000, 2000)	--	(axis cs: 0, 2000);
-					\draw[]	(axis cs: 1000, 1000)	--	(axis cs: 4250, 4000);
-				\end{axis}
-					\node[] at (magnifyglass) {%
-						\begin{tikzpicture}[]
-							\begin{axis}[xmin = 0,
-									   xmax = 1000,
-									   xtick distance = {200},
-									   scaled x ticks = false,
-									   minor x tick num = 3,
-									   ymin = 0,
-									   ymax = 2000,
-									   ymode = normal,
-									   scaled y ticks = false,
-									   grid = major,
-									   width = .6\textwidth,
-									   height = .32\textheight,
-									   axis background/.style = {fill = white}]
-								\addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_noswizzling_performance.csv};
-								\addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_swizzling_performance.csv};
-							\end{axis}
-						\end{tikzpicture}%
-					};
-			\end{tikzpicture}
-		}
-		\caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-C. The database contains 100 warehouses and 8 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{20}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. Each configuration was executed three times and each run lasted \SI{10}{\minute}. Asynchronous commits are enabled. The error bars represent the standard deviation of the three measurements.}
-		\label{fig:tpccperformance}
-	\end{figure}
+                    \coordinate (magnifyglass) at (axis cs: 8750, 3750);
+
+                    \draw[]	(axis cs: 1000, 0)	--	(axis cs: 1000, 2000)	--	(axis cs: 0, 2000);
+                    \draw[]	(axis cs: 1000, 1000)	--	(axis cs: 4250, 4000);
+                \end{axis}
+                    \node[] at (magnifyglass) {%
+                        \begin{tikzpicture}[]
+                            \begin{axis}[xmin = 0,
+                                       xmax = 1000,
+                                       xtick distance = {200},
+                                       scaled x ticks = false,
+                                       minor x tick num = 3,
+                                       ymin = 0,
+                                       ymax = 2000,
+                                       ymode = normal,
+                                       scaled y ticks = false,
+                                       grid = major,
+                                       width = .6\textwidth,
+                                       height = .32\textheight,
+                                       axis background/.style = {fill = white}]
+                                \addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_noswizzling_performance.csv};
+                                \addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_swizzling_performance.csv};
+                            \end{axis}
+                        \end{tikzpicture}%
+                    };
+            \end{tikzpicture}
+        }
+        \caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-C. The database contains 100 warehouses and 8 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{20}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. Each configuration was executed three times and each run lasted \SI{10}{\minute}. Asynchronous commits are enabled. The error bars represent the standard deviation of the three measurements.}
+        \label{fig:tpccperformance}
+    \end{figure}
 \end{@empty}
 
-	The results of the \num{234} benchmark runs are shown in figure \ref{fig:tpccperformance}. The transaction throughput of the DBMS grows nearly quadratic with the buffer pool size until the buffer has a size of \SI{2}{\gibi\byte}. Afterwards the growth of the \emph{transaction throughput is roughly linear} until the maximum throughput is achieved at a buffer pool size of around \SI{8}{\gibi\byte}. This behavior is the same for the buffer pool that utilizes pointer swizzling and for the one that doesn't utilize it. The saturation of the throughput for buffer sizes smaller than the whole database is either caused by limitations due to other components of the DBMS (maximum throughput is around \SI{15000}{\transactions\per\second} independent of the buffer latency) or it's the result of the TPC-C benchmark only accessing around \SI{8}{\gibi\byte} of pages when the database has a size of 100 warehouses. The high standard deviations for some buffer pool sizes (without pointer swizzling: \SI{14}{\gibi\byte}, with pointer swizzling: \SIlist{5; 6.5; 8.5; 17}{\gibi\byte}) are the result of single measurements with abnormally low throughputs caused by e.g. randomly occurring issues in other components (\emph{Zero} is an experimental platform where problems of the design and implementation sometimes cause deadlocks, segmentation faults and other undetected faults).
+    The results of the \num{234} benchmark runs are shown in figure \ref{fig:tpccperformance}. The transaction throughput of the DBMS grows nearly quadratic with the buffer pool size until the buffer has a size of \SI{2}{\gibi\byte}. Afterwards the growth of the \emph{transaction throughput is roughly linear} until the maximum throughput is achieved at a buffer pool size of around \SI{8}{\gibi\byte}. This behavior is the same for the buffer pool that utilizes pointer swizzling and for the one that doesn't utilize it. The saturation of the throughput for buffer sizes smaller than the whole database is either caused by limitations due to other components of the DBMS (maximum throughput is around \SI{15000}{\transactions\per\second} independent of the buffer latency) or it's the result of the TPC-C benchmark only accessing around \SI{8}{\gibi\byte} of pages when the database has a size of 100 warehouses. The high standard deviations for some buffer pool sizes (without pointer swizzling: \SI{14}{\gibi\byte}, with pointer swizzling: \SIlist{5; 6.5; 8.5; 17}{\gibi\byte}) are the result of single measurements with abnormally low throughputs caused by e.g. randomly occurring issues in other components (\emph{Zero} is an experimental platform where problems of the design and implementation sometimes cause deadlocks, segmentation faults and other undetected faults).
 
-	The performance of the DBMS \emph{for the different buffer pool sizes} is \emph{as expected}. When nearly the whole database fits in the buffer pool, the performance will be close to the maximum performance as the long term working set of pages will be smaller than the database. The steep rise of the throughput for buffer pool sizes from \SI{500}{\mebi\byte} to \SI{2}{\gibi\byte} is the result of a very small short term working set. The locality of the page reference string will cause a high hit rate even when only a small subset of the database fits in the buffer pool and as a smaller amount of terminals concurrently querying the database system would cause an even smaller working set, the performance increase would be even steeper there. The roughly linear increase for buffer pool sizes of \SIrange{2}{8}{\gibi\byte} perfectly fits between the high rate of increase before \SI{2}{\gibi\byte} and the low rate of increase after \SI{8}{\gibi\byte}.
+    The performance of the DBMS \emph{for the different buffer pool sizes} is \emph{as expected}. When nearly the whole database fits in the buffer pool, the performance will be close to the maximum performance as the long term working set of pages will be smaller than the database. The steep rise of the throughput for buffer pool sizes from \SI{500}{\mebi\byte} to \SI{2}{\gibi\byte} is the result of a very small short term working set. The locality of the page reference string will cause a high hit rate even when only a small subset of the database fits in the buffer pool and as a smaller amount of terminals concurrently querying the database system would cause an even smaller working set, the performance increase would be even steeper there. The roughly linear increase for buffer pool sizes of \SIrange{2}{8}{\gibi\byte} perfectly fits between the high rate of increase before \SI{2}{\gibi\byte} and the low rate of increase after \SI{8}{\gibi\byte}.
 
 \begin{@empty}
-	\tikzset{%
-		DBSize/.style = { - , line width = 0.625mm, dotted},
-		DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
-	}
+    \tikzset{%
+        DBSize/.style = { - , line width = 0.625mm, dotted},
+        DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditionalStyle/.style = {color = blue},
-			swizzlingStyle/.style = {color = black},
-			DBSize/.append style = {draw = purple},
-			DBSizeMark/.append style = {text = purple}
-		}
-	}{
-		\tikzset{%
-			traditionalStyle/.style = {color = black, mark = o},
-			swizzlingStyle/.style = {color = black, mark = 10-pointed star},
-			DBSize/.append style = {draw = black}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
-				\begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
-						   xlabel near ticks,
-						   xmin = 0,
-						   xmax = 15000,
-						   xtick distance = {1000},
-						   xticklabels = {,0,1,...,20},
-						   scaled x ticks = false,
-						   minor x tick num = 9,
-						   ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 25000,
-						   ymode = normal,
-						   scaled y ticks = false,
-						   grid = major,
-						   legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
-						   legend pos = north west,
-						   width = 1.5\textwidth,
-						   height = .75\textheight]		
-					\draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 25000);
-					\node[DBSizeMark]			at (axis cs: 13215, 11000)		{initial database size};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditionalStyle/.style = {color = blue},
+            swizzlingStyle/.style = {color = black},
+            DBSize/.append style = {draw = purple},
+            DBSizeMark/.append style = {text = purple}
+        }
+    }{
+        \tikzset{%
+            traditionalStyle/.style = {color = black, mark = o},
+            swizzlingStyle/.style = {color = black, mark = 10-pointed star},
+            DBSize/.append style = {draw = black}
+        }
+    }
 
-					\addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_nolog_noswizzling_performance.csv};
-					\addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_nolog_swizzling_performance.csv};
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
+                \begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
+                           xlabel near ticks,
+                           xmin = 0,
+                           xmax = 15000,
+                           xtick distance = {1000},
+                           xticklabels = {,0,1,...,20},
+                           scaled x ticks = false,
+                           minor x tick num = 9,
+                           ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 25000,
+                           ymode = normal,
+                           scaled y ticks = false,
+                           grid = major,
+                           legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
+                           legend pos = north west,
+                           width = 1.5\textwidth,
+                           height = .75\textheight]
+                    \draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 25000);
+                    \node[DBSizeMark]			at (axis cs: 13215, 11000)		{initial database size};
 
-					\coordinate (magnifyglass) at (axis cs: 9750, 5250);				
+                    \addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_nolog_noswizzling_performance.csv};
+                    \addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_nolog_swizzling_performance.csv};
 
-					\draw[]	(axis cs: 1000, 0)	--	(axis cs: 1000, 500)	--	(axis cs: 0, 500);
-					\draw[]	(axis cs: 1000, 250)	--	(axis cs: 6500, 5000);
-				\end{axis}
-					\node[] at (magnifyglass) {%
-						\begin{tikzpicture}[]
-							\begin{axis}[xmin = 0,
-									   xmax = 1000,
-									   xtick distance = {200},
-									   scaled x ticks = false,
-									   minor x tick num = 3,
-									   ymin = 0,
-									   ymax = 500,
-									   ymode = normal,
-									   scaled y ticks = false,
-									   grid = major,
-									   width = .6\textwidth,
-									   height = .32\textheight,
-									   axis background/.style = {fill = white}]
-								\addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_nolog_noswizzling_performance.csv};
-								\addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_nolog_swizzling_performance.csv};
-							\end{axis}
-						\end{tikzpicture}%
-					};
-			\end{tikzpicture}
-		}
-		\caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-C \emph{on another computer system}. The database contains 100 warehouses and 24 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{15}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. The log was written to the main memory to partly eliminate the overhead due to transactional logging. Each configuration was executed three times and each run lasted \SI{10}{\minute}. The error bars represent the standard deviation of the three measurements.}
-		\label{fig:tpccnologperformance}
-	\end{figure}
+                    \coordinate (magnifyglass) at (axis cs: 9750, 5250);
+
+                    \draw[]	(axis cs: 1000, 0)	--	(axis cs: 1000, 500)	--	(axis cs: 0, 500);
+                    \draw[]	(axis cs: 1000, 250)	--	(axis cs: 6500, 5000);
+                \end{axis}
+                    \node[] at (magnifyglass) {%
+                        \begin{tikzpicture}[]
+                            \begin{axis}[xmin = 0,
+                                       xmax = 1000,
+                                       xtick distance = {200},
+                                       scaled x ticks = false,
+                                       minor x tick num = 3,
+                                       ymin = 0,
+                                       ymax = 500,
+                                       ymode = normal,
+                                       scaled y ticks = false,
+                                       grid = major,
+                                       width = .6\textwidth,
+                                       height = .32\textheight,
+                                       axis background/.style = {fill = white}]
+                                \addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_nolog_noswizzling_performance.csv};
+                                \addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_nolog_swizzling_performance.csv};
+                            \end{axis}
+                        \end{tikzpicture}%
+                    };
+            \end{tikzpicture}
+        }
+        \caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-C \emph{on another computer system}. The database contains 100 warehouses and 24 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{15}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. The log was written to the main memory to partly eliminate the overhead due to transactional logging. Each configuration was executed three times and each run lasted \SI{10}{\minute}. The error bars represent the standard deviation of the three measurements.}
+        \label{fig:tpccnologperformance}
+    \end{figure}
 \end{@empty}
-		
-	The performance of the buffer pool that uses \emph{pointer swizzling} to locate buffered pages \emph{isn't as expected}. For either high and low miss rates, the transaction throughput of the DBMS using the buffer pool with pointer swizzling is lower than the one of the DBMS with the buffer pool only utilizing a hash table for page location. Some isolated buffer sizes show an opposite result but the high standard deviation of the results makes those inconclusive. Even configurations where the overhead caused by transactional logging is partly eliminated by storing the log in main memory (as shown in figure \ref{fig:tpccnologperformance}) doesn't show a performance improvement due to the usage of pointer swizzling.
-	
-	The reason for the unexpected behavior of the buffer pool with pointer swizzling couldn't be found but it's either an issue of the implementation or it's an issue of the configuration of the server or of the benchmark because pointer swizzling was actually utilized during the benchmark runs that had pointer swizzling enabled. The number of hash table lookups was only a fraction compared to the runs with disabled pointer swizzling.
+
+    The performance of the buffer pool that uses \emph{pointer swizzling} to locate buffered pages \emph{isn't as expected}. For either high and low miss rates, the transaction throughput of the DBMS using the buffer pool with pointer swizzling is lower than the one of the DBMS with the buffer pool only utilizing a hash table for page location. Some isolated buffer sizes show an opposite result but the high standard deviation of the results makes those inconclusive. Even configurations where the overhead caused by transactional logging is partly eliminated by storing the log in main memory (as shown in figure \ref{fig:tpccnologperformance}) doesn't show a performance improvement due to the usage of pointer swizzling.
+
+    The reason for the unexpected behavior of the buffer pool with pointer swizzling couldn't be found but it's either an issue of the implementation or it's an issue of the configuration of the server or of the benchmark because pointer swizzling was actually utilized during the benchmark runs that had pointer swizzling enabled. The number of hash table lookups was only a fraction compared to the runs with disabled pointer swizzling.
 
 \subsubsection{TPC-B}
-	
-	\emph{TPC-B} (\cite{TPC-B}) was a standard benchmark for database workloads that mainly utilize the lower levels of a DBMS. It leads to a significant I/O activity while requiring a moderate execution time. The buffer pool is the mainly utilized component when this benchmark is executed. It uses 4 different tables and the terminals run simple queries of 7 different types searching, updating, deleting and inserting on those tables. It's obsolete because it's too simple to be an appropriate representation of a modern OLTP application and the used metrics aren't proper anymore (\cite{Levine:1993}).
-		
-	Each benchmark run was executed on a database with a scaling factor of 500 ($\equiv$ \SI{1.87}{\gibi\byte}) which was initialized (schema created and initial records inserted) beforehand. Before each execution, the TRIM-command was executed on the SSDs used for the database file and for the transactional log because it wasn't executed automatically. Each benchmark run used the same initial database (initialized once and saved). The database size after \SI{10}{\minute} of TPC-B querying varies as a higher transaction throughput results in a higher number of inserted records. As the used CPUs can execute 8 threads in parallel, the used number of TPC-B terminals is 8 and therefore the system simulates 8 users concurrently running transactions on the database system. To compensate environmental effects (e.g. file accesses) on the used test system, the results are averaged over 3 runs. As synchronized commits greatly restrict the transaction throughput, the option \lstinline{asyncCommit} was set during all the benchmark runs.
-	
+
+    \emph{TPC-B} \cite{TPC-B} was a standard benchmark for database workloads that mainly utilize the lower levels of a DBMS. It leads to a significant I/O activity while requiring a moderate execution time. The buffer pool is the mainly utilized component when this benchmark is executed. It uses 4 different tables and the terminals run simple queries of 7 different types searching, updating, deleting and inserting on those tables. It's obsolete because it's too simple to be an appropriate representation of a modern OLTP application and the used metrics aren't proper anymore \cite{Levine:1993}.
+
+    Each benchmark run was executed on a database with a scaling factor of 500 ($\equiv$ \SI{1.87}{\gibi\byte}) which was initialized (schema created and initial records inserted) beforehand. Before each execution, the TRIM-command was executed on the SSDs used for the database file and for the transactional log because it wasn't executed automatically. Each benchmark run used the same initial database (initialized once and saved). The database size after \SI{10}{\minute} of TPC-B querying varies as a higher transaction throughput results in a higher number of inserted records. As the used CPUs can execute 8 threads in parallel, the used number of TPC-B terminals is 8 and therefore the system simulates 8 users concurrently running transactions on the database system. To compensate environmental effects (e.g. file accesses) on the used test system, the results are averaged over 3 runs. As synchronized commits greatly restrict the transaction throughput, the option \lstinline{asyncCommit} was set during all the benchmark runs.
+
 \begin{@empty}
-	\tikzset{%
-		DBSize/.style = { - , line width = 0.625mm, dotted},
-		DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
-	}
+    \tikzset{%
+        DBSize/.style = { - , line width = 0.625mm, dotted},
+        DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditionalStyle/.style = {color = blue},
-			swizzlingStyle/.style = {color = black},
-			DBSize/.append style = {draw = purple},
-			DBSizeMark/.append style = {text = purple}
-		}
-	}{
-		\tikzset{%
-			traditionalStyle/.style = {color = black, mark = o},
-			swizzlingStyle/.style = {color = black, mark = 10-pointed star},
-			DBSize/.append style = {draw = black}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}[]
-				\begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
-						   xlabel near ticks,
-						   xmin = 0,
-						   xmax = 5000,
-						   xtick distance = {1000},
-						   xticklabels = {,0,1,...,5},
-						   scaled x ticks = false,
-						   minor x tick num = 9,
-						   ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 55000,
-						   ymode = normal,
-						   scaled y ticks = false,
-						   grid = major,
-						   legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
-						   legend pos = north west,
-						   width = 1.5\textwidth,
-						   height = .75\textheight]		
-					\draw[DBSize]				(axis cs: 1870, 0)			edge		(axis cs: 1870, 55000);
-					\node[DBSizeMark]			at (axis cs: 1870, 17500)		{initial database size};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditionalStyle/.style = {color = blue},
+            swizzlingStyle/.style = {color = black},
+            DBSize/.append style = {draw = purple},
+            DBSizeMark/.append style = {text = purple}
+        }
+    }{
+        \tikzset{%
+            traditionalStyle/.style = {color = black, mark = o},
+            swizzlingStyle/.style = {color = black, mark = 10-pointed star},
+            DBSize/.append style = {draw = black}
+        }
+    }
 
-					\addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcb_noswizzling_performance.csv};
-					\addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcb_swizzling_performance.csv};
-				\end{axis}
-			\end{tikzpicture}
-		}
-		\caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-B. The database contains 500 warehouses and 8 terminals are running transactions concurrently. The buffer size is \SIrange{0.025}{5}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. Each configuration was executed three times and each run lasted \SI{10}{\minute}. Asynchronous commits are enabled. The error bars represent the standard deviation of the three measurements.}
-		\label{fig:tpcbperformance}
-	\end{figure}
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[]
+                \begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
+                           xlabel near ticks,
+                           xmin = 0,
+                           xmax = 5000,
+                           xtick distance = {1000},
+                           xticklabels = {,0,1,...,5},
+                           scaled x ticks = false,
+                           minor x tick num = 9,
+                           ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 55000,
+                           ymode = normal,
+                           scaled y ticks = false,
+                           grid = major,
+                           legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
+                           legend pos = north west,
+                           width = 1.5\textwidth,
+                           height = .75\textheight]
+                    \draw[DBSize]				(axis cs: 1870, 0)			edge		(axis cs: 1870, 55000);
+                    \node[DBSizeMark]			at (axis cs: 1870, 17500)		{initial database size};
+
+                    \addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcb_noswizzling_performance.csv};
+                    \addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcb_swizzling_performance.csv};
+                \end{axis}
+            \end{tikzpicture}
+        }
+        \caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-B. The database contains 500 warehouses and 8 terminals are running transactions concurrently. The buffer size is \SIrange{0.025}{5}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. Each configuration was executed three times and each run lasted \SI{10}{\minute}. Asynchronous commits are enabled. The error bars represent the standard deviation of the three measurements.}
+        \label{fig:tpcbperformance}
+    \end{figure}
 \end{@empty}
 
-	The results of the \num{150} benchmark runs are shown in figure \ref{fig:tpcbperformance}. The \emph{transaction throughput of the DBMS grows nearly linear with the buffer pool size} until the maximum throughput is achieved at a buffer pool size of around \SI{3}{\gibi\byte}. This behavior is the same for the buffer pool with pointer swizzling and for the one that needs an hash table lookup on each page hit. The fact that the performance saturates at a buffer pool size which is much higher than the initial size of the database is the result of a growth of the database size due to inserts of records. The irregular behavior for buffer sizes between \SI{600}{\mebi\byte} and \SI{1}{\gibi\byte} could be the result of a tremendous growth of the hit rate when the buffer pool growths from \SI{600}{\mebi\byte} to \SI{700}{\mebi\byte} due to a loop-like (or multiple loops initiated on the 8 terminals) reference pattern that just fits in the buffer pool.
-	
-	Therefore the performance behavior for TPC-B isn't as expected. But the expectation of the hit rates (in subsection \ref{subsec:reasonhitrate}) for different proportions of the database fitting in the buffer pool are based on the assumption that the reference pattern isn't completely random. It expects a reference string that has some reference locality. The \emph{reference string} due to TPC-B is \emph{completely random} and therefore the expected growth of the hit rate with a growing buffer size is linear. This shows a weakness of the TPC-B benchmark and it is a reason why it is deprecated. With that prerequisite, the behavior of the DBMS is even closer to the theoretical considerations as \emph{expected}. It was expected that the overhead due to other components of the DBMS would reduce the growth of the throughput but the simplicity of TPC-B highlights the performance of the buffer pool.
-	
-	The performance of the \emph{buffer pool utilizing pointer swizzling} is identical for buffer pool sizes of \SIrange{25}{100}{\mebi\byte}, slightly higher (\SIrange{1}{3.5}{\percent}) for buffer pool sizes of \SIrange{150}{300}{\mebi\byte}, lower (\SIrange{4}{8}{\percent}) for buffer pool sizes of \SIrange{350}{500}{\mebi\byte} and higher (\SIrange{4}{8}{\percent}) for buffer pool sizes of \SIrange{1.5}{3.5}{\gibi\byte}. The performance behaves irregular for buffer sizes between the mentioned ranges.
-	
-	The identical or slightly higher performance of the buffer manager with pointer swizzling for very small buffer sizes can be explained by the \emph{irrelevance of operations that doesn't require I/O} for such a very high miss rate. The cost of a hash table lookup required during a page hit in the buffer pool without pointer swizzling and the overhead due to swizzling and unswizzling of a pointer done in the buffer pool with pointer swizzling isn't significant when the miss rate is close to 1. This shows that the overhead imposed by the swizzling and unswizzling of pointers isn't as noticeable as expected. But the lower performance due to pointer swizzling for buffer sizes of \SIrange{350}{500}{\mebi\byte} would \emph{support the expectation that the buffer pool with pointer swizzling suffers from high miss rates}. The notable \emph{performance advantage of the buffer manager with pointer swizzling for large buffer pools} supports the theoretical considerations that a high hit rate and therefore the high number of saved hash table lookups, compensates the added overhead due to swizzling and unswizzling of pointers. Summarizing the results of the TPC-B benchmark runs, pointer swizzling can increase the performance of the DBMS when a large portion of the database fits in the buffer pool but the results for smaller buffer pools are unclear and therefore it can be concluded that the performance disadvantage due to pointer swizzling isn't significant there.
-	
+    The results of the \num{150} benchmark runs are shown in figure \ref{fig:tpcbperformance}. The \emph{transaction throughput of the DBMS grows nearly linear with the buffer pool size} until the maximum throughput is achieved at a buffer pool size of around \SI{3}{\gibi\byte}. This behavior is the same for the buffer pool with pointer swizzling and for the one that needs an hash table lookup on each page hit. The fact that the performance saturates at a buffer pool size which is much higher than the initial size of the database is the result of a growth of the database size due to inserts of records. The irregular behavior for buffer sizes between \SI{600}{\mebi\byte} and \SI{1}{\gibi\byte} could be the result of a tremendous growth of the hit rate when the buffer pool growths from \SI{600}{\mebi\byte} to \SI{700}{\mebi\byte} due to a loop-like (or multiple loops initiated on the 8 terminals) reference pattern that just fits in the buffer pool.
+
+    Therefore the performance behavior for TPC-B isn't as expected. But the expectation of the hit rates (in subsection \ref{subsec:reasonhitrate}) for different proportions of the database fitting in the buffer pool are based on the assumption that the reference pattern isn't completely random. It expects a reference string that has some reference locality. The \emph{reference string} due to TPC-B is \emph{completely random} and therefore the expected growth of the hit rate with a growing buffer size is linear. This shows a weakness of the TPC-B benchmark and it is a reason why it is deprecated. With that prerequisite, the behavior of the DBMS is even closer to the theoretical considerations as \emph{expected}. It was expected that the overhead due to other components of the DBMS would reduce the growth of the throughput but the simplicity of TPC-B highlights the performance of the buffer pool.
+
+    The performance of the \emph{buffer pool utilizing pointer swizzling} is identical for buffer pool sizes of \SIrange{25}{100}{\mebi\byte}, slightly higher (\SIrange{1}{3.5}{\percent}) for buffer pool sizes of \SIrange{150}{300}{\mebi\byte}, lower (\SIrange{4}{8}{\percent}) for buffer pool sizes of \SIrange{350}{500}{\mebi\byte} and higher (\SIrange{4}{8}{\percent}) for buffer pool sizes of \SIrange{1.5}{3.5}{\gibi\byte}. The performance behaves irregular for buffer sizes between the mentioned ranges.
+
+    The identical or slightly higher performance of the buffer manager with pointer swizzling for very small buffer sizes can be explained by the \emph{irrelevance of operations that doesn't require I/O} for such a very high miss rate. The cost of a hash table lookup required during a page hit in the buffer pool without pointer swizzling and the overhead due to swizzling and unswizzling of a pointer done in the buffer pool with pointer swizzling isn't significant when the miss rate is close to 1. This shows that the overhead imposed by the swizzling and unswizzling of pointers isn't as noticeable as expected. But the lower performance due to pointer swizzling for buffer sizes of \SIrange{350}{500}{\mebi\byte} would \emph{support the expectation that the buffer pool with pointer swizzling suffers from high miss rates}. The notable \emph{performance advantage of the buffer manager with pointer swizzling for large buffer pools} supports the theoretical considerations that a high hit rate and therefore the high number of saved hash table lookups, compensates the added overhead due to swizzling and unswizzling of pointers. Summarizing the results of the TPC-B benchmark runs, pointer swizzling can increase the performance of the DBMS when a large portion of the database fits in the buffer pool but the results for smaller buffer pools are unclear and therefore it can be concluded that the performance disadvantage due to pointer swizzling isn't significant there.
+
 \subsection{Execution Time of the Fix Operation}
-	
-	As the results of the benchmark runs of TPC-C doesn't show any performance advantage of the buffer pool using pointer swizzling, a deeper look inside the buffer pool might show the reason for this behavior. It was expected that a page hit is much faster when the hash table doesn't need to be looked up. But it was also expected that a page miss is slower when pointer swizzling is used in the buffer pool as the swizzling of a pointer during a page miss and as the unswizzling of a pointer during the eviction of a page add some overhead.
-	
-	The average number of hash table lookups during the benchmark runs of figure \ref{fig:tpccperformance} is shown in figure \ref{fig:tpcchashtablelookups}. This result was expected as the buffer pool utilizing pointer swizzling doesn't need the hash table during a page hit. The decreased number of hash table lookups should drastically decrease the overhead  of the buffer pool. The small amount of page misses during a benchmark run with a buffer pool that can hold the complete database shouldn't compensate this reduction of overhead as the overhead imposed by pointer swizzling during a page miss is expected to be very small compared to the whole latency of a page miss. Therefore it is expected that a benchmark run with a buffer pool size of \SI{20}{\gibi\byte} can fully benefit from the decreased number of hash table lookups.
-	
+
+    As the results of the benchmark runs of TPC-C doesn't show any performance advantage of the buffer pool using pointer swizzling, a deeper look inside the buffer pool might show the reason for this behavior. It was expected that a page hit is much faster when the hash table doesn't need to be looked up. But it was also expected that a page miss is slower when pointer swizzling is used in the buffer pool as the swizzling of a pointer during a page miss and as the unswizzling of a pointer during the eviction of a page add some overhead.
+
+    The average number of hash table lookups during the benchmark runs of figure \ref{fig:tpccperformance} is shown in figure \ref{fig:tpcchashtablelookups}. This result was expected as the buffer pool utilizing pointer swizzling doesn't need the hash table during a page hit. The decreased number of hash table lookups should drastically decrease the overhead  of the buffer pool. The small amount of page misses during a benchmark run with a buffer pool that can hold the complete database shouldn't compensate this reduction of overhead as the overhead imposed by pointer swizzling during a page miss is expected to be very small compared to the whole latency of a page miss. Therefore it is expected that a benchmark run with a buffer pool size of \SI{20}{\gibi\byte} can fully benefit from the decreased number of hash table lookups.
+
 \begin{@empty}
-	\tikzset{%
-		DBSize/.style = { - , line width = 0.625mm, dotted},
-		DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
-	}
+    \tikzset{%
+        DBSize/.style = { - , line width = 0.625mm, dotted},
+        DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditionalStyle/.style = {color = blue},
-			swizzlingStyle/.style = {color = black},
-			DBSize/.append style = {draw = purple},
-			DBSizeMark/.append style = {text = purple}
-		}
-	}{
-		\tikzset{%
-			traditionalStyle/.style = {color = black, mark = o},
-			swizzlingStyle/.style = {color = black, mark = 10-pointed star},
-			DBSize/.append style = {draw = black}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
-				\begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
-						   xlabel near ticks,
-						   xmin = 0,
-						   xmax = 20000,
-						   xtick distance = {1000},
-						   xticklabels = {,0,1,...,20},
-						   scaled x ticks = false,
-						   minor x tick num = 9,
-						   ylabel = {average number of hash table lookups},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 900000000,
-						   ymode = normal,
-						   scaled y ticks = false,
-						   grid = major,
-						   legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
-						   legend pos = north west,
-						   width = 1.5\textwidth,
-						   height = .75\textheight]		
-					\draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 9000000000);
-					\node[DBSizeMark]			at (axis cs: 13215, 450000000)		{initial database size};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditionalStyle/.style = {color = blue},
+            swizzlingStyle/.style = {color = black},
+            DBSize/.append style = {draw = purple},
+            DBSizeMark/.append style = {text = purple}
+        }
+    }{
+        \tikzset{%
+            traditionalStyle/.style = {color = black, mark = o},
+            swizzlingStyle/.style = {color = black, mark = 10-pointed star},
+            DBSize/.append style = {draw = black}
+        }
+    }
 
-					\addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_noswizzling_hash_table_lookups.csv};
-					\addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_swizzling_hash_table_lookups.csv};
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
+                \begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
+                           xlabel near ticks,
+                           xmin = 0,
+                           xmax = 20000,
+                           xtick distance = {1000},
+                           xticklabels = {,0,1,...,20},
+                           scaled x ticks = false,
+                           minor x tick num = 9,
+                           ylabel = {average number of hash table lookups},
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 900000000,
+                           ymode = normal,
+                           scaled y ticks = false,
+                           grid = major,
+                           legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
+                           legend pos = north west,
+                           width = 1.5\textwidth,
+                           height = .75\textheight]
+                    \draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 9000000000);
+                    \node[DBSizeMark]			at (axis cs: 13215, 450000000)		{initial database size};
 
-					\coordinate (magnifyglass) at (axis cs: 8750, 200000000);				
+                    \addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_noswizzling_hash_table_lookups.csv};
+                    \addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_swizzling_hash_table_lookups.csv};
 
-					\draw[]	(axis cs: 2000, 0)	--	(axis cs: 2000, 100000000)	--	(axis cs: 0, 100000000);
-					\draw[]	(axis cs: 2000, 50000000)	--	(axis cs: 4250, 200000000);
-				\end{axis}
-					\node[] at (magnifyglass) {%
-						\begin{tikzpicture}[]
-							\begin{axis}[xmin = 0,
-									   xmax = 2000,
-									   xtick distance = {500},
-									   scaled x ticks = false,
-									   minor x tick num = 4,
-									   ymin = 0,
-									   ymax = 100000000,
-									   ymode = normal,
-									   scaled y ticks = false,
-									   grid = major,
-									   width = .6\textwidth,
-									   height = .32\textheight,
-									   axis background/.style = {fill = white}]
-								\addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_noswizzling_hash_table_lookups.csv};
-								\addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_swizzling_hash_table_lookups.csv};
-							\end{axis}
-						\end{tikzpicture}%
-					};
-			\end{tikzpicture}
-		}
-		\caption{The number of hash table lookup of the TPC-C benchmark runs shown in figure \ref{fig:tpccperformance}}
-		\label{fig:tpcchashtablelookups}
-	\end{figure}
+                    \coordinate (magnifyglass) at (axis cs: 8750, 200000000);
+
+                    \draw[]	(axis cs: 2000, 0)	--	(axis cs: 2000, 100000000)	--	(axis cs: 0, 100000000);
+                    \draw[]	(axis cs: 2000, 50000000)	--	(axis cs: 4250, 200000000);
+                \end{axis}
+                    \node[] at (magnifyglass) {%
+                        \begin{tikzpicture}[]
+                            \begin{axis}[xmin = 0,
+                                       xmax = 2000,
+                                       xtick distance = {500},
+                                       scaled x ticks = false,
+                                       minor x tick num = 4,
+                                       ymin = 0,
+                                       ymax = 100000000,
+                                       ymode = normal,
+                                       scaled y ticks = false,
+                                       grid = major,
+                                       width = .6\textwidth,
+                                       height = .32\textheight,
+                                       axis background/.style = {fill = white}]
+                                \addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_noswizzling_hash_table_lookups.csv};
+                                \addplot[swizzlingStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagehashtablelookups, y error = standarddeviationhashtablelookups] {./tex/data/tpcc_swizzling_hash_table_lookups.csv};
+                            \end{axis}
+                        \end{tikzpicture}%
+                    };
+            \end{tikzpicture}
+        }
+        \caption{The number of hash table lookup of the TPC-C benchmark runs shown in figure \ref{fig:tpccperformance}}
+        \label{fig:tpcchashtablelookups}
+    \end{figure}
 \end{@empty}
 
-	But the actual execution times of the different operations of a buffer pool can be measured as well. The buffer pool log as implemented in appendix \ref{ch:bufferpoollog} can log the execution time for each call of \lstinline{fix()}, \lstinline{fix_root()} and \lstinline{fix_nonroot()}. As the methods \lstinline{fix_root()} and \lstinline{fix_nonroot()} work identical with enabled and disabled pointer swizzling and as those methods cannot be used to identify a page miss, the method \lstinline{fix()} is used to measure the execution time per fix. This method isn't executed during a page hit of a root page but the execution time of this case is independent of pointer swizzling.
+    But the actual execution times of the different operations of a buffer pool can be measured as well. The buffer pool log as implemented in appendix \ref{ch:bufferpoollog} can log the execution time for each call of \lstinline{fix()}, \lstinline{fix_root()} and \lstinline{fix_nonroot()}. As the methods \lstinline{fix_root()} and \lstinline{fix_nonroot()} work identical with enabled and disabled pointer swizzling and as those methods cannot be used to identify a page miss, the method \lstinline{fix()} is used to measure the execution time per fix. This method isn't executed during a page hit of a root page but the execution time of this case is independent of pointer swizzling.
 
 \begin{@empty}
-	\pgfplotsset{%
-		every axis/.append style = {
-			ylabel = {$\text{execution time }\left[\si{\nano\second}\right]$},
-			ylabel near ticks,
-			y label style = {font = \small},
-			ymin = 1,
-			yticklabel style = {font = \tiny},
-			ymode = log,
-			scaled y ticks = false,
-			ybar,
-			xmin = -2,
-			xmax = 4,
-			bar width = .6em,
-			xtick = {-1, 0, 1, 2, 3},
-			xticklabels = {{total}, {hit}, {miss}, {miss\\w/o\\evict}, {miss\\w/\\evict}},
-			x tick label style = {align = center, font = \footnotesize},
-			xlabel near ticks,
-			ymajorgrids = true,
-			width = .475\textwidth,
-			height = .35\textheight
-		}
-	}
-	
-	\tikzset{%
-		noSwizzle/.style = {very thick},
-		swizzle/.style = {very thick}
-	}
+    \pgfplotsset{%
+        every axis/.append style = {
+            ylabel = {$\text{execution time }\left[\si{\nano\second}\right]$},
+            ylabel near ticks,
+            y label style = {font = \small},
+            ymin = 1,
+            yticklabel style = {font = \tiny},
+            ymode = log,
+            scaled y ticks = false,
+            ybar,
+            xmin = -2,
+            xmax = 4,
+            bar width = .6em,
+            xtick = {-1, 0, 1, 2, 3},
+            xticklabels = {{total}, {hit}, {miss}, {miss\\w/o\\evict}, {miss\\w/\\evict}},
+            x tick label style = {align = center, font = \footnotesize},
+            xlabel near ticks,
+            ymajorgrids = true,
+            width = .475\textwidth,
+            height = .35\textheight
+        }
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			noSwizzle/.append style = {draw = blue, fill = blue!50},
-			swizzle/.append style = {draw = black, fill = black!25}
-		}
-	}{
-		\tikzset{%
-			noSwizzle/.append style = {draw = black, pattern = north east lines},
-			swizzle/.append style = {draw = black, pattern = north west lines}
-		}
-	}
+    \tikzset{%
+        noSwizzle/.style = {very thick},
+        swizzle/.style = {very thick}
+    }
 
-	\newcommand{\shared}{
-		\begin{tikzpicture}
-			\begin{axis}[xlabel = {\ttfamily LATCH\_SH},
-					  legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
-					  legend to name = legendname,
-					  legend style = {font = \footnotesize, legend columns = -1, /tikz/every even column/.append style={column sep = 0.5cm}}]
-				\addplot[noSwizzle] coordinates
-					{(-1, 1268.48) (0, 1132.46) (1, 59370.2) (2, 59370.2) (3, 0)};
-				\addplot[swizzle] coordinates
-					{(-1, 1277.03) (0, 771.499) (1, 212478) (2, 212478) (3, 0)};
-			\end{axis}
-		\end{tikzpicture}
-	}
+    \nottoggle{bwmode}{
+        \tikzset{%
+            noSwizzle/.append style = {draw = blue, fill = blue!50},
+            swizzle/.append style = {draw = black, fill = black!25}
+        }
+    }{
+        \tikzset{%
+            noSwizzle/.append style = {draw = black, pattern = north east lines},
+            swizzle/.append style = {draw = black, pattern = north west lines}
+        }
+    }
 
-	\newcommand{\exclusive}{
-		\begin{tikzpicture}
-			\begin{axis}[xlabel = {\ttfamily LATCH\_EX}]
-				\addplot[noSwizzle] coordinates
-					{(-1, 4141.12) (0, 4130.63) (1, 49804.3) (2, 49804.3) (3, 0)};
-				\addplot[swizzle] coordinates
-					{(-1, 3264.7) (0, 3256.26) (1, 38957.1) (2, 38957.1) (3, 0)};
-			\end{axis}
-		\end{tikzpicture}
-	}
+    \newcommand{\shared}{
+        \begin{tikzpicture}
+            \begin{axis}[xlabel = {\ttfamily LATCH\_SH},
+                      legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
+                      legend to name = legendname,
+                      legend style = {font = \footnotesize, legend columns = -1, /tikz/every even column/.append style={column sep = 0.5cm}}]
+                \addplot[noSwizzle] coordinates
+                    {(-1, 1268.48) (0, 1132.46) (1, 59370.2) (2, 59370.2) (3, 0)};
+                \addplot[swizzle] coordinates
+                    {(-1, 1277.03) (0, 771.499) (1, 212478) (2, 212478) (3, 0)};
+            \end{axis}
+        \end{tikzpicture}
+    }
 
-	\begin{figure}[ht!]
-		\centering
-		\begin{tabular}{cc}
-			\scalebox{1}{\shared}	&	\scalebox{1}{\exclusive}
-		\end{tabular}
-		\ref{legendname}
+    \newcommand{\exclusive}{
+        \begin{tikzpicture}
+            \begin{axis}[xlabel = {\ttfamily LATCH\_EX}]
+                \addplot[noSwizzle] coordinates
+                    {(-1, 4141.12) (0, 4130.63) (1, 49804.3) (2, 49804.3) (3, 0)};
+                \addplot[swizzle] coordinates
+                    {(-1, 3264.7) (0, 3256.26) (1, 38957.1) (2, 38957.1) (3, 0)};
+            \end{axis}
+        \end{tikzpicture}
+    }
+
+    \begin{figure}[ht!]
+        \centering
+        \begin{tabular}{cc}
+            \scalebox{1}{\shared}	&	\scalebox{1}{\exclusive}
+        \end{tabular}
+        \ref{legendname}
         \vspace{.5em}
-		\caption{Average execution time of the \lstinline{fix()} method for a TPC-C run with a buffer pool size of \SI{20}{\gibi\byte} like in figure \ref{fig:tpccperformance}.}
-		\label{fig:operationperformance20G}
-	\end{figure}
+        \caption{Average execution time of the \lstinline{fix()} method for a TPC-C run with a buffer pool size of \SI{20}{\gibi\byte} like in figure \ref{fig:tpccperformance}.}
+        \label{fig:operationperformance20G}
+    \end{figure}
 \end{@empty}
 
-	The measured execution times of page fixes of the execution of TPC-C with a buffer pool size of \SI{20}{\gibi\byte} as shown in figure \ref{fig:operationperformance20G} are partially as expected. When a shared latch is requested, a page hit is much faster when using pointer swizzling but a page miss suffers from the overhead of pointer swizzling. The average execution times for all fixes with shared latches are nearly identical which is expected as well as the transaction throughput for the two configurations was nearly identical, too. The performance of page hits for the request of an exclusive latch is also as expected but the performance for page misses is contrary to the expectation.
-	
-	A page hit is slower when an exclusive latch is requested instead of an shared latch. This is the result of the conditions that need to be met for acquiring a latch in the two modes. A shared latch can be acquired when no other thread has an exclusive latch on the same page while an exclusive latch can be acquiring only when no other thread has any kind of latch on the same page. But there shouldn't be a performance difference for page misses. An exclusive as well as an shared latch can be immediately acquired during a page miss as a page miss implies that no other thread used the page at that time. Therefore the performance of a page miss should be identical for the two latch modes. During a page hit, a thread might need to wait until other threads released the latch of a page to acquire the latch in exclusive mode.
-	
-	As there aren't any more page misses in this configuration after the buffer pool warmed up, the average execution time of the fix method will be approximately the average execution time of page hits when the database system is running for a longer timespan. Therefore pointer swizzling increases the performance of the buffer pool by \SI{30}{\percent} when the complete database fits in the buffer pool.
+    The measured execution times of page fixes of the execution of TPC-C with a buffer pool size of \SI{20}{\gibi\byte} as shown in figure \ref{fig:operationperformance20G} are partially as expected. When a shared latch is requested, a page hit is much faster when using pointer swizzling but a page miss suffers from the overhead of pointer swizzling. The average execution times for all fixes with shared latches are nearly identical which is expected as well as the transaction throughput for the two configurations was nearly identical, too. The performance of page hits for the request of an exclusive latch is also as expected but the performance for page misses is contrary to the expectation.
+
+    A page hit is slower when an exclusive latch is requested instead of an shared latch. This is the result of the conditions that need to be met for acquiring a latch in the two modes. A shared latch can be acquired when no other thread has an exclusive latch on the same page while an exclusive latch can be acquiring only when no other thread has any kind of latch on the same page. But there shouldn't be a performance difference for page misses. An exclusive as well as an shared latch can be immediately acquired during a page miss as a page miss implies that no other thread used the page at that time. Therefore the performance of a page miss should be identical for the two latch modes. During a page hit, a thread might need to wait until other threads released the latch of a page to acquire the latch in exclusive mode.
+
+    As there aren't any more page misses in this configuration after the buffer pool warmed up, the average execution time of the fix method will be approximately the average execution time of page hits when the database system is running for a longer timespan. Therefore pointer swizzling increases the performance of the buffer pool by \SI{30}{\percent} when the complete database fits in the buffer pool.
 
 \begin{@empty}
-	\pgfplotsset{%
-		every axis/.append style = {
-			ylabel = {$\text{execution time }\left[\si{\nano\second}\right]$},
-			ylabel near ticks,
-			y label style = {font = \small},
-			ymin = 1,
-			yticklabel style = {font = \tiny},
-			ymode = log,
-			scaled y ticks = false,
-			ybar,
-			xmin = -2,
-			xmax = 4,
-			bar width = .6em,
-			xtick = {-1, 0, 1, 2, 3},
-			xticklabels = {{total}, {hit}, {miss}, {miss\\w/o\\evict}, {miss\\w/\\evict}},
-			x tick label style = {align = center, font = \footnotesize},
-			xlabel near ticks,
-			ymajorgrids = true,
-			width = .475\textwidth,
-			height = .35\textheight
-		}
-	}
-	
-	\tikzset{%
-		noSwizzle/.style = {very thick},
-		swizzle/.style = {very thick}
-	}
+    \pgfplotsset{%
+        every axis/.append style = {
+            ylabel = {$\text{execution time }\left[\si{\nano\second}\right]$},
+            ylabel near ticks,
+            y label style = {font = \small},
+            ymin = 1,
+            yticklabel style = {font = \tiny},
+            ymode = log,
+            scaled y ticks = false,
+            ybar,
+            xmin = -2,
+            xmax = 4,
+            bar width = .6em,
+            xtick = {-1, 0, 1, 2, 3},
+            xticklabels = {{total}, {hit}, {miss}, {miss\\w/o\\evict}, {miss\\w/\\evict}},
+            x tick label style = {align = center, font = \footnotesize},
+            xlabel near ticks,
+            ymajorgrids = true,
+            width = .475\textwidth,
+            height = .35\textheight
+        }
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			noSwizzle/.append style = {draw = blue, fill = blue!50},
-			swizzle/.append style = {draw = black, fill = black!25}
-		}
-	}{
-		\tikzset{%
-			noSwizzle/.append style = {draw = black, pattern = north east lines},
-			swizzle/.append style = {draw = black, pattern = north west lines}
-		}
-	}
+    \tikzset{%
+        noSwizzle/.style = {very thick},
+        swizzle/.style = {very thick}
+    }
 
-	\newcommand{\shared}{
-		\begin{tikzpicture}
-			\begin{axis}[xlabel = {\ttfamily LATCH\_SH},
-					  legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
-					  legend to name = legendname,
-					  legend style = {font = \footnotesize, legend columns = -1, /tikz/every even column/.append style={column sep = 0.5cm}}]
-				\addplot[noSwizzle] coordinates
-					{(-1, 299457) (0, 262233) (1, 1.73524e+06) (2, 22653.6) (3, 2.24109e+09)};
-				\addplot[swizzle] coordinates
-					{(-1, 343323) (0, 299218) (1, 2.3168e+06) (2, 200154) (3, 1.98806e+09)};
-			\end{axis}
-		\end{tikzpicture}
-	}
+    \nottoggle{bwmode}{
+        \tikzset{%
+            noSwizzle/.append style = {draw = blue, fill = blue!50},
+            swizzle/.append style = {draw = black, fill = black!25}
+        }
+    }{
+        \tikzset{%
+            noSwizzle/.append style = {draw = black, pattern = north east lines},
+            swizzle/.append style = {draw = black, pattern = north west lines}
+        }
+    }
 
-	\newcommand{\exclusive}{
-		\begin{tikzpicture}
-			\begin{axis}[xlabel = {\ttfamily LATCH\_EX}]
-				\addplot[noSwizzle] coordinates
-					{(-1, 3814.68) (0, 3790.04) (1, 28319) (2, 25164.3) (3, 6495488)};
-				\addplot[swizzle] coordinates
-					{(-1, 4548.67) (0, 4163.4) (1, 345395) (2, 344582) (3, 1995776)};
-			\end{axis}
-		\end{tikzpicture}
-	}
+    \newcommand{\shared}{
+        \begin{tikzpicture}
+            \begin{axis}[xlabel = {\ttfamily LATCH\_SH},
+                      legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
+                      legend to name = legendname,
+                      legend style = {font = \footnotesize, legend columns = -1, /tikz/every even column/.append style={column sep = 0.5cm}}]
+                \addplot[noSwizzle] coordinates
+                    {(-1, 299457) (0, 262233) (1, 1.73524e+06) (2, 22653.6) (3, 2.24109e+09)};
+                \addplot[swizzle] coordinates
+                    {(-1, 343323) (0, 299218) (1, 2.3168e+06) (2, 200154) (3, 1.98806e+09)};
+            \end{axis}
+        \end{tikzpicture}
+    }
 
-	\begin{figure}[ht!]
-		\centering
-		\begin{tabular}{cc}
-			\scalebox{1}{\shared}	&	\scalebox{1}{\exclusive}
-		\end{tabular}
-		\ref{legendname}
+    \newcommand{\exclusive}{
+        \begin{tikzpicture}
+            \begin{axis}[xlabel = {\ttfamily LATCH\_EX}]
+                \addplot[noSwizzle] coordinates
+                    {(-1, 3814.68) (0, 3790.04) (1, 28319) (2, 25164.3) (3, 6495488)};
+                \addplot[swizzle] coordinates
+                    {(-1, 4548.67) (0, 4163.4) (1, 345395) (2, 344582) (3, 1995776)};
+            \end{axis}
+        \end{tikzpicture}
+    }
+
+    \begin{figure}[ht!]
+        \centering
+        \begin{tabular}{cc}
+            \scalebox{1}{\shared}	&	\scalebox{1}{\exclusive}
+        \end{tabular}
+        \ref{legendname}
         \vspace{.5em}
-		\caption{Average execution time of the \lstinline{fix()} method for a TPC-C run with a buffer pool size of \SI{500}{\mebi\byte} like in figure \ref{fig:tpccperformance}.}
-		\label{fig:operationperformance500M}
-	\end{figure}
+        \caption{Average execution time of the \lstinline{fix()} method for a TPC-C run with a buffer pool size of \SI{500}{\mebi\byte} like in figure \ref{fig:tpccperformance}.}
+        \label{fig:operationperformance500M}
+    \end{figure}
 \end{@empty}
 
-	The measured execution times of page fixes of the execution of TPC-C with a buffer pool size of \SI{500}{\mebi\byte} as shown in figure \ref{fig:operationperformance500M} aren't as expected. The buffer pool that utilizes pointer swizzling to locate a page is significantly slower as it's expected for such small buffer pool sizes. But there is no reason why the buffer pool with pointer swizzling should perform worse during a page hit. The execution time of page hits and page misses should be identical to those with the larger buffer pool as the methods doesn't change. It's expected that the performance difference between the two buffer sizes only comes from the different miss rates. The higher miss rate of a small buffer pool is expected to result in a total performance closer to the one of page misses while the performance of low miss rates is expected to converge towards the high performant page hits. The lower execution time of page evictions when pointer swizzling is active is also not as expected. The unswizzling which happens during the eviction should add additional overhead to this process.
-	
-	There is no justification for the much lower execution time of \lstinline{fix()} when an exclusive latch is requested. Finding an explanation for this unexpected behavior is left for future work as I wasn't able to do this during the processing period of this work.
+    The measured execution times of page fixes of the execution of TPC-C with a buffer pool size of \SI{500}{\mebi\byte} as shown in figure \ref{fig:operationperformance500M} aren't as expected. The buffer pool that utilizes pointer swizzling to locate a page is significantly slower as it's expected for such small buffer pool sizes. But there is no reason why the buffer pool with pointer swizzling should perform worse during a page hit. The execution time of page hits and page misses should be identical to those with the larger buffer pool as the methods doesn't change. It's expected that the performance difference between the two buffer sizes only comes from the different miss rates. The higher miss rate of a small buffer pool is expected to result in a total performance closer to the one of page misses while the performance of low miss rates is expected to converge towards the high performant page hits. The lower execution time of page evictions when pointer swizzling is active is also not as expected. The unswizzling which happens during the eviction should add additional overhead to this process.
+
+    There is no justification for the much lower execution time of \lstinline{fix()} when an exclusive latch is requested. Finding an explanation for this unexpected behavior is left for future work as I wasn't able to do this during the processing period of this work.
 
 \section{Measured Performance of MariaDB for Comparison}
 
-	\emph{Zero} is just an experimental storage manager and therefore it's not clear that its performance behavior is similar to the one of database management systems used for productive environments. I chose \emph{MariaDB} for this comparison as it's commonly used, actively maintained, freely available and it allows the selection of the buffer size which is mandatory for the measurements. It's also important that the file accesses use direct I/O to prevent double caching of the database in the DBMS's buffer pool and in the OS's page cache. A page miss of a DBMS using direct I/O would be comparable to a double page miss of a DBMS not using direct I/O. A page in the OS's page cache wouldn't use space of the DBMS' buffer pool but it would be still cached in main memory and therefore an access would be a page hit (not inside DBMS).
-	
-	The absolute transaction throughput should be ignored for this comparison but the velocity due to in increase of buffer size should be compared.
-	
+    \emph{Zero} is just an experimental storage manager and therefore it's not clear that its performance behavior is similar to the one of database management systems used for productive environments. I chose \emph{MariaDB} for this comparison as it's commonly used, actively maintained, freely available and it allows the selection of the buffer size which is mandatory for the measurements. It's also important that the file accesses use direct I/O to prevent double caching of the database in the DBMS's buffer pool and in the OS's page cache. A page miss of a DBMS using direct I/O would be comparable to a double page miss of a DBMS not using direct I/O. A page in the OS's page cache wouldn't use space of the DBMS' buffer pool but it would be still cached in main memory and therefore an access would be a page hit (not inside DBMS).
+
+    The absolute transaction throughput should be ignored for this comparison but the velocity due to in increase of buffer size should be compared.
+
 \subsection{Performance of MariaDB}
 
-	To benchmark \emph{MariaDB}, the OLTP benchmark framework \emph{OLTPBench} (presented in \cite{Difallah:2013}) was used. This tool allows the benchmarking of a wide range of DBMS which use the database gateway \emph{JDBC} and therefore \emph{MariaDB} is supported. It offers an implementation of TPC-C among many other benchmarks.
-	
-	Each benchmark run was executed on a database of 50 warehouses ($\equiv$ \SI{6.5}{\gibi\byte}) which was initialized (schema created and initial records inserted) beforehand. The TRIM-command wasn't executed on the SSD used for the database file and for the transactional log. Each benchmark run used the same initial database (initialized once and saved) and the database was restarted between consecutive benchmark runs to clear the buffer pool. The buffer pool size was set using the \lstinline{innodb_buffer_pool_size} parameter of the \emph{XtraDB} storage manager. Except for the setting of the \lstinline{datadir} to use a SSD and usage of \lstinline{ALL_O_DIRECT} to use direct I/O for the database and for the log, the default configuration of \emph{MariaDB} and of the used storage manager \emph{XtraDB} was used. The TPC-C transactions were executed with the transaction isolation level \lstinline{TRANSACTION_SERIALIZABLE} and the rate of transactions was limited to \SI{50000}{\transactions\per\second}. The database size after \SI{10}{\minute} of TPC-C querying varies as a higher transaction throughput results in a higher number of inserted records. The used number of TPC-C terminals is 5 and therefore the system simulates 5 users concurrently running transactions on the database system. To compensate environmental effects (e.g. file accesses) on the used test system, the results are averaged over 3 runs.
-	
+    To benchmark \emph{MariaDB}, the OLTP benchmark framework \emph{OLTPBench} (presented in \cite{Difallah:2013}) was used. This tool allows the benchmarking of a wide range of DBMS which use the database gateway \emph{JDBC} and therefore \emph{MariaDB} is supported. It offers an implementation of TPC-C among many other benchmarks.
+
+    Each benchmark run was executed on a database of 50 warehouses ($\equiv$ \SI{6.5}{\gibi\byte}) which was initialized (schema created and initial records inserted) beforehand. The TRIM-command wasn't executed on the SSD used for the database file and for the transactional log. Each benchmark run used the same initial database (initialized once and saved) and the database was restarted between consecutive benchmark runs to clear the buffer pool. The buffer pool size was set using the \lstinline{innodb_buffer_pool_size} parameter of the \emph{XtraDB} storage manager. Except for the setting of the \lstinline{datadir} to use a SSD and usage of \lstinline{ALL_O_DIRECT} to use direct I/O for the database and for the log, the default configuration of \emph{MariaDB} and of the used storage manager \emph{XtraDB} was used. The TPC-C transactions were executed with the transaction isolation level \lstinline{TRANSACTION_SERIALIZABLE} and the rate of transactions was limited to \SI{50000}{\transactions\per\second}. The database size after \SI{10}{\minute} of TPC-C querying varies as a higher transaction throughput results in a higher number of inserted records. The used number of TPC-C terminals is 5 and therefore the system simulates 5 users concurrently running transactions on the database system. To compensate environmental effects (e.g. file accesses) on the used test system, the results are averaged over 3 runs.
+
 \begin{@empty}
-	\tikzset{%
-		DBSize/.style = { - , line width = 0.625mm, dotted},
-		DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
-	}
+    \tikzset{%
+        DBSize/.style = { - , line width = 0.625mm, dotted},
+        DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditionalStyle/.style = {color = blue},
-			DBSize/.append style = {draw = purple},
-			DBSizeMark/.append style = {text = purple}
-		}
-	}{
-		\tikzset{%
-			traditionalStyle/.style = {color = black, mark = o},
-			DBSize/.append style = {draw = black}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
-				\begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
-						   xlabel near ticks,
-						   xmin = 0,
-						   xmax = 10000,
-						   xtick = {0, 1000, 2000, ..., 10000},
-						   xticklabels = {0, 1, 2, ..., 10},
-						   xmode = normal,
-						   scaled x ticks = false,
-						   minor x tick num = 9,
-						   ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 40000,
-						   ymode = normal,
-						   scaled y ticks = false,
-						   minor y tick num = 9,
-						   grid = major,
-						   legend entries = {MariaDB},
-						   legend pos = south east,
-						   width = 1.5\textwidth,
-						   height = .75\textheight]		
-					\addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_mariadb.csv};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditionalStyle/.style = {color = blue},
+            DBSize/.append style = {draw = purple},
+            DBSizeMark/.append style = {text = purple}
+        }
+    }{
+        \tikzset{%
+            traditionalStyle/.style = {color = black, mark = o},
+            DBSize/.append style = {draw = black}
+        }
+    }
 
-					\draw[DBSize]				(axis cs:6500, 0)			edge		(axis cs:6500, 40000);
-					\node[DBSizeMark]			at (axis cs:6500, 20000)		{initial database size};
-				\end{axis}
-			\end{tikzpicture}
-		}
-		\caption{Transaction throughput of MariaDB running the TPC-C implementation of \cite{oltpbench} (described in \cite{Difallah:2013}). The database contains 50 warehouses and 5 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{10}{\gibi\byte} and \lstinline{ALL_O_DIRECT} is used to prevent the usage of the OS page cache for database and log. Each configuration was executed three times and each run lasted \SI{10}{\minute}. The error bars represent the standard deviation of the three measurements.}
-		\label{fig:mariadbtpcc}
-	\end{figure}
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
+                \begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
+                           xlabel near ticks,
+                           xmin = 0,
+                           xmax = 10000,
+                           xtick = {0, 1000, 2000, ..., 10000},
+                           xticklabels = {0, 1, 2, ..., 10},
+                           xmode = normal,
+                           scaled x ticks = false,
+                           minor x tick num = 9,
+                           ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 40000,
+                           ymode = normal,
+                           scaled y ticks = false,
+                           minor y tick num = 9,
+                           grid = major,
+                           legend entries = {MariaDB},
+                           legend pos = south east,
+                           width = 1.5\textwidth,
+                           height = .75\textheight]
+                    \addplot[traditionalStyle, error bars/.cd, y dir = both, y explicit] table[x = buffersize, y = averagequerythroughput, y error = standarddeviationquerythroughput] {./tex/data/tpcc_mariadb.csv};
+
+                    \draw[DBSize]				(axis cs:6500, 0)			edge		(axis cs:6500, 40000);
+                    \node[DBSizeMark]			at (axis cs:6500, 20000)		{initial database size};
+                \end{axis}
+            \end{tikzpicture}
+        }
+        \caption{Transaction throughput of MariaDB running the TPC-C implementation of \cite{oltpbench} (described in \cite{Difallah:2013}). The database contains 50 warehouses and 5 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{10}{\gibi\byte} and \lstinline{ALL_O_DIRECT} is used to prevent the usage of the OS page cache for database and log. Each configuration was executed three times and each run lasted \SI{10}{\minute}. The error bars represent the standard deviation of the three measurements.}
+        \label{fig:mariadbtpcc}
+    \end{figure}
 \end{@empty}
 
-	The results of the \num{87} benchmark runs are shown in figure \ref{fig:mariadbtpcc}. The \emph{transaction throughput of the DBMS grows linear with the buffer pool size} until the maximum throughput is achieved at a buffer pool size of around \SI{1}{\gibi\byte}. The saturation of the throughput for a buffer size of around a sixth of the database size might be caused by limitations due to other components of the DBMS. The database and the transactional log are stored on the same SSD and therefore the limit of IOPS of the SSD might be the limiting factor.
+    The results of the \num{87} benchmark runs are shown in figure \ref{fig:mariadbtpcc}. The \emph{transaction throughput of the DBMS grows linear with the buffer pool size} until the maximum throughput is achieved at a buffer pool size of around \SI{1}{\gibi\byte}. The saturation of the throughput for a buffer size of around a sixth of the database size might be caused by limitations due to other components of the DBMS. The database and the transactional log are stored on the same SSD and therefore the limit of IOPS of the SSD might be the limiting factor.
 
-	The increase in transaction throughput for an increasing size of available DBMS buffer space is \emph{much faster than expected}. While the buffer can only hold less than a sixth of the database, the transaction throughput is already maximized. The transaction throughput growth nearly linear by the buffer pool size until the maximum transaction throughput is achieved.
-	
-	The results suggest that the buffer pool isn't a major bottleneck of \emph{MariaDB}. It's expected that the miss rate will be still moderately high when the buffer pool has a size of \SI{1050}{\mebi\byte} but at that point, there are already other components of the DBMS that limit the transaction throughput. 
-		
+    The increase in transaction throughput for an increasing size of available DBMS buffer space is \emph{much faster than expected}. While the buffer can only hold less than a sixth of the database, the transaction throughput is already maximized. The transaction throughput growth nearly linear by the buffer pool size until the maximum transaction throughput is achieved.
+
+    The results suggest that the buffer pool isn't a major bottleneck of \emph{MariaDB}. It's expected that the miss rate will be still moderately high when the buffer pool has a size of \SI{1050}{\mebi\byte} but at that point, there are already other components of the DBMS that limit the transaction throughput.
+
 \subsection{Comparison with Zero's Performance}
 
-	\emph{MariaDB} performs much better than \emph{Zero} even for small buffer sizes. When a sixth of the database fits in the buffer pool, the performance of \emph{MariaDB} is already at its limit but \emph{Zero} got only a tenth of its maximal performance there. But the performance of \emph{MariaDB} rapidly decreases when the buffer pool size falls below a certain point. The transaction throughput of \emph{Zero} does also basically decrease linearly with the buffer pool size when it falls below a certain (much higher) value. But a meaningful comparison of the results would require a closer look on the design and implementation of \emph{Xtra} and \emph{MariaDB} which is off the scope of this thesis. The higher transaction throughput could be due to a higher layers of the DBMS. The used index structures, a more optimized lock manager or even the query optimizer might be the reason for the much higher performance of \emph{MariaDB}. But all those components also add overhead and those are all potential bottlenecks for the performance of the complete system. As \emph{Zero} doesn't implement most of those components, those overheads and potential optimizations doesn't apply to it. If the performance of \emph{MariaDB} isn't limited by the buffer pool but by any other component, the transaction throughput might be increased even further with larger buffer pool sizes and therefore the resulting performance behavior of \emph{MariaDB} could be similar to the one of \emph{Zero} but on a much higher level of transaction throughput. Therefore it's open for future work if pointer swizzling in the buffer pool of \emph{Xtra} would improve it's performance. The results of the experiments run on \emph{Zero} doesn't imply such an advantage of pointer swizzling in an system like \emph{MariaDB}.
+    \emph{MariaDB} performs much better than \emph{Zero} even for small buffer sizes. When a sixth of the database fits in the buffer pool, the performance of \emph{MariaDB} is already at its limit but \emph{Zero} got only a tenth of its maximal performance there. But the performance of \emph{MariaDB} rapidly decreases when the buffer pool size falls below a certain point. The transaction throughput of \emph{Zero} does also basically decrease linearly with the buffer pool size when it falls below a certain (much higher) value. But a meaningful comparison of the results would require a closer look on the design and implementation of \emph{Xtra} and \emph{MariaDB} which is off the scope of this thesis. The higher transaction throughput could be due to a higher layers of the DBMS. The used index structures, a more optimized lock manager or even the query optimizer might be the reason for the much higher performance of \emph{MariaDB}. But all those components also add overhead and those are all potential bottlenecks for the performance of the complete system. As \emph{Zero} doesn't implement most of those components, those overheads and potential optimizations doesn't apply to it. If the performance of \emph{MariaDB} isn't limited by the buffer pool but by any other component, the transaction throughput might be increased even further with larger buffer pool sizes and therefore the resulting performance behavior of \emph{MariaDB} could be similar to the one of \emph{Zero} but on a much higher level of transaction throughput. Therefore it's open for future work if pointer swizzling in the buffer pool of \emph{Xtra} would improve it's performance. The results of the experiments run on \emph{Zero} doesn't imply such an advantage of pointer swizzling in an system like \emph{MariaDB}.
 
 \section{Measured Performance as in \cite{Graefe:2014}}
 
-	The experiments applied for \cite{Graefe:2014} are significantly different from the experiments applied for this thesis. But especially those differences of the settings of the experiments makes the comparison interesting and the experiments applied for the two works complement each other.
-	
+    The experiments applied for \cite{Graefe:2014} are significantly different from the experiments applied for this thesis. But especially those differences of the settings of the experiments makes the comparison interesting and the experiments applied for the two works complement each other.
+
 \subsection{Performance of the Buffer Management with Pointer Swizzling in \cite{Graefe:2014}}
 
-	Goetz Graefe et al. used a fixed database (\SI{100}{\giga\byte}) and buffer (\SI{10}{\giga\byte}) size but worked with a variable working set size (\SIrange{0.1}{100}{\giga\byte}) while the experiments presented here use a fixed database (\SIlist{13.22;1.87}{\gibi\byte}) and working set (defined by the used TPC-C/TPC-B benchmark suite and by the number of concurrently querying threads) size while the buffer pool size varies (\SIrange{0.05}{20}{\gibi\byte} and \SIrange{0.025}{5}{\gibi\byte}) between the benchmark runs.
-	
-	But the most important characteristic which is different between the two performance evaluations is the used benchmark. While the authors of the original article didn't focus on a DBMS with ACID properties, I always considered a DBMS with logging and locking. The main measurements used by Goetz Graefe et al. to show the great advantage of their technique are done using a microbenchmark that only reads a fixed subset of the database using 24 threads without the transactional logging and locking being activated. As they planned to vanish the overhead imposed by those modules in future publications as well, it was a reasonable restriction to the evaluation of their technique. Their performance evaluation isolates the effects of their optimization of the buffer pool, which is more expressiveness for their purpose.
-	
-	They also compared their new buffer pool technique with an in-memory DBMS. The title of their publication already states that their approach should enable the performance of in-memory databases for DBMS that store their database on secondary storage. Therefore they developed a version of their DBMS that doesn't use a DBMS buffer but that maps the whole database to main memory while using the virtual memory management of the OS as the database doesn't fit in main memory. But even with that approach they limit the size of available main memory to the buffer pool size used by the other approaches.
+    Goetz Graefe et al. used a fixed database (\SI{100}{\giga\byte}) and buffer (\SI{10}{\giga\byte}) size but worked with a variable working set size (\SIrange{0.1}{100}{\giga\byte}) while the experiments presented here use a fixed database (\SIlist{13.22;1.87}{\gibi\byte}) and working set (defined by the used TPC-C/TPC-B benchmark suite and by the number of concurrently querying threads) size while the buffer pool size varies (\SIrange{0.05}{20}{\gibi\byte} and \SIrange{0.025}{5}{\gibi\byte}) between the benchmark runs.
+
+    But the most important characteristic which is different between the two performance evaluations is the used benchmark. While the authors of the original article didn't focus on a DBMS with ACID properties, I always considered a DBMS with logging and locking. The main measurements used by Goetz Graefe et al. to show the great advantage of their technique are done using a microbenchmark that only reads a fixed subset of the database using 24 threads without the transactional logging and locking being activated. As they planned to vanish the overhead imposed by those modules in future publications as well, it was a reasonable restriction to the evaluation of their technique. Their performance evaluation isolates the effects of their optimization of the buffer pool, which is more expressiveness for their purpose.
+
+    They also compared their new buffer pool technique with an in-memory DBMS. The title of their publication already states that their approach should enable the performance of in-memory databases for DBMS that store their database on secondary storage. Therefore they developed a version of their DBMS that doesn't use a DBMS buffer but that maps the whole database to main memory while using the virtual memory management of the OS as the database doesn't fit in main memory. But even with that approach they limit the size of available main memory to the buffer pool size used by the other approaches.
 
 \begin{@empty}
-	\tikzset{%
-		bufferSize/.style = { - , line width = 0.625mm, dotted},
-		bufferSizeMark/.style = {draw = none, rotate = 90, anchor = south}
-	}
+    \tikzset{%
+        bufferSize/.style = { - , line width = 0.625mm, dotted},
+        bufferSizeMark/.style = {draw = none, rotate = 90, anchor = south}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditionalStyle/.style = {color = blue},
-			inMemoryStyle/.style = {color = red},
-			swizzlingStyle/.style = {color = black},
-			bufferSize/.append style = {draw = purple},
-			bufferSizeMark/.append style = {text = purple},
-			spyGlass/.style = {draw = blue}
-		}
-	}{
-		\tikzset{%
-			traditionalStyle/.style = {color = black, mark = o},
-			inMemoryStyle/.style = {color = black, mark = x},
-			swizzlingStyle/.style = {color = black, mark = 10-pointed star},
-			bufferSize/.append style = {draw = black},
-			spyGlass/.style = {draw = black}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}[spy using outlines =  {square, magnification = 2, connect spies}]
-				\begin{axis}[xlabel = {$\text{working set size }\left[\si{\gibi\byte}\right]$},
-						   xlabel near ticks,
-						   xmin = 0,
-						   xmax = 100,
-						   xtick = {0,10,...,100},
-						   xticklabels = {0,\textcolor{purple}{10},20,30,...,100},
-						   minor x tick num = 9,
-						   ylabel = {$\text{query throughput }\left[\si{\queries\per\second}\right]$},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 1500000,
-						   ymode = log,
-						   scaled y ticks = false,
-						   grid = major,
-						   legend entries = {Traditional Buffer Pool, In-Memory Database, Pointer Swizzling Buffer Pool},
-						   legend pos = north east,
-						   width = 1.5\textwidth,
-						   height = .75\textheight]		
-					\draw[bufferSize]	(axis cs: 10, 0)			edge		(axis cs: 10, 1500000);
-					\node[bufferSizeMark]	at (axis cs: 10, 10000)		{buffer pool size};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditionalStyle/.style = {color = blue},
+            inMemoryStyle/.style = {color = red},
+            swizzlingStyle/.style = {color = black},
+            bufferSize/.append style = {draw = purple},
+            bufferSizeMark/.append style = {text = purple},
+            spyGlass/.style = {draw = blue}
+        }
+    }{
+        \tikzset{%
+            traditionalStyle/.style = {color = black, mark = o},
+            inMemoryStyle/.style = {color = black, mark = x},
+            swizzlingStyle/.style = {color = black, mark = 10-pointed star},
+            bufferSize/.append style = {draw = black},
+            spyGlass/.style = {draw = black}
+        }
+    }
 
-					\addplot[traditionalStyle] table {./tex/data/graefe_traditional_buffer_pool.csv};
-					\addplot[inMemoryStyle] table {./tex/data/graefe_in_memory.csv};
-					\addplot[swizzlingStyle] table {./tex/data/graefe_swizzling_buffer_pool.csv};
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[spy using outlines =  {square, magnification = 2, connect spies}]
+                \begin{axis}[xlabel = {$\text{working set size }\left[\si{\gibi\byte}\right]$},
+                           xlabel near ticks,
+                           xmin = 0,
+                           xmax = 100,
+                           xtick = {0,10,...,100},
+                           xticklabels = {0,\textcolor{purple}{10},20,30,...,100},
+                           minor x tick num = 9,
+                           ylabel = {$\text{query throughput }\left[\si{\queries\per\second}\right]$},
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 1500000,
+                           ymode = log,
+                           scaled y ticks = false,
+                           grid = major,
+                           legend entries = {Traditional Buffer Pool, In-Memory Database, Pointer Swizzling Buffer Pool},
+                           legend pos = north east,
+                           width = 1.5\textwidth,
+                           height = .75\textheight]
+                    \draw[bufferSize]	(axis cs: 10, 0)			edge		(axis cs: 10, 1500000);
+                    \node[bufferSizeMark]	at (axis cs: 10, 10000)		{buffer pool size};
 
-					\coordinate (magnifyglass) at (axis cs: 35, 120000);				
+                    \addplot[traditionalStyle] table {./tex/data/graefe_traditional_buffer_pool.csv};
+                    \addplot[inMemoryStyle] table {./tex/data/graefe_in_memory.csv};
+                    \addplot[swizzlingStyle] table {./tex/data/graefe_swizzling_buffer_pool.csv};
 
-					\draw[]	(axis cs: 0, 50000)	--	(axis cs: 11, 50000)	--	(axis cs: 11, 1500000);
-					\draw[]	(axis cs: 11, 273861.2783)	--	(axis cs: 15, 120000);
-				\end{axis}
-				
-					\node[] at (magnifyglass) {%
-						\begin{tikzpicture}[]
-							\begin{axis}[xmin = 0,
-									   xmax = 11,
-									   xtick distance = {2},
-									   scaled x ticks = false,
-									   minor x tick num = 4,
-									   ymin = 50000,
-									   ymax = 1500000,
-									   ymode = normal,
-									   scaled y ticks = false,
-									   grid = major,
-									   width = .6\textwidth,
-									   height = .32\textheight,
-									   axis background/.style = {fill = white}]
-								\addplot[traditionalStyle] table {./tex/data/graefe_traditional_buffer_pool.csv};
-								\addplot[inMemoryStyle] table {./tex/data/graefe_in_memory.csv};
-								\addplot[swizzlingStyle] table {./tex/data/graefe_swizzling_buffer_pool.csv};
+                    \coordinate (magnifyglass) at (axis cs: 35, 120000);
 
-								\draw[bufferSize]	(axis cs: 10, 50000)			edge		(axis cs: 10, 1500000);
-							\end{axis}
-						\end{tikzpicture}%
-					};
-			\end{tikzpicture}
-		}
-		\caption{Query throughput of read-only queries for a fixed buffer pool size of 10GB and a working set size between 1GB and 100GB. The traditional buffer pool uses a hash table to find a page in the buffer pool, the in-memory database has the hold database in VM and the pointer swizzling buffer pool uses pointer swizzling as discussed here. The measurements were published by Graefe et al. in \cite{Graefe:2014}.}
-		\label{fig:graefereadperformance}
-	\end{figure}
+                    \draw[]	(axis cs: 0, 50000)	--	(axis cs: 11, 50000)	--	(axis cs: 11, 1500000);
+                    \draw[]	(axis cs: 11, 273861.2783)	--	(axis cs: 15, 120000);
+                \end{axis}
+
+                    \node[] at (magnifyglass) {%
+                        \begin{tikzpicture}[]
+                            \begin{axis}[xmin = 0,
+                                       xmax = 11,
+                                       xtick distance = {2},
+                                       scaled x ticks = false,
+                                       minor x tick num = 4,
+                                       ymin = 50000,
+                                       ymax = 1500000,
+                                       ymode = normal,
+                                       scaled y ticks = false,
+                                       grid = major,
+                                       width = .6\textwidth,
+                                       height = .32\textheight,
+                                       axis background/.style = {fill = white}]
+                                \addplot[traditionalStyle] table {./tex/data/graefe_traditional_buffer_pool.csv};
+                                \addplot[inMemoryStyle] table {./tex/data/graefe_in_memory.csv};
+                                \addplot[swizzlingStyle] table {./tex/data/graefe_swizzling_buffer_pool.csv};
+
+                                \draw[bufferSize]	(axis cs: 10, 50000)			edge		(axis cs: 10, 1500000);
+                            \end{axis}
+                        \end{tikzpicture}%
+                    };
+            \end{tikzpicture}
+        }
+        \caption{Query throughput of read-only queries for a fixed buffer pool size of 10GB and a working set size between 1GB and 100GB. The traditional buffer pool uses a hash table to find a page in the buffer pool, the in-memory database has the hold database in VM and the pointer swizzling buffer pool uses pointer swizzling as discussed here. The measurements were published by Graefe et al. in \cite{Graefe:2014}.}
+        \label{fig:graefereadperformance}
+    \end{figure}
 \end{@empty}
 
-	The presented results of their microbenchmark are shown in figure \ref{fig:graefereadperformance}. As expected, the \emph{in-memory DBMS} performs best as long as the working set fits in the available main memory. It doesn't have any overhead due to I/O latency or address translation. But when the working set exceeds the available main memory, it performs worst, as the virtual memory management of the operating system isn't optimized for the given workload. The selection of pages to swap to secondary storage isn't as good as the selection of pages to evict done by the buffer pool of the two other solutions.
-	
-	The \emph{traditional buffer pool} (buffer pool without pointer swizzling) performs worst when the whole working set fits in main memory as each page hit requires an address translation. The other two solutions doesn't need that additional operation there. But when the working set exceeds the buffer pool size, this solution performs best as it is optimized to work under this condition. The traditional buffer pool has a page replacement optimized for typical OLTP workloads and it doesn't require the overhead of swizzling and unswizzling during a page miss.
-	
-	\emph{Pointer swizzling} results in a performance close to the one of the in-memory DBMS when the working set fits in the buffer pool and the measured performance of it is close to the one of the traditional buffer pool when eviction is required. This represents the expectation that the major overhead of a traditional buffer pool during a page miss is imposed by the address translation while the performance overhead of pointer swizzling in case of a page miss is really small.
-	
-	Quantitative considerations of the performance difference between the solutions lead to a \emph{performance growth of \SI{80}{\percent}} for a buffer manager by adding \emph{pointer swizzling} when the working set fits in the buffer pool. Therefore the subtraction of the overhead due to address translation during a page hit nearly doubles the transaction throughput. This is a reasonable result as the hash table lookup has a noticeable computational complexity that is saved when using pointer swizzling. This also shows that this benchmark is very focused on showing the performance of the lower layers of the DBMS as the results imply that the DBMS with traditional buffer pool requires nearly half of the CPU-time to translate a page ID to a frame ID.
-	
-	Their results also show an \emph{overhead of around \SI{20}{\percent} due to swizzling and unswizzling of pointers} when the working set doesn't fit in the buffer. That's as expected as the swizzling and unswizzling requires a change in the parent page of a page. While those changes only happen in memory and therefore doesn't require any additional writes to database and transactional log, the parent page needs to be fixed to perform those actions and that could be costly.
-	
-	The actual performance of their \emph{in-memory DBMS} is very bad when the working set exceeds the available main memory. The DBMS with traditional buffer pool performs around 6 times faster than the in-memory version. The reason for those \emph{catastrophic} results is the simple design of their in-memory DBMS. Many in-memory DBMS doesn't support databases that exceed the available main memory because it's hard to achieve a reasonable performance for that case when the design of the DBMS is completely focused on optimizing for a high performance of in memory operations. But the usage of virtual memory management shouldn't lead to such a huge performance disadvantage compared to the usage of a specialized buffer manager.
-	
-	But the much more questionable result of the benchmarks is the behavior of all the three solutions when the size of the working set changes. The performance of each solution doesn't significantly change when the working set size changes between \SI{0.1}{\giga\byte} and \SI{10}{\giga\byte} as the whole working set fits in the buffer pool during the whole range of working set sizes. But when the working set size just exceeds the capacity of available main memory, the query throughput rapidly decreases. Even cache thrashing couldn't lead to a performance drop of nearly three orders of magnitude for the in-memory DBMS when the working set just exceeds the available main memory. A reasonable assumption should be a slightly increased miss rate when the working set increases from \SI{10}{\giga\byte} to \SI{11}{\giga\byte}. This would result in a very high performance loss due to the I/O latency of secondary storage which is 6 orders of magnitude higher than the latency of main memory. But a situation where more than \SI{90}{\percent} of pages still reside in main memory should lead to a hit rate that is still close to 1 and therefore the remaining page hits should partly compensate the performance loss imposed by the page misses.
-	
-	The performance of the other two solutions drops as well when the working set size gets increased from \SI{10}{\giga\byte} to \SI{11}{\giga\byte}. When \SI{90}{\percent} of the pages still reside in the buffer pool, the query throughput of a DBMS with a traditional buffer pool shouldn't be 60 times slower compared to the situation when \SI{100}{\percent} of the pages fit in the buffer pool. The performance should change slower. The same holds for the performance drop of the DBMS that uses pointer swizzling in the buffer pool.
-	
-	But it's still conceivable that just a small number of page misses which are 6 orders of magnitude slower than page hits drastically decrease the overall performance of the DBMS.
+    The presented results of their microbenchmark are shown in figure \ref{fig:graefereadperformance}. As expected, the \emph{in-memory DBMS} performs best as long as the working set fits in the available main memory. It doesn't have any overhead due to I/O latency or address translation. But when the working set exceeds the available main memory, it performs worst, as the virtual memory management of the operating system isn't optimized for the given workload. The selection of pages to swap to secondary storage isn't as good as the selection of pages to evict done by the buffer pool of the two other solutions.
+
+    The \emph{traditional buffer pool} (buffer pool without pointer swizzling) performs worst when the whole working set fits in main memory as each page hit requires an address translation. The other two solutions doesn't need that additional operation there. But when the working set exceeds the buffer pool size, this solution performs best as it is optimized to work under this condition. The traditional buffer pool has a page replacement optimized for typical OLTP workloads and it doesn't require the overhead of swizzling and unswizzling during a page miss.
+
+    \emph{Pointer swizzling} results in a performance close to the one of the in-memory DBMS when the working set fits in the buffer pool and the measured performance of it is close to the one of the traditional buffer pool when eviction is required. This represents the expectation that the major overhead of a traditional buffer pool during a page miss is imposed by the address translation while the performance overhead of pointer swizzling in case of a page miss is really small.
+
+    Quantitative considerations of the performance difference between the solutions lead to a \emph{performance growth of \SI{80}{\percent}} for a buffer manager by adding \emph{pointer swizzling} when the working set fits in the buffer pool. Therefore the subtraction of the overhead due to address translation during a page hit nearly doubles the transaction throughput. This is a reasonable result as the hash table lookup has a noticeable computational complexity that is saved when using pointer swizzling. This also shows that this benchmark is very focused on showing the performance of the lower layers of the DBMS as the results imply that the DBMS with traditional buffer pool requires nearly half of the CPU-time to translate a page ID to a frame ID.
+
+    Their results also show an \emph{overhead of around \SI{20}{\percent} due to swizzling and unswizzling of pointers} when the working set doesn't fit in the buffer. That's as expected as the swizzling and unswizzling requires a change in the parent page of a page. While those changes only happen in memory and therefore doesn't require any additional writes to database and transactional log, the parent page needs to be fixed to perform those actions and that could be costly.
+
+    The actual performance of their \emph{in-memory DBMS} is very bad when the working set exceeds the available main memory. The DBMS with traditional buffer pool performs around 6 times faster than the in-memory version. The reason for those \emph{catastrophic} results is the simple design of their in-memory DBMS. Many in-memory DBMS doesn't support databases that exceed the available main memory because it's hard to achieve a reasonable performance for that case when the design of the DBMS is completely focused on optimizing for a high performance of in memory operations. But the usage of virtual memory management shouldn't lead to such a huge performance disadvantage compared to the usage of a specialized buffer manager.
+
+    But the much more questionable result of the benchmarks is the behavior of all the three solutions when the size of the working set changes. The performance of each solution doesn't significantly change when the working set size changes between \SI{0.1}{\giga\byte} and \SI{10}{\giga\byte} as the whole working set fits in the buffer pool during the whole range of working set sizes. But when the working set size just exceeds the capacity of available main memory, the query throughput rapidly decreases. Even cache thrashing couldn't lead to a performance drop of nearly three orders of magnitude for the in-memory DBMS when the working set just exceeds the available main memory. A reasonable assumption should be a slightly increased miss rate when the working set increases from \SI{10}{\giga\byte} to \SI{11}{\giga\byte}. This would result in a very high performance loss due to the I/O latency of secondary storage which is 6 orders of magnitude higher than the latency of main memory. But a situation where more than \SI{90}{\percent} of pages still reside in main memory should lead to a hit rate that is still close to 1 and therefore the remaining page hits should partly compensate the performance loss imposed by the page misses.
+
+    The performance of the other two solutions drops as well when the working set size gets increased from \SI{10}{\giga\byte} to \SI{11}{\giga\byte}. When \SI{90}{\percent} of the pages still reside in the buffer pool, the query throughput of a DBMS with a traditional buffer pool shouldn't be 60 times slower compared to the situation when \SI{100}{\percent} of the pages fit in the buffer pool. The performance should change slower. The same holds for the performance drop of the DBMS that uses pointer swizzling in the buffer pool.
+
+    But it's still conceivable that just a small number of page misses which are 6 orders of magnitude slower than page hits drastically decrease the overall performance of the DBMS.
 
 \begin{@empty}
-	\pgfplotsset{%
-		every axis/.append style = {
-			ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
-			ylabel near ticks,
-			y label style = {font = \tiny},
-			ymin = 0,
-			ymax = 70000,
-			yticklabel style = {font = \tiny},
-			ymode = normal,
-			scaled y ticks = false,
-			ybar,
-			xmin = -0.3,
-			xmax = 0.3,
-			bar width = 2.5em,
-			xtick = \empty,
-			grid = major,
-			width = .425\textwidth,
-			height = .35\textheight
-		}
-	}
-	
-	\tikzset{%
-		traditional/.style = {very thick},
-		swizzling/.style = {very thick},
-		inMemory/.style = {very thick},
-	}
+    \pgfplotsset{%
+        every axis/.append style = {
+            ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
+            ylabel near ticks,
+            y label style = {font = \tiny},
+            ymin = 0,
+            ymax = 70000,
+            yticklabel style = {font = \tiny},
+            ymode = normal,
+            scaled y ticks = false,
+            ybar,
+            xmin = -0.3,
+            xmax = 0.3,
+            bar width = 2.5em,
+            xtick = \empty,
+            grid = major,
+            width = .425\textwidth,
+            height = .35\textheight
+        }
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditional/.append style = {draw = blue, fill = blue!50},
-			swizzling/.append style = {draw = black, fill = black!25},
-			inMemory/.append style = {draw = red, fill = red!50},
-		}
-	}{
-		\tikzset{%
-			traditional/.append style = {draw = black, pattern = north east lines},
-			swizzling/.append style = {draw = black, pattern = north west lines},
-			inMemory/.append style = {draw = black, pattern = crosshatch},
-		}
-	}
+    \tikzset{%
+        traditional/.style = {very thick},
+        swizzling/.style = {very thick},
+        inMemory/.style = {very thick},
+    }
 
-	\newcommand{\loggingOffLockingOff}{
-		\begin{tikzpicture}
-			\begin{axis}
-				\addplot[traditional] coordinates
-					{(0, 39329.65)};
-				\addplot[swizzling] coordinates
-					{(0, 68071.71)};
-				\addplot[inMemory] coordinates
-					{(0, 68246.6)};
-			\end{axis}
-		\end{tikzpicture}
-	}
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditional/.append style = {draw = blue, fill = blue!50},
+            swizzling/.append style = {draw = black, fill = black!25},
+            inMemory/.append style = {draw = red, fill = red!50},
+        }
+    }{
+        \tikzset{%
+            traditional/.append style = {draw = black, pattern = north east lines},
+            swizzling/.append style = {draw = black, pattern = north west lines},
+            inMemory/.append style = {draw = black, pattern = crosshatch},
+        }
+    }
 
-	\newcommand{\loggingOnLockingOff}{
-		\begin{tikzpicture}
-			\begin{axis}
-				\addplot[traditional] coordinates
-					{(0, 36335.29)};
-				\addplot[swizzling] coordinates
-					{(0, 38911.17)};
-				\addplot[inMemory] coordinates
-					{(0, 40314.04)};
-			\end{axis}
-		\end{tikzpicture}
-	}
+    \newcommand{\loggingOffLockingOff}{
+        \begin{tikzpicture}
+            \begin{axis}
+                \addplot[traditional] coordinates
+                    {(0, 39329.65)};
+                \addplot[swizzling] coordinates
+                    {(0, 68071.71)};
+                \addplot[inMemory] coordinates
+                    {(0, 68246.6)};
+            \end{axis}
+        \end{tikzpicture}
+    }
 
-	\newcommand{\loggingOffLockingOn}{
-		\begin{tikzpicture}
-			\begin{axis}
-				\addplot[traditional] coordinates
-					{(0, 40476.30)};
-				\addplot[swizzling] coordinates
-					{(0, 54813.17)};
-				\addplot[inMemory] coordinates
-					{(0, 53828.79)};
-			\end{axis}
-		\end{tikzpicture}
-	}
+    \newcommand{\loggingOnLockingOff}{
+        \begin{tikzpicture}
+            \begin{axis}
+                \addplot[traditional] coordinates
+                    {(0, 36335.29)};
+                \addplot[swizzling] coordinates
+                    {(0, 38911.17)};
+                \addplot[inMemory] coordinates
+                    {(0, 40314.04)};
+            \end{axis}
+        \end{tikzpicture}
+    }
 
-	\newcommand{\loggingOnLockingOn}{
-		\begin{tikzpicture}
-			\begin{axis}[legend entries = {\tiny Traditional Buffer Pool, \tiny Pointer Swizzling Buffer Pool, \tiny In-Memory Database},
-					   legend pos = north west,
-					   legend style = {font = \tiny}]
-				\addplot[traditional] coordinates
-					{(0, 33408.87)};
-				\addplot[swizzling] coordinates
-					{(0, 35606.75)};
-				\addplot[inMemory] coordinates
-					{(0, 36267.70)};
-			\end{axis}
-		\end{tikzpicture}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\begin{tabular}{|c|c|c|}
+    \newcommand{\loggingOffLockingOn}{
+        \begin{tikzpicture}
+            \begin{axis}
+                \addplot[traditional] coordinates
+                    {(0, 40476.30)};
+                \addplot[swizzling] coordinates
+                    {(0, 54813.17)};
+                \addplot[inMemory] coordinates
+                    {(0, 53828.79)};
+            \end{axis}
+        \end{tikzpicture}
+    }
+
+    \newcommand{\loggingOnLockingOn}{
+        \begin{tikzpicture}
+            \begin{axis}[legend entries = {\tiny Traditional Buffer Pool, \tiny Pointer Swizzling Buffer Pool, \tiny In-Memory Database},
+                       legend pos = north west,
+                       legend style = {font = \tiny}]
+                \addplot[traditional] coordinates
+                    {(0, 33408.87)};
+                \addplot[swizzling] coordinates
+                    {(0, 35606.75)};
+                \addplot[inMemory] coordinates
+                    {(0, 36267.70)};
+            \end{axis}
+        \end{tikzpicture}
+    }
+
+    \begin{figure}[ht!]
+        \centering
+        \begin{tabular}{|c|c|c|}
 																																	   \hline
 													&	\textbf{Transactional Logging Off}		&	\textbf{Transactional Logging On}				\\ \hline
-			\rotatebox{90}{\textbf{Transactional Locking Off}} 	&	\scalebox{1}{\loggingOffLockingOff}		&	\scalebox{1}{\loggingOnLockingOff}				\\ \hline
-			\rotatebox{90}{\textbf{Transactional Locking On}} 	&	\scalebox{1}{\loggingOffLockingOn}		&	\scalebox{1}{\loggingOnLockingOn}				\\ \hline
-		\end{tabular}
+            \rotatebox{90}{\textbf{Transactional Locking Off}} 	&	\scalebox{1}{\loggingOffLockingOff}		&	\scalebox{1}{\loggingOnLockingOff}				\\ \hline
+            \rotatebox{90}{\textbf{Transactional Locking On}} 	&	\scalebox{1}{\loggingOffLockingOn}		&	\scalebox{1}{\loggingOnLockingOn}				\\ \hline
+        \end{tabular}
         \vspace{.5em}
-		\caption{Transaction throughput of the DBMS with a buffer pool, with a buffer pool and pointer swizzling and without a buffer pool running TPC-C as measured in \cite{Graefe:2014}. The database contains 100 warehouses and 12 terminals are running transactions concurrently. The buffer pool is larger than the database and the buffer pool is warmed up (initially filled). The system configuration can be found in \cite{Graefe:2014}.}
-		\label{fig:graefetpccperformance}
-	\end{figure}
+        \caption{Transaction throughput of the DBMS with a buffer pool, with a buffer pool and pointer swizzling and without a buffer pool running TPC-C as measured in \cite{Graefe:2014}. The database contains 100 warehouses and 12 terminals are running transactions concurrently. The buffer pool is larger than the database and the buffer pool is warmed up (initially filled). The system configuration can be found in \cite{Graefe:2014}.}
+        \label{fig:graefetpccperformance}
+    \end{figure}
 \end{@empty}
 
-	The performance evaluation in \cite{Graefe:2014} using TPC-C shows the overhead imposed by transactional locking and logging as shown in figure \ref{fig:graefetpccperformance}. They only considered the situation where the whole database resides in main memory during the complete benchmark. That is the ideal situation for pointer swizzling as the swizzling and unswizzling of pointers isn't required there.
-	
-	Therefore the transaction throughput of the DBMS with pointer swizzling in the buffer pool is higher than the one of the DBMS with traditional buffer pool. 
-	
+    The performance evaluation in \cite{Graefe:2014} using TPC-C shows the overhead imposed by transactional locking and logging as shown in figure \ref{fig:graefetpccperformance}. They only considered the situation where the whole database resides in main memory during the complete benchmark. That is the ideal situation for pointer swizzling as the swizzling and unswizzling of pointers isn't required there.
+
+    Therefore the transaction throughput of the DBMS with pointer swizzling in the buffer pool is higher than the one of the DBMS with traditional buffer pool.
+
 \subsection{Comparison with my Performance Evaluation}
 
-	The measured execution times of the \lstinline{fix()} method support the performance increase due to pointer swizzling for large buffer pools as proven by Goetz Graefe et al. in their read-only microbenchmark with disabled locking and logging. They achieved a performance growth of around \SI{80}{\percent} and I measured a higher execution time of the buffer pool without pointer swizzling of around \SI{46}{\percent} when the database doesn't encounter any page misses anymore. The difference of the increases might be the result of different configurations of the benchmark as both measurements only take the bufferpool into account.
-	
-	The slightly lower performance of the buffer pool that uses pointer swizzling to locate a page when the database doesn't fit in main memory is also supported by the measurements of the execution performance of the buffer pool.
-	
-	The performance decrease for small buffer pools shown in \cite{Graefe:2014} does also correspond to the measured execution times of \lstinline{fix()}. But as the reliability of the data presented in figure \ref{fig:operationperformance500M} isn't clear, this behavior couldn't be proven here.
-	
-	The TPC-C results presented by Goetz Graefe et al. are very similar to my results. My results of the transaction throughput and of the execution time of \lstinline{fix()} imply that a longer execution of the benchmark would have shown a slight advantage of pointer swizzling. But a longer execution of \emph{Zero} very often leads to deadlocks in the concurrency control and therefore there aren't reliable measurements for longer TPC-C runs.
+    The measured execution times of the \lstinline{fix()} method support the performance increase due to pointer swizzling for large buffer pools as proven by Goetz Graefe et al. in their read-only microbenchmark with disabled locking and logging. They achieved a performance growth of around \SI{80}{\percent} and I measured a higher execution time of the buffer pool without pointer swizzling of around \SI{46}{\percent} when the database doesn't encounter any page misses anymore. The difference of the increases might be the result of different configurations of the benchmark as both measurements only take the bufferpool into account.
+
+    The slightly lower performance of the buffer pool that uses pointer swizzling to locate a page when the database doesn't fit in main memory is also supported by the measurements of the execution performance of the buffer pool.
+
+    The performance decrease for small buffer pools shown in \cite{Graefe:2014} does also correspond to the measured execution times of \lstinline{fix()}. But as the reliability of the data presented in figure \ref{fig:operationperformance500M} isn't clear, this behavior couldn't be proven here.
+
+    The TPC-C results presented by Goetz Graefe et al. are very similar to my results. My results of the transaction throughput and of the execution time of \lstinline{fix()} imply that a longer execution of the benchmark would have shown a slight advantage of pointer swizzling. But a longer execution of \emph{Zero} very often leads to deadlocks in the concurrency control and therefore there aren't reliable measurements for longer TPC-C runs.
 
 \section{Conclusion}
 
-	Pointer swizzling is used to replace the hash table typically needed to locate a page in the buffer pool. When traversing an index structure, the pointers between the pages are page IDs that are needed to locate the pages on secondary storage. But when a page already resides in the buffer pool, the buffer pool frame index of the frame where the page is located, is needed to fix the page. For that purpose a hash table is usually used as it offers a constant search latency (in average). But the replacement of the page ID within the transient copies of the pages which form the index structure with the memory address could even improve the performance of a page hit. But the swizzling and unswizzling of the pointers (the replacement of the page ID with the frame index and back) adds some overhead during page misses. Therefore the performance advantage of pointer swizzling only holds for high hit rates and therefore large buffer pools.
+    Pointer swizzling is used to replace the hash table typically needed to locate a page in the buffer pool. When traversing an index structure, the pointers between the pages are page IDs that are needed to locate the pages on secondary storage. But when a page already resides in the buffer pool, the buffer pool frame index of the frame where the page is located, is needed to fix the page. For that purpose a hash table is usually used as it offers a constant search latency (in average). But the replacement of the page ID within the transient copies of the pages which form the index structure with the memory address could even improve the performance of a page hit. But the swizzling and unswizzling of the pointers (the replacement of the page ID with the frame index and back) adds some overhead during page misses. Therefore the performance advantage of pointer swizzling only holds for high hit rates and therefore large buffer pools.
 
-	The current status of the implementation of pointer swizzling in \emph{Zero}'s buffer pool doesn't increase the overall performance of the database system for complex benchmarks like TPC-C. The DBMS could benefit from it during simpler workloads like TPC-B. It could also be shown by measuring the time needed to fix a page, that a longer running database with a large buffer pool could also profit from pointer swizzling even when the workload is more complex than TPC-B. Typically a database system used by an OLTP application runs continuously and therefore the performance advantage of pointer swizzling can be expected following the results presented in this chapter. It could also be shown that the performance increase due to pointer swizzling measured by me equals the performance increase measured in \cite{Graefe:2014}.
-	
-	A few belated benchmark runs could confirm the expectation that a longer running database system could easily benefit from pointer swizzling in the buffer pool. The configuration used for the benchmark runs shown in figure \ref{fig:tpcclongruns} equals the one used in subsection \ref{subsub:tpcc} but the duration of each execution got increased to \SI{50}{\minute}. Pointer swizzling could increase the transaction throughput during the benchmarks by up to \SI{18}{\percent}. Further experiments with even longer durations are very time consuming but they might be worth it. Another alternative would be to implement a warmup for the buffer pool that starts the measurements after the benchmark filled the buffer pool (or after all pages got buffered).
+    The current status of the implementation of pointer swizzling in \emph{Zero}'s buffer pool doesn't increase the overall performance of the database system for complex benchmarks like TPC-C. The DBMS could benefit from it during simpler workloads like TPC-B. It could also be shown by measuring the time needed to fix a page, that a longer running database with a large buffer pool could also profit from pointer swizzling even when the workload is more complex than TPC-B. Typically a database system used by an OLTP application runs continuously and therefore the performance advantage of pointer swizzling can be expected following the results presented in this chapter. It could also be shown that the performance increase due to pointer swizzling measured by me equals the performance increase measured in \cite{Graefe:2014}.
+
+    A few belated benchmark runs could confirm the expectation that a longer running database system could easily benefit from pointer swizzling in the buffer pool. The configuration used for the benchmark runs shown in figure \ref{fig:tpcclongruns} equals the one used in subsection \ref{subsub:tpcc} but the duration of each execution got increased to \SI{50}{\minute}. Pointer swizzling could increase the transaction throughput during the benchmarks by up to \SI{18}{\percent}. Further experiments with even longer durations are very time consuming but they might be worth it. Another alternative would be to implement a warmup for the buffer pool that starts the measurements after the benchmark filled the buffer pool (or after all pages got buffered).
 
 \begin{@empty}
-	\tikzset{%
-		DBSize/.style = { - , line width = 0.625mm, dotted},
-		DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
-	}
+    \tikzset{%
+        DBSize/.style = { - , line width = 0.625mm, dotted},
+        DBSizeMark/.style = {draw = none, rotate = 90, anchor = south}
+    }
 
-	\nottoggle{bwmode}{
-		\tikzset{%
-			traditionalStyle/.style = {color = blue},
-			swizzlingStyle/.style = {color = black},
-			DBSize/.append style = {draw = purple},
-			DBSizeMark/.append style = {text = purple}
-		}
-	}{
-		\tikzset{%
-			traditionalStyle/.style = {color = black, mark = o},
-			swizzlingStyle/.style = {color = black, mark = 10-pointed star},
-			DBSize/.append style = {draw = black}
-		}
-	}
-	
-	\begin{figure}[ht!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
-				\begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
-						   xlabel near ticks,
-						   xmin = 0,
-						   xmax = 20000,
-						   xtick distance = {1000},
-						   xticklabels = {,0,1,...,20},
-						   scaled x ticks = false,
-						   minor x tick num = 9,
-						   ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
-						   ylabel near ticks,
-						   ymin = 0,
-						   ymax = 12000,
-						   ymode = normal,
-						   scaled y ticks = false,
-						   grid = major,
-						   legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
-						   legend pos = north west,
-						   width = 1.5\textwidth,
-						   height = .75\textheight]		
-					\draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 12000);
-					\node[DBSizeMark]			at (axis cs: 13215, 6000)		{initial database size};
+    \nottoggle{bwmode}{
+        \tikzset{%
+            traditionalStyle/.style = {color = blue},
+            swizzlingStyle/.style = {color = black},
+            DBSize/.append style = {draw = purple},
+            DBSizeMark/.append style = {text = purple}
+        }
+    }{
+        \tikzset{%
+            traditionalStyle/.style = {color = black, mark = o},
+            swizzlingStyle/.style = {color = black, mark = 10-pointed star},
+            DBSize/.append style = {draw = black}
+        }
+    }
 
-					\addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_noswizzling_long.csv};
-					\addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_swizzling_long.csv};
+    \begin{figure}[ht!]
+        \centering
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[spy using outlines =  {square, magnification = 3, connect spies}]
+                \begin{axis}[xlabel = {\ttfamily sm\_bufpoolsize $\left[\si{\gibi\byte}\right]$},
+                           xlabel near ticks,
+                           xmin = 0,
+                           xmax = 20000,
+                           xtick distance = {1000},
+                           xticklabels = {,0,1,...,20},
+                           scaled x ticks = false,
+                           minor x tick num = 9,
+                           ylabel = {$\text{average transaction throughput }\left[\si{\transactions\per\second}\right]$},
+                           ylabel near ticks,
+                           ymin = 0,
+                           ymax = 12000,
+                           ymode = normal,
+                           scaled y ticks = false,
+                           grid = major,
+                           legend entries = {Traditional Buffer Pool, Pointer Swizzling Buffer Pool},
+                           legend pos = north west,
+                           width = 1.5\textwidth,
+                           height = .75\textheight]
+                    \draw[DBSize]				(axis cs: 13215, 0)			edge		(axis cs: 13215, 12000);
+                    \node[DBSizeMark]			at (axis cs: 13215, 6000)		{initial database size};
 
-					\coordinate (magnifyglass) at (axis cs: 8500, 2700);				
+                    \addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_noswizzling_long.csv};
+                    \addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_swizzling_long.csv};
 
-					\draw[]	(axis cs: 2000, 0)	--	(axis cs: 2000, 3000)	--	(axis cs: 0, 3000);
-					\draw[]	(axis cs: 2000, 1500)	--	(axis cs: 4000, 2700);
-				\end{axis}
-					\node[] at (magnifyglass) {%
-						\begin{tikzpicture}[]
-							\begin{axis}[xmin = 0,
-									   xmax = 2000,
-									   xtick distance = {500},
-									   scaled x ticks = false,
-									   minor x tick num = 4,
-									   ymin = 0,
-									   ymax = 3000,
-									   ymode = normal,
-									   scaled y ticks = false,
-									   grid = major,
-									   width = .6\textwidth,
-									   height = .32\textheight,
-									   axis background/.style = {fill = white}]
-								\addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_noswizzling_long.csv};
-								\addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_swizzling_long.csv};
-							\end{axis}
-						\end{tikzpicture}%
-					};
-			\end{tikzpicture}
-		}
-		\caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-C. The database contains 100 warehouses and 8 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{20}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. Each configuration was executed once and each run lasted \SI{50}{\minute}.}
-		\label{fig:tpcclongruns}
-	\end{figure}
+                    \coordinate (magnifyglass) at (axis cs: 8500, 2700);
+
+                    \draw[]	(axis cs: 2000, 0)	--	(axis cs: 2000, 3000)	--	(axis cs: 0, 3000);
+                    \draw[]	(axis cs: 2000, 1500)	--	(axis cs: 4000, 2700);
+                \end{axis}
+                    \node[] at (magnifyglass) {%
+                        \begin{tikzpicture}[]
+                            \begin{axis}[xmin = 0,
+                                       xmax = 2000,
+                                       xtick distance = {500},
+                                       scaled x ticks = false,
+                                       minor x tick num = 4,
+                                       ymin = 0,
+                                       ymax = 3000,
+                                       ymode = normal,
+                                       scaled y ticks = false,
+                                       grid = major,
+                                       width = .6\textwidth,
+                                       height = .32\textheight,
+                                       axis background/.style = {fill = white}]
+                                \addplot[traditionalStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_noswizzling_long.csv};
+                                \addplot[swizzlingStyle] table[x = buffersize, y = averagequerythroughput] {./tex/data/tpcc_swizzling_long.csv};
+                            \end{axis}
+                        \end{tikzpicture}%
+                    };
+            \end{tikzpicture}
+        }
+        \caption{Transaction throughput of the DBMS with a buffer pool with and without pointer swizzling running TPC-C. The database contains 100 warehouses and 8 terminals are running transactions concurrently. The buffer size is \SIrange{0.05}{20}{\gibi\byte} and the buffer wasn't warmed up (benchmark started with an empty buffer pool). Random page replacement (\lstinline{latched}) was used. Each configuration was executed once and each run lasted \SI{50}{\minute}.}
+        \label{fig:tpcclongruns}
+    \end{figure}
 \end{@empty}
 
 \section{Future Work}
-	
-	The most important concern for future work is the investigation why the \emph{performance evaluation of the overall system} doesn't reflect the performance gain of pointer swizzling. Pointer swizzling significantly improves the performance of the fix operation but the influence on the overall performance of the DBMS was close to zero even in ideal test cases. Even the serial execution of transactions (one thread running the benchmark) which reduces the overhead due to concurrency control and the transfer of the transaction log to main memory doesn't show a different result.
-	
-	The current concept of pointer swizzling in the buffer pool only works when Foster B-trees are used in the layer of storage structures. But there are reasons to use \emph{other index structures}. The requirement to have only one pointer that points to a page makes the transfer of this technique to work with other index structures challenging. But actually the most commonly used index structures work with that restriction. Any B-tree structure that doesn't use a linked list on the leafs would work fine and many other tree index structures like R-trees borrow this feature from the B-trees. Pointer swizzling wouldn't work with secondary indexes. Secondary indexes offer additional pointers to records and therefore those would need to be swizzled and unswizzled as well. But as the secondary indexes cannot use the allocation of records to pages, a secondary index would contain one page pointer per record and therefore multiple pointers to one page. The access to a page without using the primary index used would also cause that a page can be accessed without the need to access its parent page. This would break the whole scheme of swizzling pointers from the root down to the leafs. A more sophisticated lazy pointer swizzling technique would be needed. A further characterization of the suitability of alternative index structures would be worth the effort even when B-tree structures like the Foster B-trees are the most commonly used ones.
-		
-	
+
+    The most important concern for future work is the investigation why the \emph{performance evaluation of the overall system} doesn't reflect the performance gain of pointer swizzling. Pointer swizzling significantly improves the performance of the fix operation but the influence on the overall performance of the DBMS was close to zero even in ideal test cases. Even the serial execution of transactions (one thread running the benchmark) which reduces the overhead due to concurrency control and the transfer of the transaction log to main memory doesn't show a different result.
+
+    The current concept of pointer swizzling in the buffer pool only works when Foster B-trees are used in the layer of storage structures. But there are reasons to use \emph{other index structures}. The requirement to have only one pointer that points to a page makes the transfer of this technique to work with other index structures challenging. But actually the most commonly used index structures work with that restriction. Any B-tree structure that doesn't use a linked list on the leafs would work fine and many other tree index structures like R-trees borrow this feature from the B-trees. Pointer swizzling wouldn't work with secondary indexes. Secondary indexes offer additional pointers to records and therefore those would need to be swizzled and unswizzled as well. But as the secondary indexes cannot use the allocation of records to pages, a secondary index would contain one page pointer per record and therefore multiple pointers to one page. The access to a page without using the primary index used would also cause that a page can be accessed without the need to access its parent page. This would break the whole scheme of swizzling pointers from the root down to the leafs. A more sophisticated lazy pointer swizzling technique would be needed. A further characterization of the suitability of alternative index structures would be worth the effort even when B-tree structures like the Foster B-trees are the most commonly used ones.
+
